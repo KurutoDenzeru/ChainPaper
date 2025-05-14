@@ -9,6 +9,7 @@
     "@tiptap/starter-kit": "^2.1.16",
     "@tiptap/vue-3": "^2.1.16",
     "crypto-js": "^4.2.0",
+    "lucide-vue-next": "^0.510.0",
     "nuxt": "^3.17.3",
     "tailwindcss": "^4.1.6",
     "vue": "^3.5.13",
