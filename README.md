@@ -1,43 +1,3 @@
-# Nuxt Minimal Starter
-
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
-
-## Setup
-
-Make sure to install dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
 # ChainPaper
 
 > Trustless whitepaper collaboration tool with authorship proofs, no backend required.
@@ -68,30 +28,10 @@ ChainPaper is a decentralized application for collaborative document editing wit
 
 ### Prerequisites
 
-- Node.js (v16 or later)
-- npm or yarn
-
-### Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
+- Node.js (v20 or later)
+- bun or pnpm
 
 The application will be available at http://localhost:3000
-
-### Building for Production
-
-```bash
-# Generate static files
-npm run generate
-
-# Preview production build
-npm run preview
-```
 
 ## How It Works
 
