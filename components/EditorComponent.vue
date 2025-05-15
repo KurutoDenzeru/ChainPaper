@@ -65,13 +65,13 @@
                   <Info class="w-4 h-4 mr-2" />
                   Document Information
                 </button>
-                <button @click="showDocumentHistory = !showDocumentHistory; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <button @click="showDocumentHistoryModal = true; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <History class="w-4 h-4 mr-2" />
-                  {{ showDocumentHistory ? 'Hide' : 'Show' }} Document History
+                  Document History
                 </button>
-                <button @click="showVerification = !showVerification; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <button @click="showVerificationModal = true; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <Shield class="w-4 h-4 mr-2" />
-                  {{ showVerification ? 'Hide' : 'Show' }} Verification
+                  Verification
                 </button>
               </div>
             </div>
@@ -88,6 +88,10 @@
                 <button @click="showUserGuideModal = true; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <HelpCircle class="w-4 h-4 mr-2" />
                   How to use ChainPaper
+                </button>
+                <button @click="showProjectInfoModal = true; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <Info class="w-4 h-4 mr-2" />
+                  About ChainPaper
                 </button>
               </div>
             </div>
@@ -304,8 +308,15 @@
       </div>
     </div>
     
-    <!-- Document History Component (toggleable) -->
-    <DocumentHistory v-if="showDocumentHistory" />
+    <!-- Modals -->
+    <DocumentHistoryModal v-model:isOpen="showDocumentHistoryModal" />
+    
+    <VerificationModal 
+      v-model:isOpen="showVerificationModal"
+      :verificationStatus="verificationStatus"
+      :verificationMessage="verificationMessage"
+      @verify="verifyDocument"
+    />
     
     <!-- User Guide Modal -->
     <ModalComponent
@@ -313,8 +324,13 @@
       title="How to Use ChainPaper"
       :showFooter="false"
     >
-      <UserGuide />
+      <div @click.stop>
+        <UserGuide />
+      </div>
     </ModalComponent>
+    
+    <!-- Project Info Modal -->
+    <ProjectInfoModal v-model:isOpen="showProjectInfoModal" />
   </div>
 </template>
 
@@ -330,10 +346,12 @@ import FontSize from '@tiptap/extension-font-size';
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 import { IndexeddbPersistence } from 'y-indexeddb';
-import DocumentHistory from './DocumentHistory.vue';
 import documentStorage from '../utils/documentStorage.ts';
 import ModalComponent from './ModalComponent.vue';
 import UserGuide from './UserGuide.vue';
+import DocumentHistoryModal from './modals/DocumentHistoryModal.vue';
+import VerificationModal from './modals/VerificationModal.vue';
+import ProjectInfoModal from './modals/ProjectInfoModal.vue';
 import { 
   Bold, Italic, Strikethrough, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Minus, Undo, Redo,
@@ -354,9 +372,10 @@ const verificationStatus = ref(null);
 const verificationMessage = ref('');
 
 // UI state
-const showDocumentHistory = ref(false);
-const showVerification = ref(false);
+const showDocumentHistoryModal = ref(false);
+const showVerificationModal = ref(false);
 const showUserGuideModal = ref(false);
+const showProjectInfoModal = ref(false);
 const activeMenu = ref(null); // Track which menu is currently open
 
 // Yjs document setup

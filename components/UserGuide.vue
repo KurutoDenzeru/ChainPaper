@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white shadow rounded-lg p-6 mt-6">
+  <div class="bg-white shadow rounded-lg p-6 mt-6" @click.stop>
     <h2 class="text-xl font-semibold text-gray-800 mb-4">How to Use ChainPaper</h2>
     
     <div class="space-y-4 text-gray-700">
