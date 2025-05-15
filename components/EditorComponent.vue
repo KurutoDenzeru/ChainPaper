@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @click="handleOutsideClick">
     <!-- Google Docs-like top menubar -->
     <div class="bg-white border-gray-200">
       <!-- Main menubar -->
@@ -7,53 +7,85 @@
         <div class="flex items-center">
           <h2 class="text-lg font-medium text-gray-800 mr-4">ChainPaper</h2>
           <div class="flex space-x-1">
-            <div class="relative group">
-              <button class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100">File</button>
-              <div class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 hidden group-hover:block" @mouseenter="e => e.currentTarget.classList.add('block')" @mouseleave="e => e.currentTarget.classList.remove('block')" onclick="event.stopPropagation()">
-                <button @click="saveDocument" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+            <div class="relative">
+              <button 
+                class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100 menu-trigger" 
+                @click.stop="activeMenu === 'file' ? activeMenu = null : activeMenu = 'file'"
+              >File</button>
+              <div 
+                v-show="activeMenu === 'file'" 
+                class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 menu-dropdown"
+                @click.stop
+              >
+                <button @click="saveDocument; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <Save class="w-4 h-4 mr-2" />
                   Save
                 </button>
-                <button @click="exportDocument" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <button @click="exportDocument; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <Download class="w-4 h-4 mr-2" />
                   Export
                 </button>
-                <button @click="importDocument" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <button @click="importDocument; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <Upload class="w-4 h-4 mr-2" />
                   Import
                 </button>
               </div>
             </div>
-            <div class="relative group">
-              <button class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100">Edit</button>
-              <div class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 hidden group-hover:block" @mouseenter="e => e.currentTarget.classList.add('block')" @mouseleave="e => e.currentTarget.classList.remove('block')" onclick="event.stopPropagation()">
-                <button @click="editor?.chain().focus().undo().run()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+            <div class="relative">
+              <button 
+                class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100 menu-trigger"
+                @click.stop="activeMenu === 'edit' ? activeMenu = null : activeMenu = 'edit'"
+              >Edit</button>
+              <div 
+                v-show="activeMenu === 'edit'" 
+                class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 menu-dropdown"
+                @click.stop
+              >
+                <button @click="editor?.chain().focus().undo().run(); activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <Undo class="w-4 h-4 mr-2" />
                   Undo
                 </button>
-                <button @click="editor?.chain().focus().redo().run()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <button @click="editor?.chain().focus().redo().run(); activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <Redo class="w-4 h-4 mr-2" />
                   Redo
                 </button>
               </div>
             </div>
-            <div class="relative group">
-              <button class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100">View</button>
-              <div class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 hidden group-hover:block" @mouseenter="e => e.currentTarget.classList.add('block')" @mouseleave="e => e.currentTarget.classList.remove('block')" onclick="event.stopPropagation()">
-                <button @click="showDocumentHistory = !showDocumentHistory" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+            <div class="relative">
+              <button 
+                class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100 menu-trigger"
+                @click.stop="activeMenu === 'view' ? activeMenu = null : activeMenu = 'view'"
+              >View</button>
+              <div 
+                v-show="activeMenu === 'view'" 
+                class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 menu-dropdown"
+                @click.stop
+              >
+                <button @click="editor?.chain().focus().setTextSelection(editor.state.selection.from).run(); activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <Info class="w-4 h-4 mr-2" />
+                  Document Information
+                </button>
+                <button @click="showDocumentHistory = !showDocumentHistory; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <History class="w-4 h-4 mr-2" />
                   {{ showDocumentHistory ? 'Hide' : 'Show' }} Document History
                 </button>
-                <button @click="showVerification = !showVerification" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <button @click="showVerification = !showVerification; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <Shield class="w-4 h-4 mr-2" />
                   {{ showVerification ? 'Hide' : 'Show' }} Verification
                 </button>
               </div>
             </div>
-            <div class="relative group">
-              <button class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100">Help</button>
-              <div class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 hidden group-hover:block" @mouseenter="e => e.currentTarget.classList.add('block')" @mouseleave="e => e.currentTarget.classList.remove('block')" onclick="event.stopPropagation()">
-                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+            <div class="relative">
+              <button 
+                class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100 menu-trigger"
+                @click.stop="activeMenu === 'help' ? activeMenu = null : activeMenu = 'help'"
+              >Help</button>
+              <div 
+                v-show="activeMenu === 'help'" 
+                class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 menu-dropdown"
+                @click.stop
+              >
+                <button @click="showUserGuideModal = true; activeMenu = null" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                   <HelpCircle class="w-4 h-4 mr-2" />
                   How to use ChainPaper
                 </button>
@@ -179,6 +211,26 @@
           >
             <ListOrdered class="w-4 h-4 text-gray-700" />
           </button>
+          <button 
+            @click="editor.chain().focus().sinkListItem('listItem').run()"
+            :disabled="!editor.can().sinkListItem('listItem')"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none disabled:opacity-50"
+            title="Indent List"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-700">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+          <button 
+            @click="editor.chain().focus().liftListItem('listItem').run()"
+            :disabled="!editor.can().liftListItem('listItem')"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none disabled:opacity-50"
+            title="Outdent List"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-700">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
         </div>
         <span class="border-r border-gray-300 h-6 mx-2"></span>
         <div class="flex items-center space-x-1">
@@ -254,11 +306,20 @@
     
     <!-- Document History Component (toggleable) -->
     <DocumentHistory v-if="showDocumentHistory" />
+    
+    <!-- User Guide Modal -->
+    <ModalComponent
+      v-model:isOpen="showUserGuideModal"
+      title="How to Use ChainPaper"
+      :showFooter="false"
+    >
+      <UserGuide />
+    </ModalComponent>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, inject } from 'vue';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Collaboration from '@tiptap/extension-collaboration';
@@ -271,11 +332,16 @@ import { WebrtcProvider } from 'y-webrtc';
 import { IndexeddbPersistence } from 'y-indexeddb';
 import DocumentHistory from './DocumentHistory.vue';
 import documentStorage from '../utils/documentStorage.ts';
+import ModalComponent from './ModalComponent.vue';
+import UserGuide from './UserGuide.vue';
 import { 
   Bold, Italic, Strikethrough, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Minus, Undo, Redo,
-  Save, Download, Upload, X, HelpCircle, History, Shield
+  Save, Download, Upload, X, HelpCircle, History, Shield, Info
 } from 'lucide-vue-next';
+
+// Get toast service
+const toast = inject('toast');
 
 // Document state
 const editor = ref(null);
@@ -290,11 +356,21 @@ const verificationMessage = ref('');
 // UI state
 const showDocumentHistory = ref(false);
 const showVerification = ref(false);
+const showUserGuideModal = ref(false);
+const activeMenu = ref(null); // Track which menu is currently open
 
 // Yjs document setup
 const ydoc = new Y.Doc();
 const provider = ref(null);
 const persistence = ref(null);
+
+// Handle clicks outside of menus to close them
+const handleOutsideClick = (event) => {
+  // If we have an active menu and the click target is not inside a menu button or dropdown
+  if (activeMenu.value && !event.target.closest('.menu-trigger') && !event.target.closest('.menu-dropdown')) {
+    activeMenu.value = null;
+  }
+};
 
 // Initialize editor with collaboration features
 onMounted(async () => {
@@ -438,10 +514,10 @@ const saveDocument = async () => {
   
   try {
     await documentStorage.saveDocument(documentData);
-    alert('Document saved successfully!');
+    toast.success('Document saved successfully!');
   } catch (error) {
     console.error('Error saving document:', error);
-    alert('Failed to save document.');
+    toast.error('Failed to save document.');
   }
 };
 
@@ -453,7 +529,7 @@ const exportDocument = () => {
   const exportData = documentStorage.exportWithProof();
   
   if (!exportData) {
-    alert('No document to export. Please save the document first.');
+    toast.error('No document to export. Please save the document first.');
     return;
   }
   
@@ -466,6 +542,8 @@ const exportDocument = () => {
   linkElement.setAttribute('href', dataUri);
   linkElement.setAttribute('download', exportFileDefaultName);
   linkElement.click();
+  
+  toast.success('Document exported successfully!');
 };
 
 // Import document from JSON file
@@ -486,7 +564,7 @@ const handleFileUpload = async (event) => {
     
     // Validate the imported data structure
     if (!importData.document || !importData.merkleRoot || !importData.history) {
-      alert('Invalid document format. Please upload a valid ChainPaper export file.');
+      toast.error('Invalid document format. Please upload a valid ChainPaper export file.');
       return;
     }
     
@@ -504,14 +582,14 @@ const handleFileUpload = async (event) => {
       const importSuccess = documentStorage.importDocument(importData);
       
       if (importSuccess) {
-        alert('Document imported successfully!');
+        toast.success('Document imported successfully!');
       } else {
-        alert('There was an issue importing the document. Some data may not have been imported correctly.');
+        toast.error('There was an issue importing the document. Some data may not have been imported correctly.');
       }
     }
   } catch (error) {
     console.error('Error importing document:', error);
-    alert('Failed to import document. Please check the file format.');
+    toast.error('Failed to import document. Please check the file format.');
   }
   
   // Reset file input
@@ -533,6 +611,7 @@ const verifyDocument = async () => {
   if (!currentHash.value) {
     verificationStatus.value = 'failed';
     verificationMessage.value = 'No document hash available. Please save the document first.';
+    toast.error('No document hash available. Please save the document first.');
     return;
   }
   
@@ -545,6 +624,7 @@ const verifyDocument = async () => {
     if (generatedHash !== currentHash.value) {
       verificationStatus.value = 'failed';
       verificationMessage.value = 'Document has been modified since last save.';
+      toast.error('Document has been modified since last save.');
       return;
     }
     
@@ -554,102 +634,18 @@ const verifyDocument = async () => {
     if (verificationResult.verified) {
       verificationStatus.value = 'verified';
       verificationMessage.value = `${verificationResult.message} Author: ${verificationResult.author}`;
+      toast.success(`${verificationResult.message} Author: ${verificationResult.author}`);
     } else {
       verificationStatus.value = 'failed';
       verificationMessage.value = verificationResult.message;
+      toast.error(verificationResult.message);
     }
   } catch (error) {
     console.error('Error verifying document:', error);
     verificationStatus.value = 'failed';
     verificationMessage.value = 'Error verifying document: ' + error.message;
+    toast.error('Error verifying document: ' + error.message);
   }
 };
 
 </script>
-
-<style>
-/* Google Docs-like editor styling */
-.editor-content {
-  font-family: 'Arial', sans-serif;
-  line-height: 1.5;
-  color: #333;
-  max-width: 8.5in;
-  margin: 0 auto;
-  background-color: white;
-  min-height: calc(100vh - 120px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.editor-content .ProseMirror {
-  padding: 1in 1in;
-  min-height: 11in;
-}
-
-.editor-content p {
-  margin-bottom: 0.75rem;
-}
-
-.editor-content h1 {
-  font-size: 1.8rem;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: #1a1a1a;
-}
-
-.editor-content h2 {
-  font-size: 1.5rem;
-  margin-top: 1.2rem;
-  margin-bottom: 0.6rem;
-  color: #1a1a1a;
-}
-
-.editor-content h3 {
-  font-size: 1.2rem;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-  color: #1a1a1a;
-}
-
-.editor-content ul,
-.editor-content ol {
-  padding-left: 1.5rem;
-  margin-bottom: 0.75rem;
-}
-
-.editor-content blockquote {
-  border-left: 3px solid #ddd;
-  padding-left: 1rem;
-  color: #666;
-  font-style: italic;
-  margin: 1rem 0;
-}
-
-.editor-content hr {
-  border: none;
-  border-top: 1px solid #ddd;
-  margin: 1.5rem 0;
-}
-
-/* Toolbar button styling */
-.editor-content .ProseMirror:focus {
-  outline: none;
-}
-
-.ProseMirror p.is-editor-empty:first-child::before {
-  content: attr(data-placeholder);
-  float: left;
-  color: #adb5bd;
-  pointer-events: none;
-  height: 0;
-}
-
-/* Google Docs-like page styling */
-body {
-  background-color: #f8f9fa;
-}
-
-/* Dropdown menu styling */
-.group:hover .group-hover\:block {
-  display: block;
-}
-</style>

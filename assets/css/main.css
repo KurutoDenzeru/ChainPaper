@@ -63,3 +63,88 @@
   overflow-x: auto;
   margin: 1rem 0;
 }
+
+/* Google Docs-like editor styling */
+.editor-content {
+  font-family: 'Arial', sans-serif;
+  line-height: 1.5;
+  color: #333;
+  max-width: 8.5in;
+  margin: 0 auto;
+  background-color: white;
+  min-height: calc(100vh - 120px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.editor-content .ProseMirror {
+  padding: 1in 1in;
+  min-height: 11in;
+}
+
+.editor-content p {
+  margin-bottom: 0.75rem;
+}
+
+.editor-content h1 {
+  font-size: 1.8rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #1a1a1a;
+}
+
+.editor-content h2 {
+  font-size: 1.5rem;
+  margin-top: 1.2rem;
+  margin-bottom: 0.6rem;
+  color: #1a1a1a;
+}
+
+.editor-content h3 {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #1a1a1a;
+}
+
+.editor-content ul,
+.editor-content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.editor-content blockquote {
+  border-left: 3px solid #ddd;
+  padding-left: 1rem;
+  color: #666;
+  font-style: italic;
+  margin: 1rem 0;
+}
+
+.editor-content hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 1.5rem 0;
+}
+
+/* Toolbar button styling */
+.editor-content .ProseMirror:focus {
+  outline: none;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+/* Google Docs-like page styling */
+body {
+  background-color: #f8f9fa;
+}
+
+/* Dropdown menu styling */
+.group:hover .group-hover\:block {
+  display: block;
+}

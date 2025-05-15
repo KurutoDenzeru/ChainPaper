@@ -8,8 +8,9 @@
     </header> -->
     <main class="max-w-full mx-auto">
       <EditorComponent />
-      <!-- <UserGuide /> -->
     </main>
+    <!-- Toast Manager for notifications -->
+    <ToastManager />
     <footer class="border-t border-gray-200 mt-8">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center">
         <div class="flex space-x-4">
@@ -35,6 +36,7 @@
 <script setup>
 import EditorComponent from './components/EditorComponent.vue';
 import UserGuide from './components/UserGuide.vue';
+import ToastManager from './components/ToastManager.vue';
 import { Instagram, Github, Linkedin  } from 'lucide-vue-next';
 
 
