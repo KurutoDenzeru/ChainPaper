@@ -3,6 +3,9 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.6",
     "@tiptap/extension-collaboration": "^2.1.16",
+    "@tiptap/extension-font-family": "^2.12.0",
+    "@tiptap/extension-font-size": "^3.0.0-next.3",
+    "@tiptap/extension-underline": "^2.12.0",
     "@tiptap/pm": "^2.1.16",
     "@tiptap/starter-kit": "^2.1.16",
     "@tiptap/vue-3": "^2.1.16",

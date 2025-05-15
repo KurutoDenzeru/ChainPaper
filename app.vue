@@ -8,7 +8,7 @@
     </header>
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <EditorComponent />
-      <UserGuide />
+      <!-- <UserGuide /> -->
     </main>
     <footer class="border-t border-gray-200 mt-8">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center">
@@ -36,4 +36,14 @@
 import EditorComponent from './components/EditorComponent.vue';
 import UserGuide from './components/UserGuide.vue';
 import { Instagram, Github, Linkedin  } from 'lucide-vue-next';
+
+
+useHead({
+  title: 'ChainPaper',
+  meta: [
+    { name: 'description', content: 'Trustless whitepaper collaboration tool with authorship proofs' },
+    { name: 'keywords', content: 'whitepaper, collaboration, authorship, proofs' },
+    { name: 'author', content: 'ChainPaper' }
+  ]
+})
 </script>

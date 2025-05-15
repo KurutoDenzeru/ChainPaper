@@ -1,21 +1,67 @@
 <template>
   <div>
-    <div class="bg-white shadow rounded-lg p-6">
-      <div class="mb-4 flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-800">Document Editor</h2>
-        <div class="flex space-x-2">
-          <button @click="saveDocument" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-            <Save class="w-4 h-4 inline-block mr-1" />
-            Save
-          </button>
-          <button @click="exportDocument" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-            <Download class="w-4 h-4 inline-block mr-1" />
-            Export
-          </button>
-          <button @click="importDocument" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-            <Upload class="w-4 h-4 inline-block mr-1" />
-            Import
-          </button>
+    <!-- Google Docs-like top menubar -->
+    <div class="bg-white shadow border-b border-gray-200">
+      <!-- Main menubar -->
+      <div class="flex items-center px-2 py-1 border-b border-gray-200">
+        <div class="flex items-center">
+          <h2 class="text-lg font-medium text-gray-800 mr-4">ChainPaper</h2>
+          <div class="flex space-x-1">
+            <div class="relative group">
+              <button class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100">File</button>
+              <div class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 hidden group-hover:block" @mouseenter="e => e.currentTarget.classList.add('block')" @mouseleave="e => e.currentTarget.classList.remove('block')" onclick="event.stopPropagation()">
+                <button @click="saveDocument" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <Save class="w-4 h-4 mr-2" />
+                  Save
+                </button>
+                <button @click="exportDocument" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <Download class="w-4 h-4 mr-2" />
+                  Export
+                </button>
+                <button @click="importDocument" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <Upload class="w-4 h-4 mr-2" />
+                  Import
+                </button>
+              </div>
+            </div>
+            <div class="relative group">
+              <button class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100">Edit</button>
+              <div class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 hidden group-hover:block" @mouseenter="e => e.currentTarget.classList.add('block')" @mouseleave="e => e.currentTarget.classList.remove('block')" onclick="event.stopPropagation()">
+                <button @click="editor?.chain().focus().undo().run()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <Undo class="w-4 h-4 mr-2" />
+                  Undo
+                </button>
+                <button @click="editor?.chain().focus().redo().run()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <Redo class="w-4 h-4 mr-2" />
+                  Redo
+                </button>
+              </div>
+            </div>
+            <div class="relative group">
+              <button class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100">View</button>
+              <div class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 hidden group-hover:block" @mouseenter="e => e.currentTarget.classList.add('block')" @mouseleave="e => e.currentTarget.classList.remove('block')" onclick="event.stopPropagation()">
+                <button @click="showDocumentHistory = !showDocumentHistory" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <History class="w-4 h-4 mr-2" />
+                  {{ showDocumentHistory ? 'Hide' : 'Show' }} Document History
+                </button>
+                <button @click="showVerification = !showVerification" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <Shield class="w-4 h-4 mr-2" />
+                  {{ showVerification ? 'Hide' : 'Show' }} Verification
+                </button>
+              </div>
+            </div>
+            <div class="relative group">
+              <button class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100">Help</button>
+              <div class="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 hidden group-hover:block" @mouseenter="e => e.currentTarget.classList.add('block')" @mouseleave="e => e.currentTarget.classList.remove('block')" onclick="event.stopPropagation()">
+                <button class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <HelpCircle class="w-4 h-4 mr-2" />
+                  How to use ChainPaper
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ml-auto flex items-center space-x-2">
           <input 
             type="file" 
             ref="fileInput" 
@@ -26,137 +72,188 @@
         </div>
       </div>
       
-      <!-- Rich Text Editor Toolbar -->
-      <div v-if="editor" class="border-b border-gray-300 pb-2 mb-2 flex flex-wrap gap-1">
+      <!-- Formatting toolbar (Google Docs style) -->
+      <div v-if="editor" class="flex items-center px-4 py-1 flex-wrap gap-2 border-b border-gray-200 bg-gray-50">
+        <div class="flex items-center space-x-1 mr-2">
+          <select 
+            class="text-sm border border-gray-300 rounded px-2 py-1 bg-white"
+            @change="e => editor.chain().focus().setFontFamily(e.target.value).run()"
+            :value="editor.getAttributes('textStyle').fontFamily"
+          >
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana">Verdana</option>
+          </select>
+        </div>
+        <div class="flex items-center space-x-1 mr-2">
+          <select 
+            class="text-sm border border-gray-300 rounded px-2 py-1 bg-white"
+            @change="e => editor.chain().focus().setFontSize(e.target.value + 'px').run()"
+            :value="editor.getAttributes('textStyle').fontSize?.replace('px', '') || '14'"
+          >
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="14">14</option>
+            <option value="18">18</option>
+            <option value="24">24</option>
+            <option value="36">36</option>
+          </select>
+        </div>
+        <span class="border-r border-gray-300 h-6 mx-2"></span>
         <button 
           @click="editor.chain().focus().toggleBold().run()"
           :class="{ 'bg-gray-200': editor.isActive('bold') }"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+          class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
           title="Bold"
         >
-          <Bold class="w-5 h-5" />
+          <Bold class="w-4 h-4 text-gray-700" />
         </button>
         <button 
           @click="editor.chain().focus().toggleItalic().run()"
           :class="{ 'bg-gray-200': editor.isActive('italic') }"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+          class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
           title="Italic"
         >
-          <Italic class="w-5 h-5" />
+          <Italic class="w-4 h-4 text-gray-700" />
         </button>
         <button 
           @click="editor.chain().focus().toggleStrike().run()"
           :class="{ 'bg-gray-200': editor.isActive('strike') }"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+          class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
           title="Strikethrough"
         >
-          <Strikethrough class="w-5 h-5" />
-        </button>
-        <span class="border-r border-gray-300 mx-1"></span>
-        <button 
-          @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
-          :class="{ 'bg-gray-200': editor.isActive('heading', { level: 1 }) }"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Heading 1"
-        >
-          <Heading1 class="w-5 h-5" />
+          <Strikethrough class="w-4 h-4 text-gray-700" />
         </button>
         <button 
-          @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
-          :class="{ 'bg-gray-200': editor.isActive('heading', { level: 2 }) }"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Heading 2"
+          @click="editor.chain().focus().toggleUnderline().run()"
+          :class="{ 'bg-gray-200': editor.isActive('underline') }"
+          class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+          title="Underline"
         >
-          <Heading2 class="w-5 h-5" />
+          <UnderlineIcon class="w-4 h-4 text-gray-700" />
         </button>
-        <button 
-          @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
-          :class="{ 'bg-gray-200': editor.isActive('heading', { level: 3 }) }"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Heading 3"
-        >
-          <Heading3 class="w-5 h-5" />
-        </button>
-        <span class="border-r border-gray-300 mx-1"></span>
-        <button 
-          @click="editor.chain().focus().toggleBulletList().run()"
-          :class="{ 'bg-gray-200': editor.isActive('bulletList') }"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Bullet List"
-        >
-          <List class="w-5 h-5" />
-        </button>
-        <button 
-          @click="editor.chain().focus().toggleOrderedList().run()"
-          :class="{ 'bg-gray-200': editor.isActive('orderedList') }"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Ordered List"
-        >
-          <ListOrdered class="w-5 h-5" />
-        </button>
-        <span class="border-r border-gray-300 mx-1"></span>
-        <button 
-          @click="editor.chain().focus().toggleBlockquote().run()"
-          :class="{ 'bg-gray-200': editor.isActive('blockquote') }"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Blockquote"
-        >
-          <Quote class="w-5 h-5" />
-        </button>
-        <button 
-          @click="editor.chain().focus().setHorizontalRule().run()"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Horizontal Rule"
-        >
-          <Minus class="w-5 h-5" />
-        </button>
-        <span class="border-r border-gray-300 mx-1"></span>
-        <button 
-          @click="editor.chain().focus().undo().run()"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Undo"
-        >
-          <Undo class="w-5 h-5" />
-        </button>
-        <button 
-          @click="editor.chain().focus().redo().run()"
-          class="p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-          title="Redo"
-        >
-          <Redo class="w-5 h-5" />
-        </button>
+        <span class="border-r border-gray-300 h-6 mx-2"></span>
+        <div class="flex items-center space-x-1">
+          <button 
+            @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
+            :class="{ 'bg-gray-200': editor.isActive('heading', { level: 1 }) }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Heading 1"
+          >
+            <Heading1 class="w-4 h-4 text-gray-700" />
+          </button>
+          <button 
+            @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
+            :class="{ 'bg-gray-200': editor.isActive('heading', { level: 2 }) }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Heading 2"
+          >
+            <Heading2 class="w-4 h-4 text-gray-700" />
+          </button>
+          <button 
+            @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
+            :class="{ 'bg-gray-200': editor.isActive('heading', { level: 3 }) }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Heading 3"
+          >
+            <Heading3 class="w-4 h-4 text-gray-700" />
+          </button>
+        </div>
+        <span class="border-r border-gray-300 h-6 mx-2"></span>
+        <div class="flex items-center space-x-1">
+          <button 
+            @click="editor.chain().focus().toggleBulletList().run()"
+            :class="{ 'bg-gray-200': editor.isActive('bulletList') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Bullet List"
+          >
+            <List class="w-4 h-4 text-gray-700" />
+          </button>
+          <button 
+            @click="editor.chain().focus().toggleOrderedList().run()"
+            :class="{ 'bg-gray-200': editor.isActive('orderedList') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Ordered List"
+          >
+            <ListOrdered class="w-4 h-4 text-gray-700" />
+          </button>
+        </div>
+        <span class="border-r border-gray-300 h-6 mx-2"></span>
+        <div class="flex items-center space-x-1">
+          <button 
+            @click="editor.chain().focus().toggleBlockquote().run()"
+            :class="{ 'bg-gray-200': editor.isActive('blockquote') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Blockquote"
+          >
+            <Quote class="w-4 h-4 text-gray-700" />
+          </button>
+          <button 
+            @click="editor.chain().focus().setHorizontalRule().run()"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Horizontal Rule"
+          >
+            <Minus class="w-4 h-4 text-gray-700" />
+          </button>
+        </div>
+        <span class="border-r border-gray-300 h-6 mx-2"></span>
+        <div class="flex items-center space-x-1">
+          <button 
+            @click="editor.chain().focus().undo().run()"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Undo"
+          >
+            <Undo class="w-4 h-4 text-gray-700" />
+          </button>
+          <button 
+            @click="editor.chain().focus().redo().run()"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Redo"
+          >
+            <Redo class="w-4 h-4 text-gray-700" />
+          </button>
+        </div>
       </div>
       
-      <div class="border border-gray-300 rounded-lg p-4 min-h-[400px] mb-4 bg-white">
+      <!-- Main document editor area (Google Docs style) -->
+      <div class="border-0 min-h-[calc(100vh-120px)] bg-gray-100 py-8 px-4">
         <!-- TipTap Editor will be mounted here -->
         <div v-if="editor" class="prose max-w-none editor-content">
           <editor-content :editor="editor" />
         </div>
-        <div v-else class="flex justify-center items-center h-64">
+        <div v-else class="flex justify-center items-center h-64 bg-white max-w-8.5in mx-auto shadow">
           <p class="text-gray-500">Loading editor...</p>
-        </div>
-      </div>
-      
-      <div class="bg-gray-50 p-4 rounded-lg">
-        <h3 class="text-md font-medium text-gray-700 mb-2">Document Verification</h3>
-        <div class="text-sm text-gray-600">
-          <p>Current document hash: {{ currentHash || 'Not generated yet' }}</p>
-          <p>Last edited: {{ lastEdited || 'Not edited yet' }}</p>
-          <p>Contributors: {{ contributors.length || 0 }}</p>
-          <div class="mt-3 flex items-center">
-            <button @click="verifyDocument" class="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-              Verify Authorship
-            </button>
-            <span v-if="verificationStatus" class="ml-3 text-sm" :class="{'text-green-600': verificationStatus === 'verified', 'text-red-600': verificationStatus === 'failed'}">
-              {{ verificationMessage }}
-            </span>
-          </div>
         </div>
       </div>
     </div>
     
-    <!-- Document History Component -->
-    <DocumentHistory />
+    <!-- Document Verification Panel (toggleable) -->
+    <div v-if="showVerification" class="bg-white shadow rounded-lg p-6 mt-4 border border-gray-200">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-md font-medium text-gray-700">Document Verification</h3>
+        <button @click="showVerification = false" class="text-gray-500 hover:text-gray-700">
+          <X class="w-4 h-4" />
+        </button>
+      </div>
+      <div class="text-sm text-gray-600">
+        <p>Current document hash: {{ currentHash || 'Not generated yet' }}</p>
+        <p>Last edited: {{ lastEdited || 'Not edited yet' }}</p>
+        <p>Contributors: {{ contributors.length || 0 }}</p>
+        <div class="mt-3 flex items-center">
+          <button @click="verifyDocument" class="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+            Verify Authorship
+          </button>
+          <span v-if="verificationStatus" class="ml-3 text-sm" :class="{'text-green-600': verificationStatus === 'verified', 'text-red-600': verificationStatus === 'failed'}">
+            {{ verificationMessage }}
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Document History Component (toggleable) -->
+    <DocumentHistory v-if="showDocumentHistory" />
   </div>
 </template>
 
@@ -165,15 +262,19 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Collaboration from '@tiptap/extension-collaboration';
+import Underline from '@tiptap/extension-underline';
+import TextStyle from '@tiptap/extension-text-style';
+import FontFamily from '@tiptap/extension-font-family';
+import FontSize from '@tiptap/extension-font-size';
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 import { IndexeddbPersistence } from 'y-indexeddb';
 import DocumentHistory from './DocumentHistory.vue';
 import documentStorage from '../utils/documentStorage.ts';
 import { 
-  Bold, Italic, Strikethrough, Heading1, Heading2, Heading3,
+  Bold, Italic, Strikethrough, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Minus, Undo, Redo,
-  Save, Download, Upload
+  Save, Download, Upload, X, HelpCircle, History, Shield
 } from 'lucide-vue-next';
 
 // Document state
@@ -185,6 +286,10 @@ const username = ref('Anonymous User-' + Math.floor(Math.random() * 1000));
 const fileInput = ref(null);
 const verificationStatus = ref(null);
 const verificationMessage = ref('');
+
+// UI state
+const showDocumentHistory = ref(false);
+const showVerification = ref(false);
 
 // Yjs document setup
 const ydoc = new Y.Doc();
@@ -222,8 +327,14 @@ onMounted(async () => {
         heading: {
           levels: [1, 2, 3],
         },
-        bulletList: true,
-        orderedList: true,
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: true,
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: true,
+        },
         blockquote: true,
         horizontalRule: true,
         strike: true,
@@ -231,6 +342,10 @@ onMounted(async () => {
         italic: true,
         history: true,
       }),
+      Underline,
+      TextStyle,
+      FontFamily,
+      FontSize,
       Collaboration.configure({
         document: ydoc,
       }),
@@ -253,6 +368,9 @@ onMounted(async () => {
   // Add keyboard shortcuts for common formatting actions
   editor.value.registerCommand('Mod-b', () => editor.value.chain().focus().toggleBold().run());
   editor.value.registerCommand('Mod-i', () => editor.value.chain().focus().toggleItalic().run());
+  editor.value.registerCommand('Mod-u', () => editor.value.chain().focus().toggleUnderline().run());
+  editor.value.registerCommand('Mod-Shift-7', () => editor.value.chain().focus().toggleOrderedList().run());
+  editor.value.registerCommand('Mod-Shift-8', () => editor.value.chain().focus().toggleBulletList().run());
   
   // If we have a saved document, update the hash and timestamp
   if (savedDocument) {
@@ -455,6 +573,16 @@ const verifyDocument = async () => {
   font-family: 'Arial', sans-serif;
   line-height: 1.5;
   color: #333;
+  max-width: 8.5in;
+  margin: 0 auto;
+  background-color: white;
+  min-height: calc(100vh - 120px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.editor-content .ProseMirror {
+  padding: 1in 1in;
+  min-height: 11in;
 }
 
 .editor-content p {
@@ -513,5 +641,15 @@ const verifyDocument = async () => {
   color: #adb5bd;
   pointer-events: none;
   height: 0;
+}
+
+/* Google Docs-like page styling */
+body {
+  background-color: #f8f9fa;
+}
+
+/* Dropdown menu styling */
+.group:hover .group-hover\:block {
+  display: block;
 }
 </style>
