@@ -10,6 +10,16 @@
           <button @click="exportDocument" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
             Export
           </button>
+          <button @click="importDocument" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+            Import
+          </button>
+          <input 
+            type="file" 
+            ref="fileInput" 
+            accept=".json" 
+            class="hidden" 
+            @change="handleFileUpload"
+          />
         </div>
       </div>
       
@@ -29,6 +39,14 @@
           <p>Current document hash: {{ currentHash || 'Not generated yet' }}</p>
           <p>Last edited: {{ lastEdited || 'Not edited yet' }}</p>
           <p>Contributors: {{ contributors.length || 0 }}</p>
+          <div class="mt-3 flex items-center">
+            <button @click="verifyDocument" class="px-3 py-1 bg-indigo-600 text-white text-xs rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+              Verify Authorship
+            </button>
+            <span v-if="verificationStatus" class="ml-3 text-sm" :class="{'text-green-600': verificationStatus === 'verified', 'text-red-600': verificationStatus === 'failed'}">
+              {{ verificationMessage }}
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -55,6 +73,9 @@ const currentHash = ref('');
 const lastEdited = ref('');
 const contributors = ref([]);
 const username = ref('Anonymous User-' + Math.floor(Math.random() * 1000));
+const fileInput = ref(null);
+const verificationStatus = ref(null);
+const verificationMessage = ref('');
 
 // Yjs document setup
 const ydoc = new Y.Doc();
@@ -197,4 +218,102 @@ const exportDocument = () => {
   linkElement.setAttribute('download', exportFileDefaultName);
   linkElement.click();
 };
+
+// Import document from JSON file
+const importDocument = () => {
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
+};
+
+// Handle file upload for import
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  try {
+    const fileContent = await readFileAsText(file);
+    const importData = JSON.parse(fileContent);
+    
+    // Validate the imported data structure
+    if (!importData.document || !importData.merkleRoot || !importData.history) {
+      alert('Invalid document format. Please upload a valid ChainPaper export file.');
+      return;
+    }
+    
+    // Import the document content into the editor
+    if (editor.value && importData.document.content) {
+      // Update editor content
+      editor.value.commands.setContent(importData.document.content);
+      
+      // Update document metadata
+      currentHash.value = importData.document.hash || '';
+      lastEdited.value = importData.document.timestamp || new Date().toISOString();
+      
+      // Use the documentStorage importDocument method
+      await documentStorage.initialize();
+      const importSuccess = documentStorage.importDocument(importData);
+      
+      if (importSuccess) {
+        alert('Document imported successfully!');
+      } else {
+        alert('There was an issue importing the document. Some data may not have been imported correctly.');
+      }
+    }
+  } catch (error) {
+    console.error('Error importing document:', error);
+    alert('Failed to import document. Please check the file format.');
+  }
+  
+  // Reset file input
+  event.target.value = null;
+};
+
+// Helper function to read file as text
+const readFileAsText = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => resolve(event.target.result);
+    reader.onerror = (error) => reject(error);
+    reader.readAsText(file);
+  });
+};
+
+// Verify document authorship
+const verifyDocument = async () => {
+  if (!currentHash.value) {
+    verificationStatus.value = 'failed';
+    verificationMessage.value = 'No document hash available. Please save the document first.';
+    return;
+  }
+  
+  try {
+    // Get the current document content and hash
+    const content = editor.value.getHTML();
+    const generatedHash = await generateContentHash(content);
+    
+    // Check if the current hash matches the stored hash
+    if (generatedHash !== currentHash.value) {
+      verificationStatus.value = 'failed';
+      verificationMessage.value = 'Document has been modified since last save.';
+      return;
+    }
+    
+    // Use the documentStorage verifyAuthorship method
+    const verificationResult = documentStorage.verifyAuthorship(currentHash.value);
+    
+    if (verificationResult.verified) {
+      verificationStatus.value = 'verified';
+      verificationMessage.value = `${verificationResult.message} Author: ${verificationResult.author}`;
+    } else {
+      verificationStatus.value = 'failed';
+      verificationMessage.value = verificationResult.message;
+    }
+  } catch (error) {
+    console.error('Error verifying document:', error);
+    verificationStatus.value = 'failed';
+    verificationMessage.value = 'Error verifying document: ' + error.message;
+  }
+};
+
 </script>

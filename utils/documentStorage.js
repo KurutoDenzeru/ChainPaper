@@ -108,6 +108,75 @@ class DocumentStorage {
       exportTime: new Date().toISOString()
     };
   }
+  
+  /**
+   * Import document with its Merkle tree data
+   * @param {Object} importData - The imported document data
+   * @returns {boolean} - Whether the import was successful
+   */
+  importDocument(importData) {
+    try {
+      if (!importData || !importData.document || !importData.merkleRoot || !importData.history) {
+        throw new Error('Invalid import data structure');
+      }
+      
+      // Import the Merkle tree
+      this.merkleTree.import({
+        leaves: importData.history,
+        root: importData.merkleRoot
+      });
+      
+      // Save the document
+      localStorage.setItem(this.documentKey, JSON.stringify(importData.document));
+      
+      // Save history with merkle tree
+      const history = {
+        merkleTree: this.merkleTree.export(),
+        lastModified: new Date().toISOString()
+      };
+      localStorage.setItem(this.historyKey, JSON.stringify(history));
+      
+      return true;
+    } catch (error) {
+      console.error('Error importing document:', error);
+      return false;
+    }
+  }
+  
+  /**
+   * Verify document authorship
+   * @param {string} contentHash - The hash of the current content
+   * @returns {Object} - Verification result with status and message
+   */
+  verifyAuthorship(contentHash) {
+    if (!this.initialized) this.initialize();
+    
+    try {
+      // Check if the hash exists in the Merkle tree
+      const history = this.getHistory();
+      const matchingEntry = history.find(entry => entry.hash === contentHash);
+      
+      if (!matchingEntry) {
+        return {
+          verified: false,
+          message: 'Document hash not found in history.'
+        };
+      }
+      
+      return {
+        verified: true,
+        message: 'Document authorship verified successfully!',
+        author: matchingEntry.author,
+        timestamp: matchingEntry.timestamp
+      };
+    } catch (error) {
+      console.error('Error verifying authorship:', error);
+      return {
+        verified: false,
+        message: 'Error verifying document: ' + error.message
+      };
+    }
+  }
 
   /**
    * Clear all document data
