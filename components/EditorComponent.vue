@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Google Docs-like top menubar -->
-    <div class="bg-white shadow border-b border-gray-200">
+    <div class="bg-white border-gray-200">
       <!-- Main menubar -->
       <div class="flex items-center px-2 py-1 border-b border-gray-200">
         <div class="flex items-center">
@@ -220,7 +220,7 @@
       <!-- Main document editor area (Google Docs style) -->
       <div class="border-0 min-h-[calc(100vh-120px)] bg-gray-100 py-8 px-4">
         <!-- TipTap Editor will be mounted here -->
-        <div v-if="editor" class="prose max-w-none editor-content">
+        <div v-if="editor" class="prose max-w-none editor-content rounded-lg">
           <editor-content :editor="editor" />
         </div>
         <div v-else class="flex justify-center items-center h-64 bg-white max-w-8.5in mx-auto shadow">
