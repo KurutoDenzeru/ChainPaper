@@ -1,8 +1,6 @@
 {
   "name": "chainpaper",
   "dependencies": {
-    "@headlessui/vue": "^1.7.16",
-    "@heroicons/vue": "^2.1.1",
     "@tailwindcss/vite": "^4.1.6",
     "@tiptap/extension-collaboration": "^2.1.16",
     "@tiptap/pm": "^2.1.16",
