@@ -65,7 +65,7 @@ import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 import { IndexeddbPersistence } from 'y-indexeddb';
 import DocumentHistory from './DocumentHistory.vue';
-import documentStorage from '../utils/documentStorage';
+import documentStorage from '../utils/documentStorage.ts';
 
 // Document state
 const editor = ref(null);

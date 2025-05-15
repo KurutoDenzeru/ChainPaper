@@ -5,7 +5,53 @@
 
 import MerkleTree from './merkleTree';
 
+// Define types for the document structure
+interface Document {
+  content: string;
+  hash: string;
+  timestamp: string;
+  author: string;
+  contributors?: string[];
+}
+
+interface DocumentLeaf {
+  hash: string;
+  author: string;
+  timestamp: string;
+  index: number;
+}
+
+interface MerkleTreeData {
+  leaves: DocumentLeaf[];
+  root: string;
+  timestamp?: string;
+}
+
+interface HistoryData {
+  merkleTree: MerkleTreeData;
+  lastModified: string;
+}
+
+interface ExportData {
+  document: Document;
+  merkleRoot: string;
+  history: DocumentLeaf[];
+  exportTime: string;
+}
+
+interface VerificationResult {
+  verified: boolean;
+  message: string;
+  author?: string;
+  timestamp?: string;
+}
+
 class DocumentStorage {
+  private merkleTree: MerkleTree;
+  private documentKey: string;
+  private historyKey: string;
+  private initialized: boolean;
+
   constructor() {
     this.merkleTree = new MerkleTree();
     this.documentKey = 'chainpaper-document';
@@ -16,14 +62,14 @@ class DocumentStorage {
   /**
    * Initialize storage and load existing data
    */
-  async initialize() {
+  async initialize(): Promise<void> {
     if (this.initialized) return;
     
     try {
       // Load document history if exists
       const historyData = localStorage.getItem(this.historyKey);
       if (historyData) {
-        const history = JSON.parse(historyData);
+        const history = JSON.parse(historyData) as HistoryData;
         this.merkleTree.import(history.merkleTree);
       }
       
@@ -35,12 +81,9 @@ class DocumentStorage {
 
   /**
    * Save document with versioning
-   * @param {Object} document - The document to save
-   * @param {string} document.content - Document content
-   * @param {string} document.hash - Content hash
-   * @param {string} document.author - Author identifier
+   * @param {Document} document - The document to save
    */
-  async saveDocument(document) {
+  async saveDocument(document: Document): Promise<DocumentLeaf> {
     if (!this.initialized) await this.initialize();
     
     try {
@@ -55,7 +98,7 @@ class DocumentStorage {
       localStorage.setItem(this.documentKey, JSON.stringify(document));
       
       // Save history with merkle tree
-      const history = {
+      const history: HistoryData = {
         merkleTree: this.merkleTree.export(),
         lastModified: new Date().toISOString()
       };
@@ -70,12 +113,12 @@ class DocumentStorage {
 
   /**
    * Load the current document
-   * @returns {Object|null} - The loaded document or null if not found
+   * @returns {Document|null} - The loaded document or null if not found
    */
-  loadDocument() {
+  loadDocument(): Document | null {
     try {
       const documentData = localStorage.getItem(this.documentKey);
-      return documentData ? JSON.parse(documentData) : null;
+      return documentData ? JSON.parse(documentData) as Document : null;
     } catch (error) {
       console.error('Error loading document:', error);
       return null;
@@ -84,18 +127,18 @@ class DocumentStorage {
 
   /**
    * Get document history
-   * @returns {Array} - Array of document versions
+   * @returns {DocumentLeaf[]} - Array of document versions
    */
-  getHistory() {
+  getHistory(): DocumentLeaf[] {
     if (!this.initialized) this.initialize();
     return this.merkleTree.leaves;
   }
 
   /**
    * Export document with proof
-   * @returns {Object} - Document with merkle proof
+   * @returns {ExportData|null} - Document with merkle proof
    */
-  exportWithProof() {
+  exportWithProof(): ExportData | null {
     if (!this.initialized) this.initialize();
     
     const document = this.loadDocument();
@@ -103,7 +146,7 @@ class DocumentStorage {
     
     return {
       document,
-      merkleRoot: this.merkleTree.root,
+      merkleRoot: this.merkleTree.root || '',
       history: this.merkleTree.leaves,
       exportTime: new Date().toISOString()
     };
@@ -111,10 +154,10 @@ class DocumentStorage {
   
   /**
    * Import document with its Merkle tree data
-   * @param {Object} importData - The imported document data
+   * @param {ExportData} importData - The imported document data
    * @returns {boolean} - Whether the import was successful
    */
-  importDocument(importData) {
+  importDocument(importData: ExportData): boolean {
     try {
       if (!importData || !importData.document || !importData.merkleRoot || !importData.history) {
         throw new Error('Invalid import data structure');
@@ -130,7 +173,7 @@ class DocumentStorage {
       localStorage.setItem(this.documentKey, JSON.stringify(importData.document));
       
       // Save history with merkle tree
-      const history = {
+      const history: HistoryData = {
         merkleTree: this.merkleTree.export(),
         lastModified: new Date().toISOString()
       };
@@ -146,9 +189,9 @@ class DocumentStorage {
   /**
    * Verify document authorship
    * @param {string} contentHash - The hash of the current content
-   * @returns {Object} - Verification result with status and message
+   * @returns {VerificationResult} - Verification result with status and message
    */
-  verifyAuthorship(contentHash) {
+  verifyAuthorship(contentHash: string): VerificationResult {
     if (!this.initialized) this.initialize();
     
     try {
@@ -173,7 +216,7 @@ class DocumentStorage {
       console.error('Error verifying authorship:', error);
       return {
         verified: false,
-        message: 'Error verifying document: ' + error.message
+        message: 'Error verifying document: ' + (error instanceof Error ? error.message : String(error))
       };
     }
   }
@@ -181,7 +224,7 @@ class DocumentStorage {
   /**
    * Clear all document data
    */
-  clearStorage() {
+  clearStorage(): void {
     localStorage.removeItem(this.documentKey);
     localStorage.removeItem(this.historyKey);
     this.merkleTree = new MerkleTree();

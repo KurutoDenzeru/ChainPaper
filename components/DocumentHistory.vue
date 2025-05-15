@@ -52,7 +52,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import documentStorage from '../utils/documentStorage';
+import documentStorage from '../utils/documentStorage.ts';
 
 const history = ref([]);
 const merkleRoot = ref(null);

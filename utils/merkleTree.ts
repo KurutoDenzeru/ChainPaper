@@ -3,7 +3,30 @@
  * Used for creating verifiable document history with authorship proofs
  */
 
+// Define types for the tree structure
+interface DocumentLeaf {
+  hash: string;
+  author: string;
+  timestamp: string;
+  index: number;
+}
+
+interface ProofStep {
+  position: 'left' | 'right';
+  hash: string;
+}
+
+interface MerkleTreeData {
+  leaves: DocumentLeaf[];
+  root: string;
+  timestamp?: string;
+}
+
 class MerkleTree {
+  leaves: DocumentLeaf[];
+  tree: string[][];
+  root: string | null;
+
   constructor() {
     this.leaves = [];
     this.tree = [];
@@ -16,8 +39,8 @@ class MerkleTree {
    * @param {string} author - The author identifier
    * @param {string} timestamp - ISO timestamp of the edit
    */
-  addLeaf(hash, author, timestamp) {
-    const leaf = {
+  addLeaf(hash: string, author: string, timestamp: string): DocumentLeaf {
+    const leaf: DocumentLeaf = {
       hash,
       author,
       timestamp,
@@ -32,7 +55,7 @@ class MerkleTree {
   /**
    * Build the Merkle Tree from leaves
    */
-  buildTree() {
+  async buildTree(): Promise<void> {
     if (this.leaves.length === 0) {
       this.root = null;
       this.tree = [];
@@ -40,7 +63,7 @@ class MerkleTree {
     }
 
     // Start with the leaves
-    const tree = [this.leaves.map(leaf => leaf.hash)];
+    const tree: string[][] = [this.leaves.map(leaf => leaf.hash)];
     let level = 0;
 
     // Build the tree upward until we reach the root
@@ -52,7 +75,7 @@ class MerkleTree {
         if (i + 1 < tree[level - 1].length) {
           // Combine pairs of nodes
           const combined = this.hashPair(tree[level - 1][i], tree[level - 1][i + 1]);
-          tree[level].push(combined);
+          tree[level].push(await combined);
         } else {
           // Odd number of nodes, promote the last one
           tree[level].push(tree[level - 1][i]);
@@ -70,7 +93,7 @@ class MerkleTree {
    * @param {string} right - Right node hash
    * @returns {string} - Combined hash
    */
-  async hashPair(left, right) {
+  async hashPair(left: string, right: string): Promise<string> {
     const combined = left + right;
     const msgUint8 = new TextEncoder().encode(combined);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -81,14 +104,14 @@ class MerkleTree {
   /**
    * Generate a proof for a specific leaf
    * @param {number} index - The index of the leaf
-   * @returns {Array} - The proof path
+   * @returns {ProofStep[] | null} - The proof path
    */
-  generateProof(index) {
+  generateProof(index: number): ProofStep[] | null {
     if (index < 0 || index >= this.leaves.length) {
       return null;
     }
 
-    const proof = [];
+    const proof: ProofStep[] = [];
     let currentIndex = index;
 
     for (let level = 0; level < this.tree.length - 1; level++) {
@@ -112,10 +135,10 @@ class MerkleTree {
   /**
    * Verify a proof for a specific leaf
    * @param {string} leafHash - The hash of the leaf
-   * @param {Array} proof - The proof path
+   * @param {ProofStep[]} proof - The proof path
    * @returns {boolean} - Whether the proof is valid
    */
-  async verifyProof(leafHash, proof) {
+  async verifyProof(leafHash: string, proof: ProofStep[]): Promise<boolean> {
     let currentHash = leafHash;
 
     for (const step of proof) {
@@ -131,21 +154,21 @@ class MerkleTree {
 
   /**
    * Export the tree for storage
-   * @returns {Object} - The serialized tree
+   * @returns {MerkleTreeData} - The serialized tree
    */
-  export() {
+  export(): MerkleTreeData {
     return {
       leaves: this.leaves,
-      root: this.root,
+      root: this.root || '',
       timestamp: new Date().toISOString()
     };
   }
 
   /**
    * Import a previously exported tree
-   * @param {Object} data - The serialized tree
+   * @param {MerkleTreeData} data - The serialized tree
    */
-  import(data) {
+  import(data: MerkleTreeData): void {
     if (!data || !data.leaves || !data.root) {
       throw new Error('Invalid tree data');
     }
