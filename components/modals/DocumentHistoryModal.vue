@@ -34,7 +34,7 @@
                   {{ entry.hash.substring(0, 8) }}
                   <button 
                     @click="copyToClipboard(entry.hash)" 
-                    class="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none"
+                    class="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none cursor-pointer"
                     title="Copy full hash"
                   >
                     <Copy class="h-4 w-4 inline" />

@@ -22,7 +22,7 @@
                       </h3>
                       <button 
                         @click="close" 
-                        class="text-gray-400 hover:text-gray-500 focus:outline-none"
+                        class="text-gray-400 hover:text-gray-500 focus:outline-none cursor-pointer"
                       >
                         <X class="h-5 w-5" />
                       </button>
