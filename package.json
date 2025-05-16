@@ -1,23 +1,23 @@
 {
   "name": "chainpaper",
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.6",
-    "@tiptap/extension-collaboration": "^2.1.16",
+    "@tailwindcss/vite": "^4.1.7",
+    "@tiptap/extension-collaboration": "^2.12.0",
     "@tiptap/extension-font-family": "^2.12.0",
     "@tiptap/extension-font-size": "^3.0.0-next.3",
     "@tiptap/extension-underline": "^2.12.0",
-    "@tiptap/pm": "^2.1.16",
-    "@tiptap/starter-kit": "^2.1.16",
-    "@tiptap/vue-3": "^2.1.16",
+    "@tiptap/pm": "^2.12.0",
+    "@tiptap/starter-kit": "^2.12.0",
+    "@tiptap/vue-3": "^2.12.0",
     "crypto-js": "^4.2.0",
     "lucide-vue-next": "^0.510.0",
     "nuxt": "^3.17.3",
-    "tailwindcss": "^4.1.6",
-    "vue": "^3.5.13",
+    "tailwindcss": "^4.1.7",
+    "vue": "^3.5.14",
     "vue-router": "^4.5.1",
     "y-indexeddb": "^9.0.12",
-    "y-webrtc": "^10.2.6",
-    "yjs": "^13.6.10"
+    "y-webrtc": "^10.3.0",
+    "yjs": "^13.6.27"
   },
   "private": true,
   "scripts": {
