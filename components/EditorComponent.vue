@@ -138,39 +138,6 @@
           </select>
         </div>
         <span class="border-r border-gray-300 h-6 mx-2"></span>
-        <button 
-          @click="editor.chain().focus().toggleBold().run()"
-          :class="{ 'bg-gray-200': editor.isActive('bold') }"
-          class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-          title="Bold"
-        >
-          <Bold class="w-4 h-4 text-gray-700" />
-        </button>
-        <button 
-          @click="editor.chain().focus().toggleItalic().run()"
-          :class="{ 'bg-gray-200': editor.isActive('italic') }"
-          class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-          title="Italic"
-        >
-          <Italic class="w-4 h-4 text-gray-700" />
-        </button>
-        <button 
-          @click="editor.chain().focus().toggleStrike().run()"
-          :class="{ 'bg-gray-200': editor.isActive('strike') }"
-          class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-          title="Strikethrough"
-        >
-          <Strikethrough class="w-4 h-4 text-gray-700" />
-        </button>
-        <button 
-          @click="editor.chain().focus().toggleUnderline().run()"
-          :class="{ 'bg-gray-200': editor.isActive('underline') }"
-          class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-          title="Underline"
-        >
-          <UnderlineIcon class="w-4 h-4 text-gray-700" />
-        </button>
-        <span class="border-r border-gray-300 h-6 mx-2"></span>
         <div class="flex items-center space-x-1">
           <button 
             @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
@@ -198,46 +165,232 @@
           </button>
         </div>
         <span class="border-r border-gray-300 h-6 mx-2"></span>
+        <!-- Text formatting options -->  
         <div class="flex items-center space-x-1">
           <button 
-            @click="editor.chain().focus().toggleBulletList().run()"
-            :class="{ 'bg-gray-200': editor.isActive('bulletList') }"
+            @click="editor.chain().focus().toggleBold().run()"
+            :class="{ 'bg-gray-200': editor.isActive('bold') }"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Bullet List"
+            title="Bold"
           >
-            <List class="w-4 h-4 text-gray-700" />
+            <Bold class="w-4 h-4 text-gray-700" />
           </button>
           <button 
-            @click="editor.chain().focus().toggleOrderedList().run()"
-            :class="{ 'bg-gray-200': editor.isActive('orderedList') }"
+            @click="editor.chain().focus().toggleItalic().run()"
+            :class="{ 'bg-gray-200': editor.isActive('italic') }"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Ordered List"
+            title="Italic"
           >
-            <ListOrdered class="w-4 h-4 text-gray-700" />
+            <Italic class="w-4 h-4 text-gray-700" />
           </button>
           <button 
-            @click="editor.chain().focus().sinkListItem('listItem').run()"
-            :disabled="!editor.can().sinkListItem('listItem')"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none disabled:opacity-50"
-            title="Indent List"
+            @click="editor.chain().focus().toggleStrike().run()"
+            :class="{ 'bg-gray-200': editor.isActive('strike') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Strikethrough"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-700">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+            <Strikethrough class="w-4 h-4 text-gray-700" />
           </button>
           <button 
-            @click="editor.chain().focus().liftListItem('listItem').run()"
-            :disabled="!editor.can().liftListItem('listItem')"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none disabled:opacity-50"
-            title="Outdent List"
+            @click="editor.chain().focus().toggleCode().run()"
+            :class="{ 'bg-gray-200': editor.isActive('code') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Inline Code"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-gray-700">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
+            <Code class="w-4 h-4 text-gray-700" />
+          </button>
+          <button 
+            @click="editor.chain().focus().toggleUnderline().run()"
+            :class="{ 'bg-gray-200': editor.isActive('underline') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Underline"
+          >
+            <UnderlineIcon class="w-4 h-4 text-gray-700" />
+          </button>
+          <!-- Highlight dropdown -->
+          <div class="relative">
+            <button 
+              @click.stop="activeHighlightMenu = !activeHighlightMenu"
+              :class="{ 'bg-gray-200': editor.isActive('highlight') }"
+              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+              title="Highlight"
+            >
+              <Highlighter class="w-4 h-4 text-gray-700" />
+            </button>
+            <div 
+              v-show="activeHighlightMenu" 
+              class="absolute left-0 top-full mt-1 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10"
+              @click.stop
+            >
+              <div class="grid grid-cols-3 gap-1 p-1">
+                <button 
+                  @click="editor.chain().focus().setHighlight({ color: '#FFFF00' }).run(); activeHighlightMenu = false"
+                  class="w-6 h-6 rounded-sm bg-yellow-300 hover:opacity-80"
+                  title="Yellow"
+                ></button>
+                <button 
+                  @click="editor.chain().focus().setHighlight({ color: '#00FF00' }).run(); activeHighlightMenu = false"
+                  class="w-6 h-6 rounded-sm bg-green-300 hover:opacity-80"
+                  title="Green"
+                ></button>
+                <button 
+                  @click="editor.chain().focus().setHighlight({ color: '#FF9999' }).run(); activeHighlightMenu = false"
+                  class="w-6 h-6 rounded-sm bg-red-200 hover:opacity-80"
+                  title="Red"
+                ></button>
+                <button 
+                  @click="editor.chain().focus().setHighlight({ color: '#99CCFF' }).run(); activeHighlightMenu = false"
+                  class="w-6 h-6 rounded-sm bg-blue-200 hover:opacity-80"
+                  title="Blue"
+                ></button>
+                <button 
+                  @click="editor.chain().focus().setHighlight({ color: '#CC99FF' }).run(); activeHighlightMenu = false"
+                  class="w-6 h-6 rounded-sm bg-purple-200 hover:opacity-80"
+                  title="Purple"
+                ></button>
+                <button 
+                  @click="editor.chain().focus().unsetHighlight().run(); activeHighlightMenu = false"
+                  class="w-6 h-6 rounded-sm bg-white border border-gray-300 hover:bg-gray-100 flex items-center justify-center"
+                  title="Remove highlight"
+                >
+                  <X class="w-3 h-3 text-gray-700" />
+                </button>
+              </div>
+            </div>
+          </div>
+          <button 
+            @click="editor.chain().focus().toggleLink().run()"
+            :class="{ 'bg-gray-200': editor.isActive('link') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Link"
+          >
+            <Link2 class="w-4 h-4 text-gray-700" />
           </button>
         </div>
         <span class="border-r border-gray-300 h-6 mx-2"></span>
+        
+        <!-- Superscript and Subscript -->
         <div class="flex items-center space-x-1">
+          <button 
+            @click="editor.chain().focus().toggleSuperscript().run()"
+            :class="{ 'bg-gray-200': editor.isActive('superscript') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Superscript"
+          >
+            <SuperscriptIcon class="w-4 h-4 text-gray-700" />
+          </button>
+          <button 
+            @click="editor.chain().focus().toggleSubscript().run()"
+            :class="{ 'bg-gray-200': editor.isActive('subscript') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Subscript"
+          >
+            <SubscriptIcon class="w-4 h-4 text-gray-700" />
+          </button>
+        </div>
+        <span class="border-r border-gray-300 h-6 mx-2"></span>
+        
+        <!-- Text alignment -->
+        <div class="flex items-center space-x-1">
+          <button 
+            @click="editor.chain().focus().setTextAlign('left').run()"
+            :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'left' }) }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Align Left"
+          >
+            <AlignLeft class="w-4 h-4 text-gray-700" />
+          </button>
+          <button 
+            @click="editor.chain().focus().setTextAlign('center').run()"
+            :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'center' }) }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Align Center"
+          >
+            <AlignCenter class="w-4 h-4 text-gray-700" />
+          </button>
+          <button 
+            @click="editor.chain().focus().setTextAlign('right').run()"
+            :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'right' }) }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Align Right"
+          >
+            <AlignRight class="w-4 h-4 text-gray-700" />
+          </button>
+          <button 
+            @click="editor.chain().focus().setTextAlign('justify').run()"
+            :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'justify' }) }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Justify"
+          >
+            <AlignJustify class="w-4 h-4 text-gray-700" />
+          </button>
+        </div>
+        <span class="border-r border-gray-300 h-6 mx-2"></span>
+        
+        <!-- Image upload -->
+        <div class="flex items-center space-x-1">
+          <button 
+            @click="handleImageUpload"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Add Image"
+          >
+            <ImageIcon class="w-4 h-4 text-gray-700" />
+          </button>
+          <input 
+            type="file" 
+            ref="imageInput" 
+            accept="image/*" 
+            class="hidden" 
+            @change="onImageInputChange"
+          />
+        </div>
+        
+        <!-- List dropdown, Blockquote, and Code Block -->
+        <div class="ml-auto flex items-center space-x-2">
+          <!-- List dropdown -->
+          <div class="relative">
+            <button 
+              @click.stop="activeListMenu = !activeListMenu"
+              :class="{ 'bg-gray-200': editor.isActive('bulletList') || editor.isActive('orderedList') || editor.isActive('taskList') }"
+              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none flex items-center"
+              title="Lists"
+            >
+              <List class="w-4 h-4 text-gray-700 mr-1" />
+              <ChevronDown class="w-3 h-3 text-gray-700" />
+            </button>
+            <div 
+              v-show="activeListMenu" 
+              class="absolute right-0 top-full mt-1 w-40 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10"
+              @click.stop
+            >
+              <button 
+                @click="editor.chain().focus().toggleBulletList().run(); activeListMenu = false"
+                :class="{ 'bg-gray-100': editor.isActive('bulletList') }"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <List class="w-4 h-4 mr-2" />
+                Bullet List
+              </button>
+              <button 
+                @click="editor.chain().focus().toggleOrderedList().run(); activeListMenu = false"
+                :class="{ 'bg-gray-100': editor.isActive('orderedList') }"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <ListOrdered class="w-4 h-4 mr-2" />
+                Ordered List
+              </button>
+              <button 
+                @click="editor.chain().focus().toggleTaskList().run(); activeListMenu = false"
+                :class="{ 'bg-gray-100': editor.isActive('taskList') }"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <CheckSquare class="w-4 h-4 mr-2" />
+                Task List
+              </button>
+            </div>
+          </div>
+          
+          <!-- Blockquote -->
           <button 
             @click="editor.chain().focus().toggleBlockquote().run()"
             :class="{ 'bg-gray-200': editor.isActive('blockquote') }"
@@ -246,30 +399,36 @@
           >
             <Quote class="w-4 h-4 text-gray-700" />
           </button>
+          
+          <!-- Code Block -->
           <button 
-            @click="editor.chain().focus().setHorizontalRule().run()"
+            @click="editor.chain().focus().toggleCodeBlock().run()"
+            :class="{ 'bg-gray-200': editor.isActive('codeBlock') }"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Horizontal Rule"
+            title="Code Block"
           >
-            <Minus class="w-4 h-4 text-gray-700" />
+            <FileCode class="w-4 h-4 text-gray-700" />
           </button>
-        </div>
-        <span class="border-r border-gray-300 h-6 mx-2"></span>
-        <div class="flex items-center space-x-1">
-          <button 
-            @click="editor.chain().focus().undo().run()"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Undo"
-          >
-            <Undo class="w-4 h-4 text-gray-700" />
-          </button>
-          <button 
-            @click="editor.chain().focus().redo().run()"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Redo"
-          >
-            <Redo class="w-4 h-4 text-gray-700" />
-          </button>
+          
+          <span class="border-r border-gray-300 h-6 mx-2"></span>
+          
+          <!-- Undo and Redo -->
+          <div class="flex items-center space-x-1">
+            <button 
+              @click="editor.chain().focus().undo().run()"
+              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+              title="Undo"
+            >
+              <Undo class="w-4 h-4 text-gray-700" />
+            </button>
+            <button 
+              @click="editor.chain().focus().redo().run()"
+              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+              title="Redo"
+            >
+              <Redo class="w-4 h-4 text-gray-700" />
+            </button>
+          </div>
         </div>
       </div>
       
@@ -286,10 +445,10 @@
     </div>
     
     <!-- Document Verification Panel (toggleable) -->
-    <div v-if="showVerification" class="bg-white shadow rounded-lg p-6 mt-4 border border-gray-200">
+    <div v-if="showVerificationModal" class="bg-white shadow rounded-lg p-6 mt-4 border border-gray-200">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-md font-medium text-gray-700">Document Verification</h3>
-        <button @click="showVerification = false" class="text-gray-500 hover:text-gray-700">
+        <button @click="showVerificationModal = false" class="text-gray-500 hover:text-gray-700">
           <X class="w-4 h-4" />
         </button>
       </div>
@@ -343,6 +502,16 @@ import Underline from '@tiptap/extension-underline';
 import TextStyle from '@tiptap/extension-text-style';
 import FontFamily from '@tiptap/extension-font-family';
 import FontSize from '@tiptap/extension-font-size';
+import Highlight from '@tiptap/extension-highlight';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
+import TextAlign from '@tiptap/extension-text-align';
+import CodeBlockExtension from '@tiptap/extension-code-block';
+import CodeExtension from '@tiptap/extension-code';
+import Image from '@tiptap/extension-image';
+import Link from '@tiptap/extension-link';
 import * as Y from 'yjs';
 import { WebrtcProvider } from 'y-webrtc';
 import { IndexeddbPersistence } from 'y-indexeddb';
@@ -354,8 +523,11 @@ import VerificationModal from './modals/VerificationModal.vue';
 import ProjectInfoModal from './modals/ProjectInfoModal.vue';
 import { 
   Bold, Italic, Strikethrough, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
-  List, ListOrdered, Quote, Minus, Undo, Redo,
-  Save, Download, Upload, X, HelpCircle, History, Shield, Info
+  List, ListOrdered, Quote, Undo, Redo, Code, Link2, CheckSquare,
+  Save, Download, Upload, X, HelpCircle, History, Shield, Info,
+  AlignLeft, AlignCenter, AlignRight, AlignJustify, Highlighter,
+  Superscript as SuperscriptIcon, Subscript as SubscriptIcon, FileCode, Image as ImageIcon,
+  ChevronDown
 } from 'lucide-vue-next';
 
 // Get toast service
@@ -377,6 +549,9 @@ const showVerificationModal = ref(false);
 const showUserGuideModal = ref(false);
 const showProjectInfoModal = ref(false);
 const activeMenu = ref(null); // Track which menu is currently open
+const activeHighlightMenu = ref(false); // Track highlight color menu
+const activeListMenu = ref(false); // Track list type menu
+const imageInput = ref(null); // Reference to image upload input
 
 // Yjs document setup
 const ydoc = new Y.Doc();
@@ -388,6 +563,25 @@ const handleOutsideClick = (event) => {
   // If we have an active menu and the click target is not inside a menu button or dropdown
   if (activeMenu.value && !event.target.closest('.menu-trigger') && !event.target.closest('.menu-dropdown')) {
     activeMenu.value = null;
+  }
+};
+
+// Image upload handlers
+const handleImageUpload = () => {
+  imageInput.value.click();
+};
+
+const onImageInputChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target.result;
+      editor.value.chain().focus().setImage({ src: result }).run();
+    };
+    reader.readAsDataURL(file);
+    // Reset the input so the same file can be selected again
+    event.target.value = '';
   }
 };
 
@@ -435,12 +629,30 @@ onMounted(async () => {
         strike: true,
         bold: true,
         italic: true,
-        history: true,
+        history: false, // Disable history as it conflicts with collaboration extension
       }),
       Underline,
       TextStyle,
       FontFamily,
       FontSize,
+      Highlight.configure({
+        multicolor: true,
+      }),
+      TaskList,
+      TaskItem.configure({
+        nested: true,
+      }),
+      Subscript,
+      Superscript,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      CodeBlockExtension,
+      CodeExtension,
+      Image,
+      Link.configure({
+        openOnClick: false,
+      }),
       Collaboration.configure({
         document: ydoc,
       }),
@@ -668,3 +880,60 @@ const verifyDocument = async () => {
 };
 
 </script>
+
+<style>
+/* Task list styles */
+ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+
+ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.5em;
+}
+
+ul[data-type="taskList"] li > label {
+  flex: 0 0 auto;
+  margin-right: 0.5em;
+  user-select: none;
+}
+
+ul[data-type="taskList"] li > div {
+  flex: 1 1 auto;
+}
+
+/* Code block styles */
+pre {
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+code {
+  font-family: monospace;
+  background-color: rgba(175, 184, 193, 0.2);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Image styles */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Highlight styles */
+.ProseMirror mark {
+  border-radius: 0.25em;
+  padding: 0.1em 0.2em;
+}
+</style>

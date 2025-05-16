@@ -14,52 +14,20 @@
 </template>
 
 <script setup>
-import { ref, provide } from 'vue';
+import { inject } from 'vue';
 import ToastNotification from './ToastNotification.vue';
 
-const toasts = ref([]);
+// Use the toast service provided at the app level
+const toast = inject('toast');
 
-const addToast = (toast) => {
-  const newToast = {
-    title: toast.title || 'Notification',
-    message: toast.message,
-    type: toast.type || 'info',
-    duration: toast.duration || 3000,
-    show: true
-  };
-  
-  toasts.value.push(newToast);
-  
-  return toasts.value.length - 1;
-};
+// Access the toasts array from the parent component
+const toasts = inject('toasts', []);
 
+// Use the removeToast method from the parent component
 const removeToast = (index) => {
-  if (index >= 0 && index < toasts.value.length) {
-    toasts.value[index].show = false;
-    setTimeout(() => {
-      toasts.value.splice(index, 1);
-    }, 300); // Allow time for exit animation
-  }
+  toast.remove(index);
 };
 
-const clearToasts = () => {
-  toasts.value = [];
-};
-
-// Provide toast methods to all components
-provide('toast', {
-  success: (message, title = 'Success', duration = 3000) => {
-    return addToast({ title, message, type: 'success', duration });
-  },
-  error: (message, title = 'Error', duration = 5000) => {
-    return addToast({ title, message, type: 'error', duration });
-  },
-  info: (message, title = 'Information', duration = 3000) => {
-    return addToast({ title, message, type: 'info', duration });
-  },
-  remove: removeToast,
-  clear: clearToasts
-});
 </script>
 
 <style scoped>
@@ -69,7 +37,12 @@ provide('toast', {
   right: 1rem;
   z-index: 50;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  flex-direction: column-reverse; /* Show newest toast at the bottom */
+  gap: 0.75rem;
+  pointer-events: none; /* Allow clicking through the container */
+}
+
+.toast-container > :deep(*) {
+  pointer-events: auto; /* Re-enable pointer events for toast notifications */
 }
 </style>

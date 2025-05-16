@@ -2,43 +2,36 @@
   <Teleport to="body">
     <div
       v-if="isVisible"
-      class="fixed bottom-4 right-4 z-50 max-w-md transition-all duration-300 ease-in-out"
+      class="fixed bottom-4 right-4 z-50 max-w-xs transition-all duration-300 ease-in-out"
       :class="{
         'translate-y-0 opacity-100': isVisible,
-        'translate-y-8 opacity-0': !isVisible,
-        'bg-green-50 border-green-500': type === 'success',
-        'bg-red-50 border-red-500': type === 'error',
-        'bg-blue-50 border-blue-500': type === 'info'
+        'translate-y-8 opacity-0': !isVisible
       }"
+      role="alert"
+      tabindex="-1"
+      :aria-labelledby="`toast-${type}-label`"
     >
-      <div class="p-4 rounded-lg shadow-lg border-l-4 flex items-start">
-        <div class="flex-shrink-0 mr-3">
-          <CheckCircle v-if="type === 'success'" class="w-5 h-5 text-green-500" />
-          <XCircle v-else-if="type === 'error'" class="w-5 h-5 text-red-500" />
-          <InfoIcon v-else class="w-5 h-5 text-blue-500" />
-        </div>
-        <div class="flex-1">
-          <h3 class="text-sm font-medium" :class="{
-            'text-green-800': type === 'success',
-            'text-red-800': type === 'error',
-            'text-blue-800': type === 'info'
-          }">
-            {{ title }}
-          </h3>
-          <div class="mt-1 text-sm" :class="{
-            'text-green-700': type === 'success',
-            'text-red-700': type === 'error',
-            'text-blue-700': type === 'info'
-          }">
-            {{ message }}
+      <div class="bg-white border border-gray-200 rounded-xl shadow-lg">
+        <div class="flex p-4">
+          <div class="shrink-0">
+            <CheckCircle v-if="type === 'success'" class="shrink-0 size-4 text-teal-500 mt-0.5" />
+            <XCircle v-else-if="type === 'error'" class="shrink-0 size-4 text-red-500 mt-0.5" />
+            <AlertCircle v-else-if="type === 'warning'" class="shrink-0 size-4 text-yellow-500 mt-0.5" />
+            <InfoIcon v-else class="shrink-0 size-4 text-blue-500 mt-0.5" />
           </div>
+          <div class="ms-3">
+            <p :id="`toast-${type}-label`" class="text-sm text-gray-700">
+              {{ message }}
+            </p>
+          </div>
+          <button 
+            @click="close"
+            class="ms-auto shrink-0 text-gray-400 hover:text-gray-500 focus:outline-none"
+            aria-label="Close"
+          >
+            <X class="w-4 h-4" />
+          </button>
         </div>
-        <button 
-          @click="close"
-          class="flex-shrink-0 ml-2 text-gray-400 hover:text-gray-500 focus:outline-none"
-        >
-          <X class="w-4 h-4" />
-        </button>
       </div>
     </div>
   </Teleport>
@@ -46,7 +39,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
-import { CheckCircle, XCircle, Info as InfoIcon, X } from 'lucide-vue-next';
+import { CheckCircle, XCircle, AlertCircle, Info as InfoIcon, X } from 'lucide-vue-next';
 
 const props = defineProps({
   title: {
@@ -60,7 +53,7 @@ const props = defineProps({
   type: {
     type: String,
     default: 'info',
-    validator: (value) => ['success', 'error', 'info'].includes(value)
+    validator: (value) => ['success', 'error', 'info', 'warning'].includes(value)
   },
   duration: {
     type: Number,
