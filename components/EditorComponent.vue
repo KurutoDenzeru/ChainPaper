@@ -137,6 +137,22 @@
             <option value="36">36</option>
           </select>
         </div>
+        <div class="flex items-center space-x-1">
+            <button 
+              @click="editor.chain().focus().undo().run()"
+              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+              title="Undo"
+            >
+              <Undo class="w-4 h-4 text-gray-700" />
+            </button>
+            <button 
+              @click="editor.chain().focus().redo().run()"
+              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+              title="Redo"
+            >
+              <Redo class="w-4 h-4 text-gray-700" />
+            </button>
+          </div>
         <span class="border-r border-gray-300 h-6 mx-2"></span>
         <div class="flex items-center space-x-1">
           <button 
@@ -264,7 +280,7 @@
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
             title="Link"
           >
-            <Link2 class="w-4 h-4 text-gray-700" />
+            <LinkIcon class="w-4 h-4 text-gray-700" />
           </button>
         </div>
         <span class="border-r border-gray-300 h-6 mx-2"></span>
@@ -409,26 +425,6 @@
           >
             <FileCode class="w-4 h-4 text-gray-700" />
           </button>
-          
-          <span class="border-r border-gray-300 h-6 mx-2"></span>
-          
-          <!-- Undo and Redo -->
-          <div class="flex items-center space-x-1">
-            <button 
-              @click="editor.chain().focus().undo().run()"
-              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-              title="Undo"
-            >
-              <Undo class="w-4 h-4 text-gray-700" />
-            </button>
-            <button 
-              @click="editor.chain().focus().redo().run()"
-              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-              title="Redo"
-            >
-              <Redo class="w-4 h-4 text-gray-700" />
-            </button>
-          </div>
         </div>
       </div>
       
@@ -523,7 +519,7 @@ import VerificationModal from './modals/VerificationModal.vue';
 import ProjectInfoModal from './modals/ProjectInfoModal.vue';
 import { 
   Bold, Italic, Strikethrough, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
-  List, ListOrdered, Quote, Undo, Redo, Code, Link2, CheckSquare,
+  List, ListOrdered, Quote, Undo, Redo, Code, Link as LinkIcon, CheckSquare,
   Save, Download, Upload, X, HelpCircle, History, Shield, Info,
   AlignLeft, AlignCenter, AlignRight, AlignJustify, Highlighter,
   Superscript as SuperscriptIcon, Subscript as SubscriptIcon, FileCode, Image as ImageIcon,
