@@ -200,6 +200,14 @@
             <Italic class="w-4 h-4 text-gray-700" />
           </button>
           <button 
+            @click="editor.chain().focus().toggleUnderline().run()"
+            :class="{ 'bg-gray-200': editor.isActive('underline') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Underline"
+          >
+            <UnderlineIcon class="w-4 h-4 text-gray-700" />
+          </button>
+          <button 
             @click="editor.chain().focus().toggleStrike().run()"
             :class="{ 'bg-gray-200': editor.isActive('strike') }"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
@@ -214,14 +222,6 @@
             title="Inline Code"
           >
             <Code class="w-4 h-4 text-gray-700" />
-          </button>
-          <button 
-            @click="editor.chain().focus().toggleUnderline().run()"
-            :class="{ 'bg-gray-200': editor.isActive('underline') }"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Underline"
-          >
-            <UnderlineIcon class="w-4 h-4 text-gray-700" />
           </button>
           <!-- Highlight dropdown -->
           <div class="relative">
@@ -274,14 +274,6 @@
               </div>
             </div>
           </div>
-          <button 
-            @click="editor.chain().focus().toggleLink().run()"
-            :class="{ 'bg-gray-200': editor.isActive('link') }"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Link"
-          >
-            <LinkIcon class="w-4 h-4 text-gray-700" />
-          </button>
         </div>
         <span class="border-r border-gray-300 h-6 mx-2"></span>
         
@@ -345,6 +337,15 @@
         
         <!-- Image upload -->
         <div class="flex items-center space-x-1">
+          <!-- Link Button -->
+          <button 
+            @click="editor.chain().focus().toggleLink().run()"
+            :class="{ 'bg-gray-200': editor.isActive('link') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Link"
+            >
+            <LinkIcon class="w-4 h-4 text-gray-700" />
+          </button>
           <button 
             @click="handleImageUpload"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
