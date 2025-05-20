@@ -274,6 +274,25 @@
               </div>
             </div>
           </div>
+                    <!-- Blockquote -->
+          <button 
+            @click="editor.chain().focus().toggleBlockquote().run()"
+            :class="{ 'bg-gray-200': editor.isActive('blockquote') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Blockquote"
+          >
+            <Quote class="w-4 h-4 text-gray-700" />
+          </button>
+          
+          <!-- Code Block -->
+          <button 
+            @click="editor.chain().focus().toggleCodeBlock().run()"
+            :class="{ 'bg-gray-200': editor.isActive('codeBlock') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Code Block"
+          >
+            <FileCode class="w-4 h-4 text-gray-700" />
+          </button>
         </div>
         <span class="border-r border-gray-300 h-6 mx-2"></span>
         
@@ -406,26 +425,7 @@
               </button>
             </div>
           </div>
-          
-          <!-- Blockquote -->
-          <button 
-            @click="editor.chain().focus().toggleBlockquote().run()"
-            :class="{ 'bg-gray-200': editor.isActive('blockquote') }"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Blockquote"
-          >
-            <Quote class="w-4 h-4 text-gray-700" />
-          </button>
-          
-          <!-- Code Block -->
-          <button 
-            @click="editor.chain().focus().toggleCodeBlock().run()"
-            :class="{ 'bg-gray-200': editor.isActive('codeBlock') }"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Code Block"
-          >
-            <FileCode class="w-4 h-4 text-gray-700" />
-          </button>
+
         </div>
       </div>
       
