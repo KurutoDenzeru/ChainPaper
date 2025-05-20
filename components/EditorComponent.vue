@@ -319,6 +319,48 @@
         
         <!-- Text alignment -->
         <div class="flex items-center space-x-1">
+          <!-- List dropdown -->
+          <div class="relative">
+            <button 
+              @click.stop="activeListMenu = !activeListMenu"
+              :class="{ 'bg-gray-200': editor.isActive('bulletList') || editor.isActive('orderedList') || editor.isActive('taskList') }"
+              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none flex items-center"
+              title="Lists"
+            >
+              <List class="w-4 h-4 text-gray-700 mr-1" />
+              <ChevronDown class="w-3 h-3 text-gray-700" />
+            </button>
+            <div 
+              v-show="activeListMenu" 
+              class="absolute right-0 top-full mt-1 w-40 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10"
+              @click.stop
+            >
+              <button 
+                @click="editor.chain().focus().toggleBulletList().run(); activeListMenu = false"
+                :class="{ 'bg-gray-100': editor.isActive('bulletList') }"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <List class="w-4 h-4 mr-2" />
+                Bullet List
+              </button>
+              <button 
+                @click="editor.chain().focus().toggleOrderedList().run(); activeListMenu = false"
+                :class="{ 'bg-gray-100': editor.isActive('orderedList') }"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <ListOrdered class="w-4 h-4 mr-2" />
+                Ordered List
+              </button>
+              <button 
+                @click="editor.chain().focus().toggleTaskList().run(); activeListMenu = false"
+                :class="{ 'bg-gray-100': editor.isActive('taskList') }"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <CheckSquare class="w-4 h-4 mr-2" />
+                Task List
+              </button>
+            </div>
+          </div>
           <button 
             @click="editor.chain().focus().setTextAlign('left').run()"
             :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'left' }) }"
@@ -383,48 +425,7 @@
         
         <!-- List dropdown, Blockquote, and Code Block -->
         <div class="ml-auto flex items-center space-x-2">
-          <!-- List dropdown -->
-          <div class="relative">
-            <button 
-              @click.stop="activeListMenu = !activeListMenu"
-              :class="{ 'bg-gray-200': editor.isActive('bulletList') || editor.isActive('orderedList') || editor.isActive('taskList') }"
-              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none flex items-center"
-              title="Lists"
-            >
-              <List class="w-4 h-4 text-gray-700 mr-1" />
-              <ChevronDown class="w-3 h-3 text-gray-700" />
-            </button>
-            <div 
-              v-show="activeListMenu" 
-              class="absolute right-0 top-full mt-1 w-40 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10"
-              @click.stop
-            >
-              <button 
-                @click="editor.chain().focus().toggleBulletList().run(); activeListMenu = false"
-                :class="{ 'bg-gray-100': editor.isActive('bulletList') }"
-                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-              >
-                <List class="w-4 h-4 mr-2" />
-                Bullet List
-              </button>
-              <button 
-                @click="editor.chain().focus().toggleOrderedList().run(); activeListMenu = false"
-                :class="{ 'bg-gray-100': editor.isActive('orderedList') }"
-                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-              >
-                <ListOrdered class="w-4 h-4 mr-2" />
-                Ordered List
-              </button>
-              <button 
-                @click="editor.chain().focus().toggleTaskList().run(); activeListMenu = false"
-                :class="{ 'bg-gray-100': editor.isActive('taskList') }"
-                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-              >
-                <CheckSquare class="w-4 h-4 mr-2" />
-                Task List
-              </button>
-            </div>
-          </div>
+          
 
         </div>
       </div>
