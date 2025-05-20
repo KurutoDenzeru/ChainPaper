@@ -411,6 +411,24 @@
               </button>
             </div>
           </div>
+          
+          <!-- Indentation buttons -->
+          <div class="flex items-center space-x-1 ml-1">
+            <button 
+              @click="editor.chain().focus().outdent().run()"
+              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+              title="Decrease Indent"
+            >
+              <IndentDecrease class="w-4 h-4 text-gray-700" />
+            </button>
+            <button 
+              @click="editor.chain().focus().indent().run()"
+              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+              title="Increase Indent"
+            >
+              <IndentIncrease class="w-4 h-4 text-gray-700" />
+            </button>
+          </div>
         <span class="border-r border-gray-300 h-6 mx-2"></span>
         
         <!-- Image upload -->
@@ -533,13 +551,14 @@ import UserGuide from './UserGuide.vue';
 import DocumentHistoryModal from './modals/DocumentHistoryModal.vue';
 import VerificationModal from './modals/VerificationModal.vue';
 import ProjectInfoModal from './modals/ProjectInfoModal.vue';
+import { Indent } from '../extensions/Indent.js';
 import { 
   Bold, Italic, Strikethrough, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Undo, Redo, Code, Link as LinkIcon, CheckSquare,
   Save, Download, Upload, X, HelpCircle, History, Shield, Info,
   AlignLeft, AlignCenter, AlignRight, AlignJustify, Highlighter,
   Superscript as SuperscriptIcon, Subscript as SubscriptIcon, FileCode, Image as ImageIcon,
-  ChevronDown
+  ChevronDown, IndentIncrease , IndentDecrease 
 } from 'lucide-vue-next';
 
 // Get toast service
@@ -678,6 +697,9 @@ onMounted(async () => {
       Image,
       Link.configure({
         openOnClick: false,
+      }),
+      Indent.configure({
+        types: ['heading', 'paragraph'],
       }),
       Collaboration.configure({
         document: ydoc,
