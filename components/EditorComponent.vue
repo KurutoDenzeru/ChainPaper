@@ -361,39 +361,56 @@
               </button>
             </div>
           </div>
-          <button 
-            @click="editor.chain().focus().setTextAlign('left').run()"
-            :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'left' }) }"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Align Left"
-          >
-            <AlignLeft class="w-4 h-4 text-gray-700" />
-          </button>
-          <button 
-            @click="editor.chain().focus().setTextAlign('center').run()"
-            :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'center' }) }"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Align Center"
-          >
-            <AlignCenter class="w-4 h-4 text-gray-700" />
-          </button>
-          <button 
-            @click="editor.chain().focus().setTextAlign('right').run()"
-            :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'right' }) }"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Align Right"
-          >
-            <AlignRight class="w-4 h-4 text-gray-700" />
-          </button>
-          <button 
-            @click="editor.chain().focus().setTextAlign('justify').run()"
-            :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'justify' }) }"
-            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-            title="Justify"
-          >
-            <AlignJustify class="w-4 h-4 text-gray-700" />
-          </button>
-        </div>
+          <!-- Text alignment dropdown -->
+          <div class="relative">
+            <button 
+              @click.stop="activeTextAlignMenu = !activeTextAlignMenu"
+              :class="{ 'bg-gray-200': editor.isActive({ textAlign: 'center' }) || editor.isActive({ textAlign: 'left' }) || editor.isActive({ textAlign: 'right' }) || editor.isActive({ textAlign: 'justify' }) }"
+              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none flex items-center text-align-menu"
+              title="Text Alignment"
+            >
+              <AlignCenter class="w-4 h-4 text-gray-700 mr-1" />
+              <ChevronDown class="w-3 h-3 text-gray-700" />
+            </button>
+            <div 
+              v-show="activeTextAlignMenu" 
+              class="absolute right-0 top-full mt-1 w-40 bg-white shadow-lg rounded-md border border-gray-200 py-1 z-10 text-align-menu"
+              @click.stop
+            >
+              <button 
+                @click="editor.chain().focus().setTextAlign('left').run(); activeTextAlignMenu = false"
+                :class="{ 'bg-gray-100': editor.isActive({ textAlign: 'left' }) }"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <AlignLeft class="w-4 h-4 mr-2" />
+                Align Left
+              </button>
+              <button 
+                @click="editor.chain().focus().setTextAlign('center').run(); activeTextAlignMenu = false"
+                :class="{ 'bg-gray-100': editor.isActive({ textAlign: 'center' }) }"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <AlignCenter class="w-4 h-4 mr-2" />
+                Align Center
+              </button>
+              <button 
+                @click="editor.chain().focus().setTextAlign('right').run(); activeTextAlignMenu = false"
+                :class="{ 'bg-gray-100': editor.isActive({ textAlign: 'right' }) }"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <AlignRight class="w-4 h-4 mr-2" />
+                Align Right
+              </button>
+              <button 
+                @click="editor.chain().focus().setTextAlign('justify').run(); activeTextAlignMenu = false"
+                :class="{ 'bg-gray-100': editor.isActive({ textAlign: 'justify' }) }"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+              >
+                <AlignJustify class="w-4 h-4 mr-2" />
+                Justify
+              </button>
+            </div>
+          </div>
         <span class="border-r border-gray-300 h-6 mx-2"></span>
         
         <!-- Image upload -->
@@ -423,11 +440,8 @@
           />
         </div>
         
-        <!-- List dropdown, Blockquote, and Code Block -->
-        <div class="ml-auto flex items-center space-x-2">
-          
-
-        </div>
+        <!-- End of formatting toolbar items -->
+      </div>
       </div>
       
       <!-- Main document editor area (Google Docs style) -->
@@ -440,7 +454,6 @@
           <p class="text-gray-500">Loading editor...</p>
         </div>
       </div>
-    </div>
     
     <!-- Document Verification Panel (toggleable) -->
     <div v-if="showVerificationModal" class="bg-white shadow rounded-lg p-6 mt-4 border border-gray-200">
@@ -488,6 +501,7 @@
     
     <!-- Project Info Modal -->
     <ProjectInfoModal v-model:isOpen="showProjectInfoModal" />
+  </div>
   </div>
 </template>
 
@@ -549,6 +563,7 @@ const showProjectInfoModal = ref(false);
 const activeMenu = ref(null); // Track which menu is currently open
 const activeHighlightMenu = ref(false); // Track highlight color menu
 const activeListMenu = ref(false); // Track list type menu
+const activeTextAlignMenu = ref(false); // Track text alignment menu
 const imageInput = ref(null); // Reference to image upload input
 
 // Yjs document setup
@@ -561,6 +576,19 @@ const handleOutsideClick = (event) => {
   // If we have an active menu and the click target is not inside a menu button or dropdown
   if (activeMenu.value && !event.target.closest('.menu-trigger') && !event.target.closest('.menu-dropdown')) {
     activeMenu.value = null;
+  }
+  
+  // Close other dropdown menus when clicking outside
+  if (activeHighlightMenu.value && !event.target.closest('.highlight-menu')) {
+    activeHighlightMenu.value = false;
+  }
+  
+  if (activeListMenu.value && !event.target.closest('.list-menu')) {
+    activeListMenu.value = false;
+  }
+  
+  if (activeTextAlignMenu.value && !event.target.closest('.text-align-menu')) {
+    activeTextAlignMenu.value = false;
   }
 };
 
