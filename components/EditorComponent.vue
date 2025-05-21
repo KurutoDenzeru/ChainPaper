@@ -103,10 +103,11 @@
 
       <!-- Formatting toolbar (Google Docs style) -->
       <div v-if="editor" class="flex items-center px-4 py-1 flex-wrap gap-2 border-b border-gray-200 bg-gray-50">
+        <!-- Font Style -->
         <div class="flex items-center space-x-1 mr-2">
-          <select class="text-sm border border-gray-300 rounded px-2 py-1 bg-white"
+          <select class="text-sm border border-gray-300 rounded px-2 py-1 bg-white min-w-[120px]"
             @change="e => editor.chain().focus().setFontFamily(e.target.value).run()"
-            :value="editor.getAttributes('textStyle').fontFamily">
+            :value="editor.getAttributes('textStyle').fontFamily || 'Arial'">
             <option value="Arial">Arial</option>
             <option value="Times New Roman">Times New Roman</option>
             <option value="Courier New">Courier New</option>
@@ -115,6 +116,7 @@
           </select>
         </div>
         <!-- Font size -->
+        <span class="border-r border-gray-300 h-6"></span>
         <div class="flex items-center space-x-1 mr-2">
           <button @click="decreaseFontSize" class="rounded-md px-2 py-1 hover:bg-gray-200 focus:outline-none"
             title="Decrease font size">
@@ -130,6 +132,7 @@
           </button>
         </div>
         <!-- Undo/Redo -->
+        <span class="border-r border-gray-300 h-6"></span>
         <div class="flex items-center space-x-1">
           <button @click="editor.chain().focus().undo().run()"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none" title="Undo">
@@ -141,7 +144,7 @@
           </button>
         </div>
         <!-- Headings -->
-        <span class="border-r border-gray-300 h-6 mx-2"></span>
+        <span class="border-r border-gray-300 h-6"></span>
         <div class="flex items-center space-x-1">
           <button @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
             :class="{ 'bg-gray-200': editor.isActive('heading', { level: 1 }) }"
@@ -159,28 +162,33 @@
             <Heading3 class="w-4 h-4 text-gray-700" />
           </button>
         </div>
-        <span class="border-r border-gray-300 h-6 mx-2"></span>
+        <span class="border-r border-gray-300 h-6"></span>
         <!-- Text formatting options -->
         <div class="flex items-center space-x-1">
+          <!-- Bold -->
           <button @click="editor.chain().focus().toggleBold().run()" :class="{ 'bg-gray-200': editor.isActive('bold') }"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none" title="Bold">
             <Bold class="w-4 h-4 text-gray-700" />
           </button>
+          <!-- Italic -->
           <button @click="editor.chain().focus().toggleItalic().run()"
             :class="{ 'bg-gray-200': editor.isActive('italic') }"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none" title="Italic">
             <Italic class="w-4 h-4 text-gray-700" />
           </button>
+          <!-- Underline -->
           <button @click="editor.chain().focus().toggleUnderline().run()"
             :class="{ 'bg-gray-200': editor.isActive('underline') }"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none" title="Underline">
             <UnderlineIcon class="w-4 h-4 text-gray-700" />
           </button>
+          <!-- Strikethrough -->
           <button @click="editor.chain().focus().toggleStrike().run()"
             :class="{ 'bg-gray-200': editor.isActive('strike') }"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none" title="Strikethrough">
             <Strikethrough class="w-4 h-4 text-gray-700" />
           </button>
+          <!-- Inline Code -->
           <button @click="editor.chain().focus().toggleCode().run()" :class="{ 'bg-gray-200': editor.isActive('code') }"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none" title="Inline Code">
             <Code class="w-4 h-4 text-gray-700" />
@@ -233,7 +241,7 @@
             <FileCode class="w-4 h-4 text-gray-700" />
           </button>
         </div>
-        <span class="border-r border-gray-300 h-6 mx-2"></span>
+        <span class="border-r border-gray-300 h-6"></span>
 
         <!-- Superscript and Subscript -->
         <div class="flex items-center space-x-1">
@@ -248,9 +256,22 @@
             <SubscriptIcon class="w-4 h-4 text-gray-700" />
           </button>
         </div>
-        <span class="border-r border-gray-300 h-6 mx-2"></span>
+        <span class="border-r border-gray-300 h-6"></span>
 
         <!-- Text alignment -->
+        <div class="flex items-center space-x-1">
+          <!-- Link Button -->
+          <button @click="editor.chain().focus().toggleLink().run()" :class="{ 'bg-gray-200': editor.isActive('link') }"
+            class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none" title="Link">
+            <LinkIcon class="w-4 h-4 text-gray-700" />
+          </button>
+          <button @click="handleImageUpload" class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
+            title="Add Image">
+            <ImageIcon class="w-4 h-4 text-gray-700" />
+          </button>
+          <input type="file" ref="imageInput" accept="image/*" class="hidden" @change="onImageInputChange" />
+        </div>
+        <span class="border-r border-gray-300 h-6"></span>
         <div class="flex items-center space-x-1">
           <!-- List dropdown -->
           <div class="relative">
@@ -333,24 +354,6 @@
               <IndentIncrease class="w-4 h-4 text-gray-700" />
             </button>
           </div>
-          <span class="border-r border-gray-300 h-6 mx-2"></span>
-
-          <!-- Image upload -->
-          <div class="flex items-center space-x-1">
-            <!-- Link Button -->
-            <button @click="editor.chain().focus().toggleLink().run()"
-              :class="{ 'bg-gray-200': editor.isActive('link') }"
-              class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none" title="Link">
-              <LinkIcon class="w-4 h-4 text-gray-700" />
-            </button>
-            <button @click="handleImageUpload" class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none"
-              title="Add Image">
-              <ImageIcon class="w-4 h-4 text-gray-700" />
-            </button>
-            <input type="file" ref="imageInput" accept="image/*" class="hidden" @change="onImageInputChange" />
-          </div>
-
-          <!-- End of formatting toolbar items -->
         </div>
       </div>
 
@@ -410,56 +413,85 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, inject } from 'vue';
-import { Editor, EditorContent } from '@tiptap/vue-3';
-import StarterKit from '@tiptap/starter-kit';
-import Collaboration from '@tiptap/extension-collaboration';
-import Underline from '@tiptap/extension-underline';
-import TextStyle from '@tiptap/extension-text-style';
-import FontFamily from '@tiptap/extension-font-family';
-import FontSize from '@tiptap/extension-font-size';
-import Highlight from '@tiptap/extension-highlight';
-import TaskList from '@tiptap/extension-task-list';
-import TaskItem from '@tiptap/extension-task-item';
-import Subscript from '@tiptap/extension-subscript';
-import Superscript from '@tiptap/extension-superscript';
-import TextAlign from '@tiptap/extension-text-align';
-import CodeBlockExtension from '@tiptap/extension-code-block';
-import { Extension } from '@tiptap/core';
-import CodeExtension from '@tiptap/extension-code';
-import Image from '@tiptap/extension-image';
-import Link from '@tiptap/extension-link';
-import * as Y from 'yjs';
-import { WebrtcProvider } from 'y-webrtc';
-import { IndexeddbPersistence } from 'y-indexeddb';
-import documentStorage from '../utils/documentStorage.ts';
-import ModalComponent from './ModalComponent.vue';
-import UserGuide from './UserGuide.vue';
-import DocumentHistoryModal from './modals/DocumentHistoryModal.vue';
-import VerificationModal from './modals/VerificationModal.vue';
-import ProjectInfoModal from './modals/ProjectInfoModal.vue';
-import { Indent } from '../extensions/Indent.js';
-import { 
-  Bold, Italic, Strikethrough, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
-  List, ListOrdered, Quote, Undo, Redo, Code, Link as LinkIcon, CheckSquare,
-  Save, Download, Upload, X, HelpCircle, History, Shield, Info,
-  AlignLeft, AlignCenter, AlignRight, AlignJustify, Highlighter,
-  Superscript as SuperscriptIcon, Subscript as SubscriptIcon, FileCode, Image as ImageIcon,
-  ChevronDown, IndentIncrease , IndentDecrease 
-} from 'lucide-vue-next';
+import { ref, onMounted, onBeforeUnmount, inject } from "vue";
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import StarterKit from "@tiptap/starter-kit";
+import Collaboration from "@tiptap/extension-collaboration";
+import Underline from "@tiptap/extension-underline";
+import TextStyle from "@tiptap/extension-text-style";
+import FontFamily from "@tiptap/extension-font-family";
+import FontSize from "@tiptap/extension-font-size";
+import Highlight from "@tiptap/extension-highlight";
+import TaskList from "@tiptap/extension-task-list";
+import TaskItem from "@tiptap/extension-task-item";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import TextAlign from "@tiptap/extension-text-align";
+import CodeBlockExtension from "@tiptap/extension-code-block";
+import { Extension } from "@tiptap/core";
+import CodeExtension from "@tiptap/extension-code";
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
+import * as Y from "yjs";
+import { WebrtcProvider } from "y-webrtc";
+import { IndexeddbPersistence } from "y-indexeddb";
+import documentStorage from "../utils/documentStorage.ts";
+import ModalComponent from "./ModalComponent.vue";
+import UserGuide from "./UserGuide.vue";
+import DocumentHistoryModal from "./modals/DocumentHistoryModal.vue";
+import VerificationModal from "./modals/VerificationModal.vue";
+import ProjectInfoModal from "./modals/ProjectInfoModal.vue";
+import { Indent } from "../extensions/Indent.js";
+import {
+	Bold,
+	Italic,
+	Strikethrough,
+	Underline as UnderlineIcon,
+	Heading1,
+	Heading2,
+	Heading3,
+	List,
+	ListOrdered,
+	Quote,
+	Undo,
+	Redo,
+	Code,
+	Link as LinkIcon,
+	CheckSquare,
+	Save,
+	Download,
+	Upload,
+	X,
+	HelpCircle,
+	History,
+	Shield,
+	Info,
+	AlignLeft,
+	AlignCenter,
+	AlignRight,
+	AlignJustify,
+	Highlighter,
+	Superscript as SuperscriptIcon,
+	Subscript as SubscriptIcon,
+	FileCode,
+	Image as ImageIcon,
+	ChevronDown,
+	IndentIncrease,
+	IndentDecrease,
+} from "lucide-vue-next";
 
 // Get toast service
-const toast = inject('toast');
+const toast = inject("toast");
 
 // Document state
 const editor = ref(null);
-const currentHash = ref('');
-const lastEdited = ref('');
+const currentHash = ref("");
+const lastEdited = ref("");
 const contributors = ref([]);
 const username = ref(`Anonymous User-${Math.floor(Math.random() * 1000)}`);
 const fileInput = ref(null);
 const verificationStatus = ref(null);
-const verificationMessage = ref('');
+const verificationMessage = ref("");
 
 // UI state
 const showDocumentHistoryModal = ref(false);
@@ -479,434 +511,458 @@ const persistence = ref(null);
 
 // Handle clicks outside of menus to close them
 const handleOutsideClick = (event) => {
-  // If we have an active menu and the click target is not inside a menu button or dropdown
-  if (activeMenu.value && !event.target.closest('.menu-trigger') && !event.target.closest('.menu-dropdown')) {
-    activeMenu.value = null;
-  }
-  
-  // Close other dropdown menus when clicking outside
-  if (activeHighlightMenu.value && !event.target.closest('.highlight-menu')) {
-    activeHighlightMenu.value = false;
-  }
-  
-  if (activeListMenu.value && !event.target.closest('.list-menu')) {
-    activeListMenu.value = false;
-  }
-  
-  if (activeTextAlignMenu.value && !event.target.closest('.text-align-menu')) {
-    activeTextAlignMenu.value = false;
-  }
+	// If we have an active menu and the click target is not inside a menu button or dropdown
+	if (
+		activeMenu.value &&
+		!event.target.closest(".menu-trigger") &&
+		!event.target.closest(".menu-dropdown")
+	) {
+		activeMenu.value = null;
+	}
+
+	// Close other dropdown menus when clicking outside
+	if (activeHighlightMenu.value && !event.target.closest(".highlight-menu")) {
+		activeHighlightMenu.value = false;
+	}
+
+	if (activeListMenu.value && !event.target.closest(".list-menu")) {
+		activeListMenu.value = false;
+	}
+
+	if (activeTextAlignMenu.value && !event.target.closest(".text-align-menu")) {
+		activeTextAlignMenu.value = false;
+	}
 };
 
 // Image upload handlers
 const handleImageUpload = () => {
-  imageInput.value.click();
+	imageInput.value.click();
 };
 
 const onImageInputChange = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target.result;
-      editor.value.chain().focus().setImage({ src: result }).run();
-    };
-    reader.readAsDataURL(file);
-    // Reset the input so the same file can be selected again
-    event.target.value = '';
-  }
+	const file = event.target.files[0];
+	if (file) {
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			const result = e.target.result;
+			editor.value.chain().focus().setImage({ src: result }).run();
+		};
+		reader.readAsDataURL(file);
+		// Reset the input so the same file can be selected again
+		event.target.value = "";
+	}
 };
 
 // Initialize editor with collaboration features
 onMounted(async () => {
-  // Initialize document storage
-  await documentStorage.initialize();
-  
-  // Set up persistence with IndexedDB
-  persistence.value = new IndexeddbPersistence('chainpaper-document', ydoc);
-  
-  // Set up WebRTC provider for real-time collaboration
-  provider.value = new WebrtcProvider('chainpaper-document', ydoc, {
-      // signaling: ['wss://signaling.yjs.dev']
-      signaling: [],
-  });
-  
-  // Add current user to awareness
-  provider.value.awareness.setLocalStateField('user', {
-    name: username.value,
-    color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-  });
-  
-  // Initialize TipTap editor with Yjs collaboration
-  const ytext = ydoc.getText('content');
-  
-  // Load existing document if available
-  const savedDocument = documentStorage.loadDocument();
+	// Initialize document storage
+	await documentStorage.initialize();
 
-  const CodeIndent = Extension.create({
-  addCommands() {
-    return {
-      indentCode: () => ({ editor, chain }) => {
-        if (!editor.isActive('codeBlock')) return false
-        return chain()
-          .toggleCodeBlock()
-          .command(({ tr }) => {
-            tr.insertText('  ', editor.state.selection.from)
-            return true
-          })
-          .run()
-      },
-      outdentCode: () => ({ editor, chain }) => {
-        if (!editor.isActive('codeBlock')) return false
-        return chain()
-          .toggleCodeBlock()
-          .command(({ tr }) => {
-            const text = editor.state.doc.textBetween(
-              editor.state.selection.from - 2,
-              editor.state.selection.from,
-              ''
-            )
-            if (text === '  ') {
-              tr.deleteRange(
-                editor.state.selection.from - 2,
-                editor.state.selection.from
-              )
-            }
-            return true
-          })
-          .run()
-      },
-    }
-  },
-});
+	// Set up persistence with IndexedDB
+	persistence.value = new IndexeddbPersistence("chainpaper-document", ydoc);
 
-  // Add this helper function to your setup
-  const ensureValidSelection = (editor) => {
-    try {
-      // If the current selection is invalid, try to move to a safe position
-      if (!editor.state.selection.empty) {
-        return;
-      }
+	// Set up WebRTC provider for real-time collaboration
+	provider.value = new WebrtcProvider("chainpaper-document", ydoc, {
+		// signaling: ['wss://signaling.yjs.dev']
+		signaling: [],
+	});
 
-      // Find a paragraph or other text node to place the cursor in
-      const { doc } = editor.state;
-      let pos = 0;
+	// Add current user to awareness
+	provider.value.awareness.setLocalStateField("user", {
+		name: username.value,
+		color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+	});
 
-      doc.descendants((node, nodePos) => {
-        if (node.type.name === 'paragraph' && node.content.size === 0) {
-          pos = nodePos + 1; // Position inside the paragraph
-          return false;
-        }
-        return true;
-      });
+	// Initialize TipTap editor with Yjs collaboration
+	const ytext = ydoc.getText("content");
 
-      // Set the selection to this position if we found one
-      if (pos > 0) {
-        editor.commands.setTextSelection(pos);
-      }
-    } catch (e) {
-      console.log("Selection adjustment failed:", e);
-    }
-  };
-  
-  editor.value = new Editor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
-        },
-        bulletList: {
-          keepMarks: true,
-          keepAttributes: true,
-        },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: true,
-        },
-        blockquote: true,
-        horizontalRule: true,
-        strike: true,
-        bold: true,
-        italic: true,
-        code: false, // Disable default code extension as we're adding it separately
-        codeBlock: false, // Disable default codeBlock extension as we're adding it separately
-        history: false, // Disable history as it conflicts with collaboration extension
-      }),
-      Underline,
-      TextStyle,
-      FontFamily,
-      FontSize,
-      Highlight.configure({
-        multicolor: true,
-      }),
-      TaskList,
-      TaskItem.configure({
-        nested: true,
-      }),
-      Subscript,
-      Superscript,
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
-      CodeBlockExtension.configure({ name: 'customCodeBlock' }),
-      CodeExtension.configure({ name: 'inlineCode' }),
-      Image,
-      Link.configure({
-        openOnClick: false,
-      }),
-      CodeIndent,
-      Indent.configure({
-        types: ['heading', 'paragraph', 'codeBlock'],
-      }),
-      Collaboration.configure({
-        document: ydoc,
-      }),
-    ],
-    content: savedDocument?.content || '',
-    editorProps: {
-      attributes: {
-        class: 'focus:outline-none min-h-[350px] p-2',
-        'data-placeholder': 'Start typing your document...',
-      },
-    },
-    onUpdate: ({ editor }) => {
-      // Generate hash of current content
-      generateContentHash(editor.getHTML());
-      // Update last edited timestamp
-      lastEdited.value = new Date().toISOString();
-    },
-  });
+	// Load existing document if available
+	const savedDocument = documentStorage.loadDocument();
 
-    if (editor.value) {
-    ensureValidSelection(editor.value);
-  }
+	const CodeIndent = Extension.create({
+		addCommands() {
+			return {
+				indentCode:
+					() =>
+					({ editor, chain }) => {
+						if (!editor.isActive("codeBlock")) return false;
+						return chain()
+							.toggleCodeBlock()
+							.command(({ tr }) => {
+								tr.insertText("  ", editor.state.selection.from);
+								return true;
+							})
+							.run();
+					},
+				outdentCode:
+					() =>
+					({ editor, chain }) => {
+						if (!editor.isActive("codeBlock")) return false;
+						return chain()
+							.toggleCodeBlock()
+							.command(({ tr }) => {
+								const text = editor.state.doc.textBetween(
+									editor.state.selection.from - 2,
+									editor.state.selection.from,
+									"",
+								);
+								if (text === "  ") {
+									tr.deleteRange(
+										editor.state.selection.from - 2,
+										editor.state.selection.from,
+									);
+								}
+								return true;
+							})
+							.run();
+					},
+			};
+		},
+	});
 
-// If we have a saved document, update the hash and timestamp
-  if (savedDocument) {
-    currentHash.value = savedDocument.hash;
-    lastEdited.value = savedDocument.timestamp;
-  }
-  
-  // Track contributors
-  provider.value.awareness.on('change', () => {
-    const states = provider.value.awareness.getStates();
-    const users = [];
-    for (const [_, state] of states.entries()) {
-      if (state.user) {
-        users.push(state.user);
-      }
-    }
-    contributors.value = users;
-  });
+	// Add this helper function to your setup
+	const ensureValidSelection = (editor) => {
+		try {
+			// If the current selection is invalid, try to move to a safe position
+			if (!editor.state.selection.empty) {
+				return;
+			}
+
+			// Find a paragraph or other text node to place the cursor in
+			const { doc } = editor.state;
+			let pos = 0;
+
+			doc.descendants((node, nodePos) => {
+				if (node.type.name === "paragraph" && node.content.size === 0) {
+					pos = nodePos + 1; // Position inside the paragraph
+					return false;
+				}
+				return true;
+			});
+
+			// Set the selection to this position if we found one
+			if (pos > 0) {
+				editor.commands.setTextSelection(pos);
+			}
+		} catch (e) {
+			console.log("Selection adjustment failed:", e);
+		}
+	};
+
+	editor.value = new Editor({
+		extensions: [
+			StarterKit.configure({
+				heading: {
+					levels: [1, 2, 3],
+				},
+				bulletList: {
+					keepMarks: true,
+					keepAttributes: true,
+				},
+				orderedList: {
+					keepMarks: true,
+					keepAttributes: true,
+				},
+				blockquote: true,
+				horizontalRule: true,
+				strike: true,
+				bold: true,
+				italic: true,
+				code: false, // Disable default code extension as we're adding it separately
+				codeBlock: false, // Disable default codeBlock extension as we're adding it separately
+				history: false, // Disable history as it conflicts with collaboration extension
+			}),
+			Underline,
+			TextStyle,
+			FontFamily,
+			FontSize,
+			Highlight.configure({
+				multicolor: true,
+			}),
+			TaskList,
+			TaskItem.configure({
+				nested: true,
+			}),
+			Subscript,
+			Superscript,
+			TextAlign.configure({
+				types: ["heading", "paragraph"],
+			}),
+			CodeBlockExtension.configure({ name: "customCodeBlock" }),
+			CodeExtension.configure({ name: "inlineCode" }),
+			Image,
+			Link.configure({
+				openOnClick: false,
+			}),
+			CodeIndent,
+			Indent.configure({
+				types: ["heading", "paragraph", "codeBlock"],
+			}),
+			Collaboration.configure({
+				document: ydoc,
+			}),
+		],
+		content: savedDocument?.content || "",
+		editorProps: {
+			attributes: {
+				class: "focus:outline-none min-h-[350px] p-2",
+				"data-placeholder": "Start typing your document...",
+			},
+		},
+		onUpdate: ({ editor }) => {
+			// Generate hash of current content
+			generateContentHash(editor.getHTML());
+			// Update last edited timestamp
+			lastEdited.value = new Date().toISOString();
+		},
+	});
+
+	if (editor.value) {
+		ensureValidSelection(editor.value);
+	}
+
+	// If we have a saved document, update the hash and timestamp
+	if (savedDocument) {
+		currentHash.value = savedDocument.hash;
+		lastEdited.value = savedDocument.timestamp;
+	}
+
+	// Track contributors
+	provider.value.awareness.on("change", () => {
+		const states = provider.value.awareness.getStates();
+		const users = [];
+		for (const [_, state] of states.entries()) {
+			if (state.user) {
+				users.push(state.user);
+			}
+		}
+		contributors.value = users;
+	});
 });
 
 // Clean up on component unmount
 onBeforeUnmount(() => {
-  if (editor.value) {
-    editor.value.destroy();
-  }
-  if (provider.value) {
-    provider.value.destroy();
-  }
-  if (persistence.value) {
-    persistence.value.destroy();
-  }
-  ydoc.destroy();
+	if (editor.value) {
+		editor.value.destroy();
+	}
+	if (provider.value) {
+		provider.value.destroy();
+	}
+	if (persistence.value) {
+		persistence.value.destroy();
+	}
+	ydoc.destroy();
 });
 
 // Generate SHA-256 hash of content
 const generateContentHash = async (content) => {
-  if (!content) return;
-  
-  try {
-    // Use Web Crypto API for SHA-256 hashing
-    const msgUint8 = new TextEncoder().encode(content);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    
-    currentHash.value = hashHex;
-    return hashHex;
-  } catch (error) {
-    console.error('Error generating hash:', error);
-    return null;
-  }
+	if (!content) return;
+
+	try {
+		// Use Web Crypto API for SHA-256 hashing
+		const msgUint8 = new TextEncoder().encode(content);
+		const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
+		const hashArray = Array.from(new Uint8Array(hashBuffer));
+		const hashHex = hashArray
+			.map((b) => b.toString(16).padStart(2, "0"))
+			.join("");
+
+		currentHash.value = hashHex;
+		return hashHex;
+	} catch (error) {
+		console.error("Error generating hash:", error);
+		return null;
+	}
 };
 
-  // Font Size and Font Family handlers
-  const updateFontSize = (e) => {
-    const value = e.target.value.trim();
-    if (value && !Number.isNaN(value)) {
-      editor.value.chain().focus().setFontSize(`${value}px`).run();
-    }
-  };
+// Font Size and Font Family handlers
+const updateFontSize = (e) => {
+	const value = e.target.value.trim();
+	if (value && !Number.isNaN(value)) {
+		editor.value.chain().focus().setFontSize(`${value}px`).run();
+	}
+};
 
-  const validateFontSize = (e) => {
-    let value = e.target.value.trim();
-    // Set default or fix invalid values
-    if (!value || Number.isNaN(value) || value < 1) {
-      value = '12';
-      editor.value.chain().focus().setFontSize(`${value}px`).run();
-    }
-  };
+const validateFontSize = (e) => {
+	let value = e.target.value.trim();
+	// Set default or fix invalid values
+	if (!value || Number.isNaN(value) || value < 1) {
+		value = "12";
+		editor.value.chain().focus().setFontSize(`${value}px`).run();
+	}
+};
 
-  const increaseFontSize = () => {
-    const currentSize = Number.parseInt(editor.value.getAttributes('textStyle').fontSize?.replace('px', '') || '12');
-    const newSize = currentSize + 1;
-    editor.value.chain().focus().setFontSize(`${newSize}px`).run();
-  };
+const increaseFontSize = () => {
+	const currentSize = Number.parseInt(
+		editor.value.getAttributes("textStyle").fontSize?.replace("px", "") || "12",
+	);
+	const newSize = currentSize + 1;
+	editor.value.chain().focus().setFontSize(`${newSize}px`).run();
+};
 
-  const decreaseFontSize = () => {
-    const currentSize = Number.parseInt(editor.value.getAttributes('textStyle').fontSize?.replace('px', '') || '12');
-    const newSize = Math.max(1, currentSize - 1);
-    editor.value.chain().focus().setFontSize(`${newSize}px`).run();
-  };
+const decreaseFontSize = () => {
+	const currentSize = Number.parseInt(
+		editor.value.getAttributes("textStyle").fontSize?.replace("px", "") || "12",
+	);
+	const newSize = Math.max(1, currentSize - 1);
+	editor.value.chain().focus().setFontSize(`${newSize}px`).run();
+};
 
 // Save document using DocumentStorage
 const saveDocument = async () => {
-  if (!editor.value) return;
-  
-  const documentData = {
-    content: editor.value.getHTML(),
-    hash: currentHash.value,
-    timestamp: new Date().toISOString(),
-    author: username.value,
-    contributors: contributors.value.map(user => user.name),
-  };
-  
-  try {
-    await documentStorage.saveDocument(documentData);
-    toast.success('Document saved successfully!');
-  } catch (error) {
-    console.error('Error saving document:', error);
-    toast.error('Failed to save document.');
-  }
+	if (!editor.value) return;
+
+	const documentData = {
+		content: editor.value.getHTML(),
+		hash: currentHash.value,
+		timestamp: new Date().toISOString(),
+		author: username.value,
+		contributors: contributors.value.map((user) => user.name),
+	};
+
+	try {
+		await documentStorage.saveDocument(documentData);
+		toast.success("Document saved successfully!");
+	} catch (error) {
+		console.error("Error saving document:", error);
+		toast.error("Failed to save document.");
+	}
 };
 
 // Export document as JSON with Merkle proof
 const exportDocument = () => {
-  if (!editor.value) return;
-  
-  // Get document with proof from storage
-  const exportData = documentStorage.exportWithProof();
-  
-  if (!exportData) {
-    toast.error('No document to export. Please save the document first.');
-    return;
-  }
-  
-  const dataStr = JSON.stringify(exportData, null, 2);
-  const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
-  
-  const exportFileDefaultName = `chainpaper-${new Date().toISOString().slice(0, 10)}.json`;
-  
-  const linkElement = document.createElement('a');
-  linkElement.setAttribute('href', dataUri);
-  linkElement.setAttribute('download', exportFileDefaultName);
-  linkElement.click();
-  
-  toast.success('Document exported successfully!');
+	if (!editor.value) return;
+
+	// Get document with proof from storage
+	const exportData = documentStorage.exportWithProof();
+
+	if (!exportData) {
+		toast.error("No document to export. Please save the document first.");
+		return;
+	}
+
+	const dataStr = JSON.stringify(exportData, null, 2);
+	const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+
+	const exportFileDefaultName = `chainpaper-${new Date().toISOString().slice(0, 10)}.json`;
+
+	const linkElement = document.createElement("a");
+	linkElement.setAttribute("href", dataUri);
+	linkElement.setAttribute("download", exportFileDefaultName);
+	linkElement.click();
+
+	toast.success("Document exported successfully!");
 };
 
 // Import document from JSON file
 const importDocument = () => {
-  if (fileInput.value) {
-    fileInput.value.click();
-  }
+	if (fileInput.value) {
+		fileInput.value.click();
+	}
 };
 
 // Handle file upload for import
 const handleFileUpload = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-  
-  try {
-    const fileContent = await readFileAsText(file);
-    const importData = JSON.parse(fileContent);
-    
-    // Validate the imported data structure
-    if (!importData.document || !importData.merkleRoot || !importData.history) {
-      toast.error('Invalid document format. Please upload a valid ChainPaper export file.');
-      return;
-    }
-    
-    // Import the document content into the editor
-    if (editor.value && importData.document.content) {
-      // Update editor content
-      editor.value.commands.setContent(importData.document.content);
-      
-      // Update document metadata
-      currentHash.value = importData.document.hash || '';
-      lastEdited.value = importData.document.timestamp || new Date().toISOString();
-      
-      // Use the documentStorage importDocument method
-      await documentStorage.initialize();
-      const importSuccess = documentStorage.importDocument(importData);
-      
-      if (importSuccess) {
-        toast.success('Document imported successfully!');
-      } else {
-        toast.error('There was an issue importing the document. Some data may not have been imported correctly.');
-      }
-    }
-  } catch (error) {
-    console.error('Error importing document:', error);
-    toast.error('Failed to import document. Please check the file format.');
-  }
-  
-  // Reset file input
-  event.target.value = null;
+	const file = event.target.files[0];
+	if (!file) return;
+
+	try {
+		const fileContent = await readFileAsText(file);
+		const importData = JSON.parse(fileContent);
+
+		// Validate the imported data structure
+		if (!importData.document || !importData.merkleRoot || !importData.history) {
+			toast.error(
+				"Invalid document format. Please upload a valid ChainPaper export file.",
+			);
+			return;
+		}
+
+		// Import the document content into the editor
+		if (editor.value && importData.document.content) {
+			// Update editor content
+			editor.value.commands.setContent(importData.document.content);
+
+			// Update document metadata
+			currentHash.value = importData.document.hash || "";
+			lastEdited.value =
+				importData.document.timestamp || new Date().toISOString();
+
+			// Use the documentStorage importDocument method
+			await documentStorage.initialize();
+			const importSuccess = documentStorage.importDocument(importData);
+
+			if (importSuccess) {
+				toast.success("Document imported successfully!");
+			} else {
+				toast.error(
+					"There was an issue importing the document. Some data may not have been imported correctly.",
+				);
+			}
+		}
+	} catch (error) {
+		console.error("Error importing document:", error);
+		toast.error("Failed to import document. Please check the file format.");
+	}
+
+	// Reset file input
+	event.target.value = null;
 };
 
 // Helper function to read file as text
 const readFileAsText = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => resolve(event.target.result);
-    reader.onerror = (error) => reject(error);
-    reader.readAsText(file);
-  });
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onload = (event) => resolve(event.target.result);
+		reader.onerror = (error) => reject(error);
+		reader.readAsText(file);
+	});
 };
 
 // Verify document authorship
 const verifyDocument = async () => {
-  if (!currentHash.value) {
-    verificationStatus.value = 'failed';
-    verificationMessage.value = 'No document hash available. Please save the document first.';
-    toast.error('No document hash available. Please save the document first.');
-    return;
-  }
-  
-  try {
-    // Get the current document content and hash
-    const content = editor.value.getHTML();
-    const generatedHash = await generateContentHash(content);
-    
-    // Check if the current hash matches the stored hash
-    if (generatedHash !== currentHash.value) {
-      verificationStatus.value = 'failed';
-      verificationMessage.value = 'Document has been modified since last save.';
-      toast.error('Document has been modified since last save.');
-      return;
-    }
-    
-    // Use the documentStorage verifyAuthorship method
-    const verificationResult = documentStorage.verifyAuthorship(currentHash.value);
-    
-    if (verificationResult.verified) {
-      verificationStatus.value = 'verified';
-      verificationMessage.value = `${verificationResult.message} Author: ${verificationResult.author}`;
-      toast.success(`${verificationResult.message} Author: ${verificationResult.author}`);
-    } else {
-      verificationStatus.value = 'failed';
-      verificationMessage.value = verificationResult.message;
-      toast.error(verificationResult.message);
-    }
-  } catch (error) {
-    console.error('Error verifying document:', error);
-    verificationStatus.value = 'failed';
-    verificationMessage.value = `Error verifying document: ${error.message}`;
-    toast.error(`Error verifying document: ${error.message}`);
-  }
+	if (!currentHash.value) {
+		verificationStatus.value = "failed";
+		verificationMessage.value =
+			"No document hash available. Please save the document first.";
+		toast.error("No document hash available. Please save the document first.");
+		return;
+	}
+
+	try {
+		// Get the current document content and hash
+		const content = editor.value.getHTML();
+		const generatedHash = await generateContentHash(content);
+
+		// Check if the current hash matches the stored hash
+		if (generatedHash !== currentHash.value) {
+			verificationStatus.value = "failed";
+			verificationMessage.value = "Document has been modified since last save.";
+			toast.error("Document has been modified since last save.");
+			return;
+		}
+
+		// Use the documentStorage verifyAuthorship method
+		const verificationResult = documentStorage.verifyAuthorship(
+			currentHash.value,
+		);
+
+		if (verificationResult.verified) {
+			verificationStatus.value = "verified";
+			verificationMessage.value = `${verificationResult.message} Author: ${verificationResult.author}`;
+			toast.success(
+				`${verificationResult.message} Author: ${verificationResult.author}`,
+			);
+		} else {
+			verificationStatus.value = "failed";
+			verificationMessage.value = verificationResult.message;
+			toast.error(verificationResult.message);
+		}
+	} catch (error) {
+		console.error("Error verifying document:", error);
+		verificationStatus.value = "failed";
+		verificationMessage.value = `Error verifying document: ${error.message}`;
+		toast.error(`Error verifying document: ${error.message}`);
+	}
 };
 </script>
