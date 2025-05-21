@@ -43,18 +43,17 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
 import { Instagram, Github, Linkedin } from 'lucide-vue-next';
 import ModalComponent from '../ModalComponent.vue';
 
-const props = defineProps({
+defineProps({
   isOpen: {
     type: Boolean,
     default: false
   }
 });
 
-const emit = defineEmits(['update:isOpen']);
+defineEmits(['update:isOpen']);
 </script>
 
 <style scoped>

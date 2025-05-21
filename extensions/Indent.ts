@@ -3,37 +3,31 @@ import { TextSelection, AllSelection, type Transaction, type EditorState } from 
 import type { Node as ProsemirrorNode } from 'prosemirror-model';
 
 declare module '@tiptap/core' {
-  interface Commands {
-    indent: {
-      /**
-       * Set the indent attribute
-       */
-      indent: () => Commands['indent']['indent']
-      /**
-       * Unset the indent attribute
-       */
-      outdent: () => Commands['indent']['outdent']
+  interface Commands<ReturnType> {
+    codeIndent: {
+      indentCode: () => ReturnType
+      outdentCode: () => ReturnType
     }
   }
-}
-
-interface IndentOptions {
-  types: string[];
-  indentLevels: number[];
-  defaultIndentLevel: number;
 }
 
 interface IndentAttributes {
   indent: number;
 }
 
-export const Indent = Extension.create<IndentOptions>({
+export const Indent = Extension.create<{
+  types: string[]
+  indentLevels: number[]
+  defaultIndentLevel: number
+}>({
   name: 'indent',
 
-  defaultOptions: {
-    types: ['heading', 'paragraph'],
-    indentLevels: [0, 30, 60, 90, 120, 150, 180, 210],
-    defaultIndentLevel: 0,
+  addOptions() {
+    return {
+      types: ['paragraph', 'heading', 'blockquote'],
+      indentLevels: [0, 30, 60, 90, 120, 150],
+      defaultIndentLevel: 0,
+    }
   },
 
   addGlobalAttributes() {
@@ -43,7 +37,7 @@ export const Indent = Extension.create<IndentOptions>({
         attributes: {
           indent: {
             default: this.options.defaultIndentLevel,
-            renderHTML: (attributes: Record<string, any>) => ({
+            renderHTML: (attributes: Record<string, IndentAttributes>) => ({
               style: `margin-left: ${attributes.indent}px!important;`
             }),
             parseHTML: (element: HTMLElement) => ({
@@ -57,41 +51,37 @@ export const Indent = Extension.create<IndentOptions>({
 
   addCommands() {
     return {
-      indent: () => ({ tr, state, dispatch }: { tr: Transaction, state: EditorState, dispatch?: (tr: Transaction) => void }) => {
-        const { selection } = state;
-        let transaction = tr.setSelection(selection);
-        transaction = updateIndentLevel(transaction, 30, this.options.types, this.options.indentLevels);
-
-        if (transaction.docChanged) {
-          dispatch?.(transaction);
-          return true;
-        }
-
-        return false;
+      indent: () => ({ tr, dispatch }: { tr: Transaction; dispatch?: (tr: Transaction) => void }) => {
+        const newTr = updateIndentLevel(
+          tr,
+          this.options.indentLevels[1],             // +30px
+          this.options.types,
+          this.options.indentLevels,
+        )
+        if (dispatch) dispatch(newTr)
+        return true
       },
-      outdent: () => ({ tr, state, dispatch }: { tr: Transaction, state: EditorState, dispatch?: (tr: Transaction) => void }) => {
-        const { selection } = state;
-        let transaction = tr.setSelection(selection);
-        transaction = updateIndentLevel(transaction, -30, this.options.types, this.options.indentLevels);
-
-        if (transaction.docChanged) {
-          dispatch?.(transaction);
-          return true;
-        }
-
-        return false;
+      outdent: () => ({ tr, dispatch }: { tr: Transaction; dispatch?: (tr: Transaction) => void }) => {
+        const newTr = updateIndentLevel(
+          tr,
+          -this.options.indentLevels[1],            // -30px
+          this.options.types,
+          this.options.indentLevels,
+        )
+        if (dispatch) dispatch(newTr)
+        return true
       },
-    };
+    }
   },
 
   addKeyboardShortcuts() {
     return {
       Tab: (): boolean => {
-        this.editor.commands.indent();
+        this.editor.commands.indentCode();
         return true;
       },
       'Ctrl-[': (): boolean => {
-        this.editor.commands.outdent();
+        this.editor.commands.outdentCode();
         return true;
       },
     };

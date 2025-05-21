@@ -216,7 +216,7 @@ class DocumentStorage {
       console.error('Error verifying authorship:', error);
       return {
         verified: false,
-        message: 'Error verifying document: ' + (error instanceof Error ? error.message : String(error))
+        message: `Error verifying document: ${error instanceof Error ? error.message : String(error)}`
       };
     }
   }

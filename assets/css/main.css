@@ -148,3 +148,58 @@ body {
 .group:hover .group-hover\:block {
   display: block;
 }
+
+/* Task List Styles */
+ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+
+ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 0.5em;
+}
+
+ul[data-type="taskList"] li>label {
+  flex: 0 0 auto;
+  margin-right: 0.5em;
+  user-select: none;
+}
+
+ul[data-type="taskList"] li>div {
+  flex: 1 1 auto;
+}
+
+/* Code block styles */
+pre {
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+code {
+  font-family: monospace;
+  background-color: rgba(175, 184, 193, 0.2);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Image styles */
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Highlight styles */
+.ProseMirror mark {
+  border-radius: 0.25em;
+  padding: 0.1em 0.2em;
+}

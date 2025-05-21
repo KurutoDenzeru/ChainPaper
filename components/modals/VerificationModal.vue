@@ -46,7 +46,6 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
 import { Shield } from 'lucide-vue-next';
 import ModalComponent from '../ModalComponent.vue';
 
