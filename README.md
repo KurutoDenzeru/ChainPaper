@@ -1,3 +1,5 @@
+![ChainPaper](public/openGraph.png)
+
 # ChainPaper
 
 > Trustless whitepaper collaboration tool with authorship proofs, no backend required.
