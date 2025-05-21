@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, defineProps, defineEmits } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import documentStorage from '../../utils/documentStorage.ts';
 import { Copy } from 'lucide-vue-next';
 import ModalComponent from '../ModalComponent.vue';
