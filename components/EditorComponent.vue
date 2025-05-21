@@ -114,18 +114,22 @@
             <option value="Verdana">Verdana</option>
           </select>
         </div>
+        <!-- Font size -->
         <div class="flex items-center space-x-1 mr-2">
-          <select class="text-sm border border-gray-300 rounded px-2 py-1 bg-white"
-            @change="e => editor.chain().focus().setFontSize(e.target.value + 'px').run()"
-            :value="editor.getAttributes('textStyle').fontSize?.replace('px', '') || '14'">
-            <option value="11">11</option>
-            <option value="12">12</option>
-            <option value="14">14</option>
-            <option value="18">18</option>
-            <option value="24">24</option>
-            <option value="36">36</option>
-          </select>
+          <button @click="decreaseFontSize" class="rounded-md px-2 py-1 hover:bg-gray-200 focus:outline-none"
+            title="Decrease font size">
+            <span class="text-gray-700">−</span>
+          </button>
+          <input type="text"
+            class="text-sm border rounded-md border-gray-300 w-10 py-1 text-center focus:outline-none focus:border-blue-300"
+            :value="editor.getAttributes('textStyle').fontSize?.replace('px', '') || '12'" @input="updateFontSize"
+            @blur="validateFontSize" />
+          <button @click="increaseFontSize" class="rounded-md px-2 py-1 hover:bg-gray-200 focus:outline-none"
+            title="Increase font size">
+            <span class="text-gray-700">+</span>
+          </button>
         </div>
+        <!-- Undo/Redo -->
         <div class="flex items-center space-x-1">
           <button @click="editor.chain().focus().undo().run()"
             class="p-1 rounded-sm hover:bg-gray-200 focus:outline-none" title="Undo">
@@ -136,6 +140,7 @@
             <Redo class="w-4 h-4 text-gray-700" />
           </button>
         </div>
+        <!-- Headings -->
         <span class="border-r border-gray-300 h-6 mx-2"></span>
         <div class="flex items-center space-x-1">
           <button @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
@@ -401,7 +406,7 @@
       <!-- Project Info Modal -->
       <ProjectInfoModal v-model:isOpen="showProjectInfoModal" />
     </div>
-</div>
+  </div>
 </template>
 
 <script setup>
@@ -523,7 +528,8 @@ onMounted(async () => {
   // Set up WebRTC provider for real-time collaboration
   provider.value = new WebrtcProvider('chainpaper-document', ydoc, {
       // signaling: ['wss://signaling.yjs.dev']
-});
+      signaling: [],
+  });
   
   // Add current user to awareness
   provider.value.awareness.setLocalStateField('user', {
@@ -726,6 +732,35 @@ const generateContentHash = async (content) => {
     return null;
   }
 };
+
+  // Font Size and Font Family handlers
+  const updateFontSize = (e) => {
+    const value = e.target.value.trim();
+    if (value && !Number.isNaN(value)) {
+      editor.value.chain().focus().setFontSize(`${value}px`).run();
+    }
+  };
+
+  const validateFontSize = (e) => {
+    let value = e.target.value.trim();
+    // Set default or fix invalid values
+    if (!value || Number.isNaN(value) || value < 1) {
+      value = '12';
+      editor.value.chain().focus().setFontSize(`${value}px`).run();
+    }
+  };
+
+  const increaseFontSize = () => {
+    const currentSize = Number.parseInt(editor.value.getAttributes('textStyle').fontSize?.replace('px', '') || '12');
+    const newSize = currentSize + 1;
+    editor.value.chain().focus().setFontSize(`${newSize}px`).run();
+  };
+
+  const decreaseFontSize = () => {
+    const currentSize = Number.parseInt(editor.value.getAttributes('textStyle').fontSize?.replace('px', '') || '12');
+    const newSize = Math.max(1, currentSize - 1);
+    editor.value.chain().focus().setFontSize(`${newSize}px`).run();
+  };
 
 // Save document using DocumentStorage
 const saveDocument = async () => {
