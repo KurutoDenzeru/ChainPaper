@@ -1,21 +1,21 @@
 ![ChainPaper](public/openGraph.png)
 
-# ChainPaper
+# ChainPaper - Trustless Whitepaper
 
-> Trustless whitepaper collaboration tool with authorship proofs, no backend required.
+> Decentralized application for document editing with built-in authorship verification. Maintains a verifiable history of contributions using cryptographic proofs.
 
 ## Overview
 
-ChainPaper is a decentralized application for collaborative document editing with built-in authorship verification. It allows multiple users to work on whitepapers together while maintaining a verifiable history of contributions using cryptographic proofs.
+Decentralized application for document editing with built-in authorship verification. Maintains a verifiable history of contributions using cryptographic proofs.
 
 ## Features
 
 - **Rich Text Editing**: Powered by TipTap editor for a seamless writing experience
-- **Real-time Collaboration**: Using Yjs and WebRTC for peer-to-peer synchronization
 - **Authorship Verification**: SHA-256 hashing and Merkle Tree implementation for proof of contribution
 - **Offline Support**: Local storage with IndexedDB persistence
 - **No Backend Required**: Fully client-side application with optional IPFS/Arweave publishing
 - **Document Export**: Save and share documents with complete authorship history
+<!-- - **Real-time Collaboration**: Using Yjs and WebRTC for peer-to-peer synchronization -->
 
 ## Tech Stack
 
@@ -24,7 +24,7 @@ ChainPaper is a decentralized application for collaborative document editing wit
 - **Styling**: Tailwind CSS
 - **Authorship Verification**: SHA-256 via Web Crypto API + custom Merkle Tree implementation
 - **Data Storage**: localStorage, IndexedDB
-- **Collaboration**: Yjs, WebRTC
+<!-- - **Collaboration**: Yjs, WebRTC -->
 
 ## Getting Started
 
@@ -41,9 +41,9 @@ The application will be available at http://localhost:3000
 
 ChainPaper uses TipTap, a headless editor framework based on ProseMirror, to provide a rich text editing experience. The editor supports common formatting options and is extensible for additional features.
 
-### Collaboration
+<!-- ### Collaboration
 
-Real-time collaboration is powered by Yjs, a CRDT (Conflict-free Replicated Data Type) implementation that enables seamless synchronization between peers. WebRTC is used for peer-to-peer communication, allowing users to collaborate without a central server.
+Real-time collaboration is powered by Yjs, a CRDT (Conflict-free Replicated Data Type) implementation that enables seamless synchronization between peers. WebRTC is used for peer-to-peer communication, allowing users to collaborate without a central server. -->
 
 ### Authorship Verification
 
