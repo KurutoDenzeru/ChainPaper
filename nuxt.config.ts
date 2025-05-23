@@ -1,4 +1,3 @@
-
 import tailwindcss from "@tailwindcss/vite";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -6,11 +5,21 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
+
   vite: {
     plugins: [
       tailwindcss(),
     ],
   },
+
+  experimental: {
+    payloadExtraction: false,
+  },
+
+  vitalizer: {
+    disableStylesheets: "entry",
+  },
+
   app: {
     head: {
       title: 'ChainPaper - Trustless Whitepaper Collaboration',
@@ -23,5 +32,7 @@ export default defineNuxtConfig({
         { name: 'robots', content: 'index, follow' },
       ]
     }
-  }
+  },
+
+  modules: ['nuxt-vitalizer']
 })

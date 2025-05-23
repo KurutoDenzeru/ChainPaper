@@ -1,12 +1,18 @@
 <template>
-  <div @click="handleOutsideClick">
+  <div @click="handleOutsideClick" class="sticky top-0 z-50 shadow-sm bg-white">
     <!-- Google Docs-like top menubar -->
-    <div class="bg-white border-gray-200">
+    <div class="bg-white border-gray-200 sticky top-0 z-50 shadow-sm">
       <!-- Main menubar -->
-      <div class="flex items-center px-2 py-1 border-b border-gray-200">
-        <div class="flex items-center">
-          <h2 class="text-lg font-medium text-gray-800 mr-4">ChainPaper</h2>
-          <div class="flex space-x-1">
+      <div class="flex items-center justify-between px-2 py-1 border-b border-gray-200">
+        <!-- Left section with logo and title -->
+        <div class="flex items-center space-x-4">
+          <img src="/notebook-pen.svg" alt="ChainPaper Logo" class="w-6 h-6 text-gray-700" />
+          <div class="flex flex-col">
+            <input type="text" placeholder="Untitled document" class="text-lg font-medium text-gray-800 focus:outline-none bg-transparent border-b border-transparent hover:border-gray-300 focus:border-gray-400 transition-colors duration-200 w-48" />
+          </div>
+        </div>
+        <!-- Menu section -->
+        <div class="flex space-x-1">
             <div class="relative">
               <button class="px-3 py-1 text-sm text-gray-700 rounded hover:bg-gray-100 menu-trigger"
                 @click.stop="activeMenu === 'file' ? activeMenu = null : activeMenu = 'file'">File</button>
@@ -409,7 +415,6 @@
       <!-- Project Info Modal -->
       <ProjectInfoModal v-model:isOpen="showProjectInfoModal" />
     </div>
-  </div>
 </template>
 
 <script setup>
@@ -441,7 +446,7 @@ import UserGuide from "./UserGuide.vue";
 import DocumentHistoryModal from "./modals/DocumentHistoryModal.vue";
 import VerificationModal from "./modals/VerificationModal.vue";
 import ProjectInfoModal from "./modals/ProjectInfoModal.vue";
-import { Indent } from "../extensions/Indent.js";
+import { Indent } from "../extensions/Indent.ts";
 import {
 	Bold,
 	Italic,
