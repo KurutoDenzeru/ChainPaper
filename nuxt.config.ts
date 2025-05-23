@@ -14,10 +14,14 @@ export default defineNuxtConfig({
 
   experimental: {
     payloadExtraction: false,
+    viewTransition: true,
   },
 
   vitalizer: {
     disableStylesheets: "entry",
+  },
+  nitro: {
+    compressPublicAssets: true,
   },
 
   app: {
@@ -30,7 +34,11 @@ export default defineNuxtConfig({
         { name: 'keywords', content: 'whitepaper, collaboration, trustless, authorship, proof, no backend' },
         { name: 'author', content: 'ChainPaper' },
         { name: 'robots', content: 'index, follow' },
-      ]
+      ],
+
+      link: [
+        { rel: 'preload', href: '/notebook-pen.svg', as: 'image' },
+      ],
     }
   },
 
