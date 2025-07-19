@@ -10,6 +10,10 @@ export default defineNuxtConfig({
     plugins: [
       tailwindcss(),
     ],
+
+    build: {
+      sourcemap: false,
+    },
   },
 
   experimental: {
@@ -18,10 +22,7 @@ export default defineNuxtConfig({
   },
 
   vitalizer: {
-    disableStylesheets: "entry",
-  },
-  nitro: {
-    compressPublicAssets: true,
+    disablePrefetchLinks: true
   },
 
   app: {
