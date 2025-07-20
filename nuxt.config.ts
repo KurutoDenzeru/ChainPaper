@@ -2,8 +2,11 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+
+  modules: ['nuxt-vitalizer', 'shadcn-nuxt', '@nuxt/image', '@pinia/nuxt'],
+
   css: ['~/assets/css/main.css'],
 
   vite: {
@@ -16,11 +19,7 @@ export default defineNuxtConfig({
     },
   },
 
-  experimental: {
-    payloadExtraction: false,
-    viewTransition: true,
-  },
-
+  // Nuxt Vitalizer
   vitalizer: {
     disablePrefetchLinks: true
   },
@@ -43,5 +42,16 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['nuxt-vitalizer']
+  // Shadcn Nuxt
+  shadcn: {
+    /**
+     * Prefix for all the imported component
+     */
+    prefix: '',
+    /**
+     * Directory that the component lives in.
+     * @default "./app/components/ui"
+     */
+    componentDir: './app/components/ui'
+  }
 })
