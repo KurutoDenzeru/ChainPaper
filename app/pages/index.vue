@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div class="w-screen h-screen overflow-hidden">
     <!-- Welcome Screen for New Users -->
     <WelcomeScreen 
       v-if="showWelcome"
@@ -12,7 +12,7 @@
     />
 
     <!-- Main Editor Interface -->
-    <div v-else class="editor-interface">
+    <div v-else class="flex flex-col h-screen">
       <!-- Menu Bar -->
       <MenuBar
         :document-title="documentStore.metadata.title"
@@ -31,6 +31,18 @@
       <EditorContent 
         ref="editorContent"
         @document-change="handleDocumentChange"
+        @toggle-sidebar="showSidebar = !showSidebar"
+      />
+
+      <!-- Document Sidebar -->
+      <DocumentSidebar
+        :is-visible="showSidebar"
+        :document-index="documentStore.documentIndex"
+        :comments="documentStore.comments"
+        :document-metadata="documentStore.metadata"
+        :authorship-proof="documentStore.authorshipProof"
+        @close="showSidebar = false"
+        @navigate-to-heading="handleTOCNavigation"
       />
 
       <!-- Settings Dialog -->
@@ -54,7 +66,7 @@
 
       <!-- Loading Overlay -->
       <LoadingOverlay
-        v-if="documentStore.isLoading"
+        :is-visible="documentStore.isLoading"
         :message="loadingMessage"
       />
 
@@ -69,23 +81,25 @@ import { ref, onMounted, computed } from 'vue'
 import { useDocumentStore } from '~/stores/document'
 import { useEditorStore } from '~/stores/editor'
 import EditorContent from '~/components/editor/EditorContent.vue'
+import DocumentSidebar from '~/components/editor/DocumentSidebar.vue'
 import WelcomeScreen from '~/components/welcome/WelcomeScreen.vue'
 import MenuBar from '~/components/layout/MenuBar.vue'
 import DocumentSettingsDialog from '~/components/dialogs/DocumentSettingsDialog.vue'
 import AboutDialog from '~/components/dialogs/AboutDialog.vue'
 import UserSetupDialog from '~/components/dialogs/UserSetupDialog.vue'
-import LoadingOverlay from '~/components/ui/LoadingOverlay.vue'
-import NotificationSystem from '~/components/ui/NotificationSystem.vue'
+import LoadingOverlay from '~/components/ui/LoadingOverlay'
+import NotificationSystem from '~/components/ui/NotificationSystem'
 
 // Stores
 const documentStore = useDocumentStore()
 const editorStore = useEditorStore()
 
 // UI State
-const showWelcome = ref(!documentStore.currentUser.name)
+const showWelcome = ref(!documentStore.currentDocument || !documentStore.currentUser.name)
 const showSettings = ref(false)
 const showAbout = ref(false)
 const showUserSetup = ref(false)
+const showSidebar = ref(false)
 
 // Refs
 const editorContent = ref()
@@ -393,7 +407,13 @@ async function loadDefaultTemplates() {
 }
 
 function handleCreateNew(title?: string, template?: any) {
-  documentStore.createNewDocument(title, documentStore.currentUser.name, template)
+  if (!title && !template) {
+    // Show welcome screen to choose template or create blank
+    showWelcome.value = true
+    return
+  }
+  
+  documentStore.createNewDocument(title || 'Untitled Document', documentStore.currentUser.name, template)
   showWelcome.value = false
   notifications.value?.showSuccess('New document created')
 }
@@ -493,6 +513,13 @@ function handleUserSetup(userData: any) {
   notifications.value?.showSuccess('User profile created')
 }
 
+function handleTOCNavigation(entry: any) {
+  // Navigate to the TOC entry in the editor
+  // This would typically scroll to the heading or set cursor position
+  console.log('Navigate to TOC entry:', entry)
+  // TODO: Implement actual navigation logic
+}
+
 // Keyboard shortcuts
 onMounted(() => {
   const handleKeyboard = (e: KeyboardEvent) => {
@@ -525,128 +552,3 @@ onMounted(() => {
   }
 })
 </script>
-
-<style scoped>
-.app-container {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.editor-interface {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-/* Global styles for the application */
-:global(body) {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-:global(.ProseMirror) {
-  outline: none;
-  min-height: 500px;
-  padding: 1rem;
-  line-height: 1.6;
-}
-
-:global(.ProseMirror p) {
-  margin: 0.5rem 0;
-}
-
-:global(.ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6) {
-  margin: 1rem 0 0.5rem 0;
-  font-weight: bold;
-}
-
-:global(.ProseMirror h1) {
-  font-size: 2rem;
-}
-
-:global(.ProseMirror h2) {
-  font-size: 1.5rem;
-}
-
-:global(.ProseMirror h3) {
-  font-size: 1.25rem;
-}
-
-:global(.ProseMirror ul, .ProseMirror ol) {
-  margin: 0.5rem 0;
-  padding-left: 1.5rem;
-}
-
-:global(.ProseMirror li) {
-  margin: 0.25rem 0;
-}
-
-:global(.ProseMirror blockquote) {
-  border-left: 4px solid #ddd;
-  margin: 1rem 0;
-  padding-left: 1rem;
-  color: #666;
-}
-
-:global(.ProseMirror code) {
-  background: #f4f4f4;
-  padding: 0.125rem 0.25rem;
-  border-radius: 3px;
-  font-family: 'Courier New', monospace;
-}
-
-:global(.ProseMirror pre) {
-  background: #f4f4f4;
-  padding: 1rem;
-  border-radius: 5px;
-  overflow-x: auto;
-  margin: 1rem 0;
-}
-
-:global(.ProseMirror table) {
-  border-collapse: collapse;
-  width: 100%;
-  margin: 1rem 0;
-}
-
-:global(.ProseMirror th, .ProseMirror td) {
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-  text-align: left;
-}
-
-:global(.ProseMirror th) {
-  background-color: #f2f2f2;
-  font-weight: bold;
-}
-
-:global(.ProseMirror a) {
-  color: #0066cc;
-  text-decoration: underline;
-}
-
-:global(.ProseMirror img) {
-  max-width: 100%;
-  height: auto;
-  margin: 0.5rem 0;
-}
-
-/* Comment highlighting */
-:global(.comment-highlight) {
-  background-color: rgba(255, 255, 0, 0.3);
-  border-radius: 2px;
-  padding: 0 2px;
-}
-
-/* Spell check errors */
-:global(.spell-error) {
-  border-bottom: 2px wavy red;
-}
-
-/* Selection in comment mode */
-:global(.comment-mode-selection) {
-  background-color: rgba(59, 130, 246, 0.3);
-}
-</style>

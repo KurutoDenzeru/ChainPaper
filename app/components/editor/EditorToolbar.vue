@@ -1,100 +1,154 @@
 <template>
-  <div class="editor-toolbar border-b border-gray-200 bg-white p-2 flex flex-wrap gap-1 items-center">
-    <!-- File Operations -->
-    <div class="toolbar-group flex items-center gap-1 pr-2 border-r border-gray-200">
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="saveDocument"
-        :disabled="!isDirty"
-        class="flex items-center gap-1"
-      >
-        <Save class="w-4 h-4" />
-        <span class="hidden sm:inline">Save</span>
-      </Button>
+  <div class="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200 min-h-14 overflow-x-auto gap-2">
+    <!-- Left Section: View Controls & Basic Formatting -->
+    <div class="flex items-center gap-1">
+      <!-- View Controls -->
+      <div class="flex items-center gap-1 mr-2">
+        <Button variant="ghost" size="sm" @click="$emit('toggle-sidebar')" class="h-8 w-8 p-0">
+          <Sidebar class="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" @click="$emit('toggle-find')" class="h-8 w-8 p-0">
+          <Search class="w-4 h-4" />
+        </Button>
+      </div>
       
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="exportDocument"
-        class="flex items-center gap-1"
-      >
-        <Download class="w-4 h-4" />
-        <span class="hidden sm:inline">Export</span>
-      </Button>
+      <div class="h-6 w-px bg-gray-300 mx-1"></div>
+      
+      <!-- Undo/Redo -->
+      <div class="flex items-center gap-1 mr-2">
+        <Button variant="ghost" size="sm" @click="undo" :disabled="!canUndo" class="h-8 w-8 p-0">
+          <Undo2 class="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" @click="redo" :disabled="!canRedo" class="h-8 w-8 p-0">
+          <Redo2 class="w-4 h-4" />
+        </Button>
+      </div>
+      
+      <div class="h-6 w-px bg-gray-300 mx-1"></div>
+      
+      <!-- Font Family -->
+      <Select v-model="selectedFont" @update:modelValue="handleFontChange">
+        <SelectTrigger class="w-32 sm:w-40 h-8">
+          <SelectValue placeholder="Font" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem v-for="font in fonts" :key="font.value" :value="font.value">
+            {{ font.label }}
+          </SelectItem>
+        </SelectContent>
+      </Select>
+      
+      <!-- Font Size -->
+      <Select v-model="selectedFontSize" @update:modelValue="handleFontSizeChange">
+        <SelectTrigger class="w-16 h-8">
+          <SelectValue placeholder="12" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem v-for="size in fontSizes" :key="size" :value="size.toString()">
+            {{ size }}
+          </SelectItem>
+        </SelectContent>
+      </Select>
+      
+      <div class="h-6 w-px bg-gray-300 mx-1"></div>
+      
+      <!-- Basic Formatting -->
+      <div class="flex items-center gap-1">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          :class="['h-8 w-8 p-0', { 'bg-gray-100': isBold }]"
+          @click="toggleBold"
+        >
+          <Bold class="w-4 h-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          :class="['h-8 w-8 p-0', { 'bg-gray-100': isItalic }]"
+          @click="toggleItalic"
+        >
+          <Italic class="w-4 h-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          :class="['h-8 w-8 p-0', { 'bg-gray-100': isUnderline }]"
+          @click="toggleUnderline"
+        >
+          <Underline class="w-4 h-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          :class="['h-8 w-8 p-0', { 'bg-gray-100': isStrikethrough }]"
+          @click="toggleStrikethrough"
+        >
+          <Strikethrough class="w-4 h-4" />
+        </Button>
+      </div>
+      
+      <div class="h-6 w-px bg-gray-300 mx-1"></div>
+      
+      <!-- Text Color -->
+      <Popover>
+        <PopoverTrigger as-child>
+          <Button variant="ghost" size="sm" class="h-8 w-8 p-0">
+            <div class="relative">
+              <Type class="w-4 h-4" />
+              <div 
+                class="absolute bottom-0 left-0 w-full h-1 rounded" 
+                :style="{ backgroundColor: selectedTextColor }"
+              ></div>
+            </div>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent class="w-56 p-3">
+          <div class="grid grid-cols-8 gap-1">
+            <button
+              v-for="color in textColors"
+              :key="color"
+              class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform"
+              :style="{ backgroundColor: color }"
+              @click="setTextColor(color)"
+            ></button>
+          </div>
+        </PopoverContent>
+      </Popover>
+      
+      <!-- Highlight Color -->
+      <Popover>
+        <PopoverTrigger as-child>
+          <Button variant="ghost" size="sm" class="h-8 w-8 p-0">
+            <div class="relative">
+              <Highlighter class="w-4 h-4" />
+              <div 
+                class="absolute bottom-0 left-0 w-full h-1 rounded" 
+                :style="{ backgroundColor: selectedHighlightColor }"
+              ></div>
+            </div>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent class="w-56 p-3">
+          <div class="grid grid-cols-8 gap-1">
+            <button
+              v-for="color in highlightColors"
+              :key="color"
+              class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform"
+              :style="{ backgroundColor: color }"
+              @click="setHighlightColor(color)"
+            ></button>
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
-
-    <!-- Undo/Redo -->
-    <div class="toolbar-group flex items-center gap-1 pr-2 border-r border-gray-200">
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="undo"
-        :disabled="!canUndo"
-        title="Undo (Ctrl+Z)"
-      >
-        <Undo class="w-4 h-4" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="redo"
-        :disabled="!canRedo"
-        title="Redo (Ctrl+Y)"
-      >
-        <Redo class="w-4 h-4" />
-      </Button>
-    </div>
-
-    <!-- Text Formatting -->
-    <div class="toolbar-group flex items-center gap-1 pr-2 border-r border-gray-200">
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="() => toggleFormat('bold')"
-        :class="{ 'bg-gray-100': isFormatActive('bold') }"
-        title="Bold (Ctrl+B)"
-      >
-        <Bold class="w-4 h-4" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="() => toggleFormat('italic')"
-        :class="{ 'bg-gray-100': isFormatActive('italic') }"
-        title="Italic (Ctrl+I)"
-      >
-        <Italic class="w-4 h-4" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="() => toggleFormat('underline')"
-        :class="{ 'bg-gray-100': isFormatActive('underline') }"
-        title="Underline (Ctrl+U)"
-      >
-        <Underline class="w-4 h-4" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="() => toggleFormat('strikethrough')"
-        :class="{ 'bg-gray-100': isFormatActive('strikethrough') }"
-        title="Strikethrough"
-      >
-        <Strikethrough class="w-4 h-4" />
-      </Button>
-    </div>
-
-    <!-- Paragraph Styles -->
-    <div class="toolbar-group flex items-center gap-1 pr-2 border-r border-gray-200">
-      <Select v-model="currentStyle" @value-change="changeStyle">
-        <SelectTrigger class="w-32">
-          <SelectValue placeholder="Style" />
+    
+    <!-- Center Section: Paragraph Formatting -->
+    <div class="flex items-center gap-1">
+      <!-- Heading Styles -->
+      <Select v-model="selectedHeading" @update:modelValue="handleHeadingChange">
+        <SelectTrigger class="w-28 sm:w-32 h-8">
+          <SelectValue placeholder="Normal" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="paragraph">Normal</SelectItem>
@@ -106,577 +160,312 @@
           <SelectItem value="heading6">Heading 6</SelectItem>
         </SelectContent>
       </Select>
+      
+      <div class="h-6 w-px bg-gray-300 mx-1"></div>
+      
+      <!-- Alignment -->
+      <div class="flex items-center gap-1">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          :class="['h-8 w-8 p-0', { 'bg-gray-100': alignment === 'left' }]"
+          @click="setAlignment('left')"
+        >
+          <AlignLeft class="w-4 h-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          :class="['h-8 w-8 p-0', { 'bg-gray-100': alignment === 'center' }]"
+          @click="setAlignment('center')"
+        >
+          <AlignCenter class="w-4 h-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          :class="['h-8 w-8 p-0', { 'bg-gray-100': alignment === 'right' }]"
+          @click="setAlignment('right')"
+        >
+          <AlignRight class="w-4 h-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          :class="['h-8 w-8 p-0', { 'bg-gray-100': alignment === 'justify' }]"
+          @click="setAlignment('justify')"
+        >
+          <AlignJustify class="w-4 h-4" />
+        </Button>
+      </div>
+      
+      <div class="h-6 w-px bg-gray-300 mx-1"></div>
+      
+      <!-- Lists -->
+      <div class="flex items-center gap-1">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          :class="['h-8 w-8 p-0', { 'bg-gray-100': isBulletList }]"
+          @click="toggleBulletList"
+        >
+          <List class="w-4 h-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          :class="['h-8 w-8 p-0', { 'bg-gray-100': isOrderedList }]"
+          @click="toggleOrderedList"
+        >
+          <ListOrdered class="w-4 h-4" />
+        </Button>
+      </div>
+      
+      <!-- Indent -->
+      <div class="flex items-center gap-1">
+        <Button variant="ghost" size="sm" @click="outdent" class="h-8 w-8 p-0">
+          <Indent class="w-4 h-4 rotate-180" />
+        </Button>
+        <Button variant="ghost" size="sm" @click="indent" class="h-8 w-8 p-0">
+          <Indent class="w-4 h-4" />
+        </Button>
+      </div>
     </div>
-
-    <!-- Text Alignment -->
-    <div class="toolbar-group flex items-center gap-1 pr-2 border-r border-gray-200">
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="() => setAlignment('left')"
-        :class="{ 'bg-gray-100': currentAlignment === 'left' }"
-        title="Align Left"
-      >
-        <AlignLeft class="w-4 h-4" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="() => setAlignment('center')"
-        :class="{ 'bg-gray-100': currentAlignment === 'center' }"
-        title="Align Center"
-      >
-        <AlignCenter class="w-4 h-4" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="() => setAlignment('right')"
-        :class="{ 'bg-gray-100': currentAlignment === 'right' }"
-        title="Align Right"
-      >
-        <AlignRight class="w-4 h-4" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="() => setAlignment('justify')"
-        :class="{ 'bg-gray-100': currentAlignment === 'justify' }"
-        title="Justify"
-      >
-        <AlignJustify class="w-4 h-4" />
-      </Button>
-    </div>
-
-    <!-- Lists -->
-    <div class="toolbar-group flex items-center gap-1 pr-2 border-r border-gray-200">
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="() => toggleList('bullet_list')"
-        :class="{ 'bg-gray-100': currentNodeType === 'bullet_list' }"
-        title="Bullet List"
-      >
-        <List class="w-4 h-4" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="() => toggleList('ordered_list')"
-        :class="{ 'bg-gray-100': currentNodeType === 'ordered_list' }"
-        title="Numbered List"
-      >
-        <ListOrdered class="w-4 h-4" />
-      </Button>
-    </div>
-
-    <!-- Insert Elements -->
-    <div class="toolbar-group flex items-center gap-1 pr-2 border-r border-gray-200">
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="insertLink"
-        title="Insert Link"
-      >
+    
+    <!-- Right Section: Insert Tools -->
+    <div class="flex items-center gap-1">
+      <!-- Insert -->
+      <Button variant="ghost" size="sm" @click="insertLink" class="h-8 w-8 p-0">
         <Link class="w-4 h-4" />
       </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="insertImage"
-        title="Insert Image"
-      >
+      <Button variant="ghost" size="sm" @click="insertImage" class="h-8 w-8 p-0">
         <ImageIcon class="w-4 h-4" />
       </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="insertTable"
-        title="Insert Table"
-      >
+      <Button variant="ghost" size="sm" @click="insertTable" class="h-8 w-8 p-0">
         <Table class="w-4 h-4" />
       </Button>
       
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="insertHorizontalRule"
-        title="Insert Horizontal Rule"
-      >
-        <Minus class="w-4 h-4" />
-      </Button>
-    </div>
-
-    <!-- Advanced Tools -->
-    <div class="toolbar-group flex items-center gap-1">
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="toggleSpellCheck"
-        :class="{ 'bg-gray-100': spellCheckEnabled }"
-        title="Spell Check"
-      >
-        <CheckCircle class="w-4 h-4" />
-      </Button>
+      <div class="h-6 w-px bg-gray-300 mx-1"></div>
       
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="openFindReplace"
-        title="Find & Replace (Ctrl+F)"
-      >
-        <Search class="w-4 h-4" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="toggleCommentMode"
-        :class="{ 'bg-gray-100': commentMode }"
-        title="Comment Mode"
-      >
-        <MessageSquare class="w-4 h-4" />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="showDocumentStats"
-        title="Document Statistics"
-      >
-        <BarChart3 class="w-4 h-4" />
-      </Button>
-    </div>
-
-    <!-- Right side - Document info -->
-    <div class="ml-auto flex items-center gap-2 text-sm text-gray-600">
-      <div v-if="documentStats" class="flex items-center gap-4">
-        <span>{{ documentStats.wordCount }} words</span>
-        <span>{{ documentStats.characterCount }} characters</span>
-        <span v-if="documentStats.readingTime">{{ documentStats.readingTime }}min read</span>
-      </div>
-      
-      <div v-if="isDirty" class="flex items-center gap-1 text-orange-600">
-        <Circle class="w-2 h-2 fill-current" />
-        <span class="hidden sm:inline">Unsaved</span>
-      </div>
-      
-      <div v-else-if="lastSaved" class="flex items-center gap-1 text-green-600">
-        <Check class="w-3 h-3" />
-        <span class="hidden sm:inline">Saved</span>
-      </div>
-    </div>
-  </div>
-</template>
-              <SelectItem 
-                v-for="size in fontSizes" 
-                :key="size" 
-                :value="size.toString()"
-              >
-                {{ size }}pt
-              </SelectItem>
-            </SelectContent>
-          </Select>
-
-          <!-- Text Color -->
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" class="toolbar-button">
-                <Icon name="palette" class="w-4 h-4" />
-                <div 
-                  class="w-2 h-2 rounded ml-1" 
-                  :style="{ backgroundColor: selectedTextColor }"
-                />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-64">
-              <ColorPicker 
-                v-model="selectedTextColor" 
-                @update:modelValue="updateTextColor"
-              />
-            </PopoverContent>
-          </Popover>
-
-          <!-- Background Color -->
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" class="toolbar-button">
-                <Icon name="paint-bucket" class="w-4 h-4" />
-                <div 
-                  class="w-2 h-2 rounded ml-1" 
-                  :style="{ backgroundColor: selectedBackgroundColor }"
-                />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-64">
-              <ColorPicker 
-                v-model="selectedBackgroundColor" 
-                @update:modelValue="updateBackgroundColor"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
-
-      <!-- Advanced Tools -->
-      <div class="toolbar-group">
-        <div class="group-label">Insert</div>
-        <div class="group-items">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" class="toolbar-button">
-                <Icon name="plus" class="w-4 h-4" />
-                <Icon name="chevron-down" class="w-3 h-3 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem @click="$emit('insert', 'page-break')">
-                <Icon name="scissors" class="w-4 h-4 mr-2" />
-                Page Break
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="$emit('insert', 'footnote')">
-                <Icon name="subscript" class="w-4 h-4 mr-2" />
-                Footnote
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="$emit('insert', 'endnote')">
-                <Icon name="superscript" class="w-4 h-4 mr-2" />
-                Endnote
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="$emit('insert', 'bookmark')">
-                <Icon name="bookmark" class="w-4 h-4 mr-2" />
-                Bookmark
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="$emit('insert', 'math')">
-                <Icon name="sigma" class="w-4 h-4 mr-2" />
-                Math Equation
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="$emit('insert', 'code-block')">
-                <Icon name="code" class="w-4 h-4 mr-2" />
-                Code Block
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="$emit('insert', 'mermaid')">
-                <Icon name="workflow" class="w-4 h-4 mr-2" />
-                Diagram
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <!-- Emoji Picker -->
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" class="toolbar-button">
-                <Icon name="smile" class="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-80">
-              <EmojiPicker @select="insertEmoji" />
-            </PopoverContent>
-          </Popover>
-
-          <!-- Symbol Picker -->
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" class="toolbar-button">
-                <Icon name="omega" class="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-80">
-              <SymbolPicker @select="insertSymbol" />
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
-
-      <!-- Document Actions -->
-      <div class="toolbar-group">
-        <div class="group-label">Actions</div>
-        <div class="group-items">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            @click="$emit('action', 'save')"
-            :disabled="!isDirty"
-            class="toolbar-button"
-          >
-            <Icon name="save" class="w-4 h-4" />
-            <span v-if="showLabels" class="ml-1">Save</span>
+      <!-- More Options -->
+      <Popover>
+        <PopoverTrigger as-child>
+          <Button variant="ghost" size="sm" class="h-8 w-8 p-0">
+            <MoreHorizontal class="w-4 h-4" />
           </Button>
-
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            @click="$emit('action', 'export')"
-            class="toolbar-button"
-          >
-            <Icon name="download" class="w-4 h-4" />
-            <span v-if="showLabels" class="ml-1">Export</span>
-          </Button>
-
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            @click="$emit('action', 'find')"
-            class="toolbar-button"
-          >
-            <Icon name="search" class="w-4 h-4" />
-            <span v-if="showLabels" class="ml-1">Find</span>
-          </Button>
-
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            @click="$emit('action', 'comment')"
-            :variant="commentMode ? 'default' : 'ghost'"
-            class="toolbar-button"
-          >
-            <Icon name="message-circle" class="w-4 h-4" />
-            <span v-if="showLabels" class="ml-1">Comment</span>
-          </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" class="toolbar-button">
-                <Icon name="settings" class="w-4 h-4" />
-                <Icon name="chevron-down" class="w-3 h-3 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem @click="$emit('action', 'settings')">
-                <Icon name="settings" class="w-4 h-4 mr-2" />
-                Document Settings
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="$emit('action', 'focus')">
-                <Icon name="focus" class="w-4 h-4 mr-2" />
-                Focus Mode
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="$emit('action', 'reading')">
-                <Icon name="book-open" class="w-4 h-4 mr-2" />
-                Reading Mode
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="$emit('action', 'typewriter')">
-                <Icon name="type" class="w-4 h-4 mr-2" />
-                Typewriter Mode
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem @click="$emit('action', 'word-count')">
-                <Icon name="bar-chart" class="w-4 h-4 mr-2" />
-                Document Statistics
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="$emit('action', 'authorship')">
-                <Icon name="shield-check" class="w-4 h-4 mr-2" />
-                Verify Authorship
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="toolbar-quick">
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        @click="toggleToolbarLabels"
-        class="toolbar-button"
-      >
-        <Icon :name="showLabels ? 'eye-off' : 'eye'" class="w-4 h-4" />
-      </Button>
-
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        @click="$emit('action', 'fullscreen')"
-        class="toolbar-button"
-      >
-        <Icon name="maximize" class="w-4 h-4" />
-      </Button>
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" class="toolbar-button">
-            <Icon name="palette" class="w-4 h-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem @click="setTheme('light')">
-            <Icon name="sun" class="w-4 h-4 mr-2" />
-            Light Theme
-          </DropdownMenuItem>
-          <DropdownMenuItem @click="setTheme('dark')">
-            <Icon name="moon" class="w-4 h-4 mr-2" />
-            Dark Theme
-          </DropdownMenuItem>
-          <DropdownMenuItem @click="setTheme('sepia')">
-            <Icon name="coffee" class="w-4 h-4 mr-2" />
-            Sepia Theme
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </PopoverTrigger>
+        <PopoverContent class="w-48 p-2">
+          <div class="space-y-1">
+            <Button variant="ghost" size="sm" @click="insertHorizontalRule" class="w-full justify-start h-8">
+              <Minus class="w-4 h-4 mr-2" />
+              Horizontal Rule
+            </Button>
+            <Button variant="ghost" size="sm" @click="insertPageBreak" class="w-full justify-start h-8">
+              <FileText class="w-4 h-4 mr-2" />
+              Page Break
+            </Button>
+            <Button variant="ghost" size="sm" @click="insertSymbol" class="w-full justify-start h-8">
+              <Hash class="w-4 h-4 mr-2" />
+              Special Character
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { 
-  Save, Download, Undo, Redo, Bold, Italic, Underline, Strikethrough,
-  AlignLeft, AlignCenter, AlignRight, AlignJustify, List, ListOrdered,
-  Link, ImageIcon, Table, Minus, CheckCircle, Search, MessageSquare,
-  BarChart3, Circle, Check
+import { ref, computed } from 'vue'
+import {
+  Bold, Italic, Underline, Strikethrough, Type, Highlighter,
+  AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  List, ListOrdered, Indent, Link, ImageIcon as Image, Table,
+  Undo2, Redo2, MoreHorizontal, Minus, FileText, Hash, Sidebar, Search
 } from 'lucide-vue-next'
-
-import { Button } from '~/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { useEditorStore } from '~/stores/editor'
-import { useDocumentStore } from '~/stores/document'
+
+// Fix the ImageIcon import conflict
+const ImageIcon = Image
 
 const editorStore = useEditorStore()
-const documentStore = useDocumentStore()
 
-// Computed properties
+// State
+const selectedFont = ref('Times New Roman')
+const selectedFontSize = ref('12')
+const selectedHeading = ref('paragraph')
+const alignment = ref('left')
+const selectedTextColor = ref('#000000')
+const selectedHighlightColor = ref('#ffff00')
+
+// Font options
+const fonts = [
+  { label: 'Times New Roman', value: 'Times New Roman' },
+  { label: 'Arial', value: 'Arial' },
+  { label: 'Helvetica', value: 'Helvetica' },
+  { label: 'Georgia', value: 'Georgia' },
+  { label: 'Verdana', value: 'Verdana' },
+  { label: 'Calibri', value: 'Calibri' },
+  { label: 'Trebuchet MS', value: 'Trebuchet MS' },
+  { label: 'Impact', value: 'Impact' },
+]
+
+const fontSizes = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 60, 72]
+
+const textColors = [
+  '#000000', '#1f2937', '#374151', '#6b7280', '#9ca3af', '#d1d5db', '#ffffff',
+  '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#22c55e', '#10b981',
+  '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
+  '#ec4899', '#f43f5e'
+]
+
+const highlightColors = [
+  'transparent', '#fef3c7', '#fde68a', '#fed7aa', '#fecaca', '#f3e8ff',
+  '#e0e7ff', '#dbeafe', '#bfdbfe', '#bef264', '#bbf7d0', '#a7f3d0'
+]
+
+// Computed properties for active states
+const isBold = computed(() => editorStore.isFormatActive('bold'))
+const isItalic = computed(() => editorStore.isFormatActive('italic'))
+const isUnderline = computed(() => editorStore.isFormatActive('underline'))
+const isStrikethrough = computed(() => editorStore.isFormatActive('strikethrough'))
+const isBulletList = computed(() => editorStore.currentNodeType === 'bullet_list')
+const isOrderedList = computed(() => editorStore.currentNodeType === 'ordered_list')
 const canUndo = computed(() => editorStore.canUndo)
 const canRedo = computed(() => editorStore.canRedo)
-const isDirty = computed(() => documentStore.isDirty)
-const lastSaved = computed(() => documentStore.lastSaved)
-const currentNodeType = computed(() => editorStore.currentNodeType)
-const currentAlignment = computed(() => {
-  // This would need to be implemented in the editor store
-  return 'left'
-})
-const spellCheckEnabled = computed(() => documentStore.settings.spellCheck)
-const commentMode = computed(() => editorStore.commentMode)
-const documentStats = computed(() => documentStore.documentStatistics)
 
-// Current style for the dropdown
-const currentStyle = computed({
-  get() {
-    if (currentNodeType.value === 'heading') {
-      const level = editorStore.currentNode?.attrs?.level || 1
-      return `heading${level}`
-    }
-    return currentNodeType.value || 'paragraph'
-  },
-  set(value: string) {
-    changeStyle(value)
+// Actions
+function undo() {
+  editorStore.undo()
+}
+
+function redo() {
+  editorStore.redo()
+}
+
+function toggleBold() {
+  editorStore.toggleBold()
+}
+
+function toggleItalic() {
+  editorStore.toggleItalic()
+}
+
+function toggleUnderline() {
+  editorStore.toggleUnderline()
+}
+
+function toggleStrikethrough() {
+  editorStore.toggleStrikethrough()
+}
+
+function handleFontChange(font: any) {
+  if (typeof font === 'string') {
+    editorStore.setFontFamily(font)
   }
-})
-
-// Methods
-const isFormatActive = (format: string) => {
-  return editorStore.isFormatActive(format)
 }
 
-const toggleFormat = (format: string) => {
-  editorStore.toggleFormat(format)
+function handleFontSizeChange(size: any) {
+  if (typeof size === 'string') {
+    editorStore.setFontSize(parseInt(size))
+  } else if (typeof size === 'number') {
+    editorStore.setFontSize(size)
+  }
 }
 
-const changeStyle = (style: string) => {
-  if (style === 'paragraph') {
+function handleHeadingChange(heading: any) {
+  if (heading === 'paragraph') {
     editorStore.setParagraph()
-  } else if (style.startsWith('heading')) {
-    const level = parseInt(style.replace('heading', ''))
+  } else if (typeof heading === 'string') {
+    const level = parseInt(heading.replace('heading', ''))
     editorStore.setHeading(level)
   }
 }
 
-const setAlignment = (alignment: string) => {
-  // This would need to be implemented in the editor store
-  console.log('Set alignment:', alignment)
+function setAlignment(align: string) {
+  alignment.value = align
+  editorStore.setAlignment(align)
 }
 
-const toggleList = (listType: string) => {
-  editorStore.toggleList(listType)
+function setTextColor(color: string) {
+  selectedTextColor.value = color
+  editorStore.setTextColor(color)
 }
 
-const insertLink = () => {
-  editorStore.insertLink()
+function setHighlightColor(color: string) {
+  selectedHighlightColor.value = color
+  editorStore.setHighlightColor(color)
 }
 
-const insertImage = () => {
-  editorStore.insertImage()
+function toggleBulletList() {
+  editorStore.toggleBulletList()
 }
 
-const insertTable = () => {
-  editorStore.insertTable()
+function toggleOrderedList() {
+  editorStore.toggleOrderedList()
 }
 
-const insertHorizontalRule = () => {
+function indent() {
+  editorStore.indent()
+}
+
+function outdent() {
+  editorStore.outdent()
+}
+
+function insertLink() {
+  // Emit event to parent to handle link dialog
+  window.dispatchEvent(new CustomEvent('editor:insert-link'))
+}
+
+function insertImage() {
+  // Emit event to parent to handle image dialog
+  window.dispatchEvent(new CustomEvent('editor:insert-image'))
+}
+
+function insertTable() {
+  // Emit event to parent to handle table dialog
+  window.dispatchEvent(new CustomEvent('editor:insert-table'))
+}
+
+function insertHorizontalRule() {
   editorStore.insertHorizontalRule()
 }
 
-const undo = () => {
-  // This would need to be implemented in the editor store
-  console.log('Undo')
+function insertPageBreak() {
+  editorStore.insertPageBreak()
 }
 
-const redo = () => {
-  // This would need to be implemented in the editor store
-  console.log('Redo')
+function insertSymbol() {
+  // Emit event to parent to handle symbol dialog
+  window.dispatchEvent(new CustomEvent('editor:insert-symbol'))
 }
 
-const saveDocument = async () => {
-  await documentStore.saveDocument()
-}
-
-const exportDocument = () => {
-  // This would open an export dialog
-  console.log('Export document')
-}
-
-const toggleSpellCheck = () => {
-  documentStore.updateSettings({ spellCheck: !spellCheckEnabled.value })
-}
-
-const openFindReplace = () => {
-  // This would open find/replace dialog
-  console.log('Open find/replace')
-}
-
-const toggleCommentMode = () => {
-  if (commentMode.value) {
-    editorStore.disableCommentMode()
-  } else {
-    editorStore.enableCommentMode()
-  }
-}
-
-const showDocumentStats = () => {
-  // This would open document statistics dialog
-  console.log('Show document stats')
-}
+// Events
+defineEmits<{
+  'format-bold': []
+  'format-italic': []
+  'format-underline': []
+  'set-heading': [level: number]
+  'insert-link': []
+  'insert-image': []
+  'insert-table': []
+  'save': []
+  'export': []
+  'toggle-sidebar': []
+  'toggle-find': []
+}>()
 </script>
-
-<style scoped>
-.editor-toolbar {
-  min-height: 48px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  backdrop-filter: blur(8px);
-}
-
-.toolbar-group {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-@media (max-width: 640px) {
-  .editor-toolbar {
-    flex-wrap: wrap;
-    padding: 0.5rem;
-  }
-  
-  .toolbar-group {
-    border-right: none !important;
-    padding-right: 0 !important;
-  }
-}
-</style>

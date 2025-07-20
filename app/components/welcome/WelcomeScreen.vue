@@ -1,163 +1,155 @@
 <template>
-  <div class="welcome-screen">
-    <div class="welcome-overlay" @click="$emit('close')"></div>
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50" @click="$emit('close')"></div>
     
-    <div class="welcome-container">
+    <div class="relative bg-white rounded-xl shadow-2xl max-w-6xl w-[90vw] max-h-[90vh] overflow-hidden flex flex-col">
       <!-- Header -->
-      <div class="welcome-header">
-        <div class="logo-section">
-          <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14,2 14,8 20,8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-            <polyline points="10,9 9,9 8,9"/>
-          </svg>
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 sm:p-6 lg:p-8 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white gap-4">
+        <div class="flex items-center gap-3 sm:gap-4">
+          <FileText class="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12" />
           <div>
-            <h1 class="app-title">ChainPaper</h1>
-            <p class="app-subtitle">Decentralized Document Editor with Verifiable Authorship</p>
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold">ChainPaper</h1>
+            <p class="text-xs sm:text-sm opacity-90 mt-1">Decentralized Document Editor with Verifiable Authorship</p>
           </div>
         </div>
-        <button @click="$emit('close')" class="close-button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
+        <button 
+          @click="$emit('close')" 
+          class="w-8 h-8 sm:w-10 sm:h-10 self-end sm:self-auto flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+        >
+          <X class="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
       </div>
 
       <!-- Main Content -->
-      <div class="welcome-content">
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <!-- Quick Actions -->
-        <div class="quick-actions">
-          <h2>Get Started</h2>
-          <div class="actions-grid">
+        <div class="mb-12">
+          <h2 class="text-2xl font-semibold text-gray-900 mb-6">Get Started</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <button 
               @click="$emit('create-new')"
-              class="action-card primary"
+              class="flex items-center gap-4 p-6 border-2 border-blue-500 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14,2 14,8 20,8"/>
-                <line x1="12" y1="18" x2="12" y2="12"/>
-                <line x1="9" y1="15" x2="15" y2="15"/>
-              </svg>
-              <div>
-                <h3>Create New Document</h3>
-                <p>Start with a blank document</p>
+              <FilePlus class="w-10 h-10 flex-shrink-0" />
+              <div class="text-left">
+                <h3 class="text-lg font-semibold">Create New Document</h3>
+                <p class="text-sm opacity-90">Start with a blank document</p>
               </div>
             </button>
 
             <button 
               @click="handleOpenDocument"
-              class="action-card"
+              class="flex items-center gap-4 p-6 border-2 border-gray-200 rounded-lg bg-white hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14,2 14,8 20,8"/>
-              </svg>
-              <div>
-                <h3>Open Document</h3>
-                <p>Import existing document</p>
+              <FolderOpen class="w-10 h-10 flex-shrink-0 text-gray-600" />
+              <div class="text-left">
+                <h3 class="text-lg font-semibold text-gray-900">Open Document</h3>
+                <p class="text-sm text-gray-600">Import existing document</p>
               </div>
             </button>
           </div>
         </div>
 
         <!-- Templates -->
-        <div class="templates-section" v-if="templates.length > 0">
-          <h2>Templates</h2>
-          <div class="templates-grid">
+        <div v-if="templates.length > 0" class="mb-8 sm:mb-12">
+          <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6">Templates</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             <button
               v-for="template in templates"
               :key="template.id"
               @click="$emit('use-template', template)"
-              class="template-card"
+              class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 text-left"
             >
-              <div class="template-preview">
-                <svg v-if="!template.thumbnail" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14,2 14,8 20,8"/>
-                  <line x1="16" y1="13" x2="8" y2="13"/>
-                  <line x1="16" y1="17" x2="8" y2="17"/>
-                </svg>
-                <img v-else :src="template.thumbnail" :alt="template.name" />
+              <div class="h-32 bg-gray-50 flex items-center justify-center overflow-hidden">
+                <FileText v-if="!template.thumbnail" class="w-12 h-12 text-gray-400" />
+                <img v-else :src="template.thumbnail" :alt="template.name" class="w-full h-full object-cover" />
               </div>
-              <div class="template-info">
-                <h3>{{ template.name }}</h3>
-                <p>{{ template.description }}</p>
-                <span class="template-category">{{ template.category }}</span>
+              <div class="p-4">
+                <h3 class="font-semibold text-gray-900 mb-2">{{ template.name }}</h3>
+                <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ template.description }}</p>
+                <span class="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded font-medium">
+                  {{ template.category }}
+                </span>
               </div>
             </button>
           </div>
         </div>
 
         <!-- Recent Documents -->
-        <div class="recent-section" v-if="recentDocuments.length > 0">
-          <h2>Recent Documents</h2>
-          <div class="recent-list">
+        <div v-if="recentDocuments.length > 0" class="mb-8 sm:mb-12">
+          <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6">Recent Documents</h2>
+          <div class="space-y-2">
             <button
               v-for="doc in recentDocuments.slice(0, 5)"
               :key="doc.id"
-              @click="handleOpenRecent(doc)"
-              class="recent-item"
+              @click="$emit('open-document', doc)"
+              class="w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border border-gray-200 rounded-lg bg-white hover:border-blue-500 hover:bg-gray-50 transition-all duration-200 text-left"
             >
-              <div class="recent-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14,2 14,8 20,8"/>
-                </svg>
+              <div class="w-8 sm:w-10 h-8 sm:h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <FileText class="w-4 sm:w-5 h-4 sm:h-5 text-gray-600" />
               </div>
-              <div class="recent-info">
-                <h4>{{ doc.title || 'Untitled Document' }}</h4>
-                <p>{{ formatDate(doc.lastModified) }}</p>
-                <span class="recent-author">by {{ doc.author }}</span>
+              <div class="flex-1 min-w-0">
+                <h4 class="text-sm sm:text-base font-semibold text-gray-900 truncate">{{ doc.title || 'Untitled Document' }}</h4>
+                <p class="text-xs sm:text-sm text-gray-600">{{ formatDate(doc.updatedAt) }}</p>
+                <p class="text-xs text-gray-500">by {{ doc.author }}</p>
               </div>
-              <div class="recent-stats">
-                <span>{{ doc.wordCount || 0 }} words</span>
+              <div class="text-xs sm:text-sm text-gray-500 flex-shrink-0">
+                {{ doc.wordCount || 0 }} words
               </div>
             </button>
           </div>
         </div>
 
         <!-- Features -->
-        <div class="features-section">
-          <h2>Features</h2>
-          <div class="features-grid">
-            <div class="feature">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              </svg>
-              <h3>Verifiable Authorship</h3>
-              <p>Cryptographic proof of document ownership and authenticity</p>
+        <div class="features-section mb-8 sm:mb-12">
+          <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6">Features</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div class="text-center p-4 sm:p-6">
+              <Shield class="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 text-blue-500 mx-auto mb-3 sm:mb-4" />
+              <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">Blockchain Verification</h3>
+              <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                Verify document authorship and integrity using blockchain technology.
+              </p>
             </div>
-            <div class="feature">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
-                <line x1="12" y1="22.08" x2="12" y2="12"/>
-              </svg>
-              <h3>Decentralized Storage</h3>
-              <p>Store documents securely without relying on central servers</p>
+
+            <div class="text-center p-4 sm:p-6">
+              <Users class="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 text-blue-500 mx-auto mb-3 sm:mb-4" />
+              <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">Real-time Collaboration</h3>
+              <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                Work together on documents with real-time editing and commenting.
+              </p>
             </div>
-            <div class="feature">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14,2 14,8 20,8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-              </svg>
-              <h3>Rich Editing</h3>
-              <p>Full-featured document editing with advanced formatting</p>
+
+            <div class="text-center p-4 sm:p-6">
+              <Download class="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 text-blue-500 mx-auto mb-3 sm:mb-4" />
+              <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">Export Anywhere</h3>
+              <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                Export your documents to PDF, Word, HTML, and more formats.
+              </p>
             </div>
-            <div class="feature">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7,10 12,15 17,10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              <h3>Export Formats</h3>
-              <p>Export to JSON, PDF, DOCX, HTML, and more formats</p>
+
+            <div class="text-center p-4 sm:p-6">
+              <Lock class="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 text-blue-500 mx-auto mb-3 sm:mb-4" />
+              <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">End-to-End Encryption</h3>
+              <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                Your documents are encrypted and only accessible by authorized users.
+              </p>
+            </div>
+
+            <div class="text-center p-4 sm:p-6">
+              <Search class="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 text-blue-500 mx-auto mb-3 sm:mb-4" />
+              <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">Smart Search</h3>
+              <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                Find anything in your documents with intelligent search capabilities.
+              </p>
+            </div>
+
+            <div class="text-center p-4 sm:p-6">
+              <Smartphone class="w-8 sm:w-10 lg:w-12 h-8 sm:h-10 lg:h-12 text-blue-500 mx-auto mb-3 sm:mb-4" />
+              <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2">Mobile Responsive</h3>
+              <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                Edit and review documents on any device, anywhere, anytime.
+              </p>
             </div>
           </div>
         </div>
@@ -167,7 +159,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, defineProps } from 'vue'
+import { FileText, FilePlus, FolderOpen, X, Shield, Users, Download, Lock, Search, Smartphone } from 'lucide-vue-next'
 
 const props = defineProps<{
   recentDocuments: any[]
@@ -218,348 +210,3 @@ function formatDate(date: string | Date) {
   }
 }
 </script>
-
-<style scoped>
-.welcome-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.welcome-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.welcome-container {
-  position: relative;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-  max-width: 1200px;
-  max-height: 90vh;
-  width: 90vw;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.welcome-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 2rem;
-  border-bottom: 1px solid #e5e7eb;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.logo {
-  width: 3rem;
-  height: 3rem;
-  stroke-width: 1.5;
-}
-
-.app-title {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.app-subtitle {
-  margin: 0.25rem 0 0 0;
-  opacity: 0.9;
-  font-size: 0.875rem;
-}
-
-.close-button {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  border-radius: 6px;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.close-button:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.close-button svg {
-  width: 1.25rem;
-  height: 1.25rem;
-  stroke: white;
-  stroke-width: 2;
-}
-
-.welcome-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 2rem;
-}
-
-.welcome-content h2 {
-  margin: 0 0 1.5rem 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.quick-actions {
-  margin-bottom: 3rem;
-}
-
-.actions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-}
-
-.action-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
-}
-
-.action-card:hover {
-  border-color: #3b82f6;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-.action-card.primary {
-  border-color: #3b82f6;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  color: white;
-}
-
-.action-card.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-}
-
-.action-card svg {
-  width: 2.5rem;
-  height: 2.5rem;
-  stroke-width: 1.5;
-  flex-shrink: 0;
-}
-
-.action-card h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.action-card p {
-  margin: 0;
-  opacity: 0.8;
-  font-size: 0.875rem;
-}
-
-.templates-section,
-.recent-section,
-.features-section {
-  margin-bottom: 3rem;
-}
-
-.templates-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.template-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
-}
-
-.template-card:hover {
-  border-color: #3b82f6;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-.template-preview {
-  height: 120px;
-  background: #f9fafb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.template-preview svg {
-  width: 3rem;
-  height: 3rem;
-  color: #9ca3af;
-  stroke-width: 1.5;
-}
-
-.template-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.template-info {
-  padding: 1rem;
-}
-
-.template-info h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.template-info p {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.875rem;
-  color: #6b7280;
-  line-height: 1.4;
-}
-
-.template-category {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  background: #e5e7eb;
-  color: #374151;
-  font-size: 0.75rem;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-.recent-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.recent-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
-}
-
-.recent-item:hover {
-  border-color: #3b82f6;
-  background: #f8fafc;
-}
-
-.recent-icon {
-  flex-shrink: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  background: #f3f4f6;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.recent-icon svg {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: #6b7280;
-  stroke-width: 1.5;
-}
-
-.recent-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.recent-info h4 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.recent-info p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.recent-author {
-  font-size: 0.75rem;
-  color: #9ca3af;
-}
-
-.recent-stats {
-  flex-shrink: 0;
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-}
-
-.feature {
-  text-align: center;
-  padding: 1.5rem;
-}
-
-.feature svg {
-  width: 3rem;
-  height: 3rem;
-  color: #3b82f6;
-  stroke-width: 1.5;
-  margin-bottom: 1rem;
-}
-
-.feature h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.feature p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: #6b7280;
-  line-height: 1.5;
-}
-</style>

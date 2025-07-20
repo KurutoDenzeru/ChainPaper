@@ -17,6 +17,11 @@ export default defineNuxtConfig({
     build: {
       sourcemap: false,
     },
+
+    ssr: {
+      noExternal: [],
+      external: ['jspdf', 'html2canvas', 'docx', 'mammoth', 'file-saver']
+    },
   },
 
   // Nuxt Vitalizer

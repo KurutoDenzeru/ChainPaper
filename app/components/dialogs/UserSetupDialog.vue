@@ -1,6 +1,6 @@
 <template>
   <Dialog v-model:open="open">
-    <DialogContent class="user-setup-dialog">
+    <DialogContent class="max-w-xl max-h-[90vh] overflow-hidden flex flex-col">
       <DialogHeader>
         <DialogTitle>Welcome to ChainPaper</DialogTitle>
         <DialogDescription>
@@ -8,134 +8,142 @@
         </DialogDescription>
       </DialogHeader>
 
-      <div class="setup-content">
-        <div class="form-group">
-          <Label for="user-name">Full Name *</Label>
-          <Input
-            id="user-name"
-            v-model="userData.name"
-            placeholder="Enter your full name"
-            required
-          />
-          <p class="field-help">This will be used for document authorship</p>
-        </div>
-
-        <div class="form-group">
-          <Label for="user-email">Email Address</Label>
-          <Input
-            id="user-email"
-            v-model="userData.email"
-            type="email"
-            placeholder="your.email@example.com"
-          />
-          <p class="field-help">Optional, for contact and verification purposes</p>
-        </div>
-
-        <div class="form-group">
-          <Label for="user-organization">Organization</Label>
-          <Input
-            id="user-organization"
-            v-model="userData.organization"
-            placeholder="Your organization or company"
-          />
-          <p class="field-help">Optional, appears in document metadata</p>
-        </div>
-
-        <div class="form-group">
-          <Label for="user-title">Professional Title</Label>
-          <Input
-            id="user-title"
-            v-model="userData.title"
-            placeholder="Your job title or role"
-          />
-          <p class="field-help">Optional, for professional documents</p>
-        </div>
-
-        <div class="security-section">
-          <h3>Security Settings</h3>
-          
-          <div class="checkbox-group">
-            <Checkbox
-              id="generate-keys"
-              v-model:checked="userData.generateKeys"
+      <div class="flex-1 overflow-y-auto space-y-6 px-1">
+        <!-- Basic Information -->
+        <div class="space-y-4">
+          <div class="space-y-2">
+            <Label for="user-name">Full Name *</Label>
+            <Input
+              id="user-name"
+              v-model="userData.name"
+              placeholder="Enter your full name"
+              required
             />
-            <div class="checkbox-content">
-              <Label for="generate-keys">Generate cryptographic keys</Label>
-              <p class="field-help">
-                Automatically generate a key pair for document signing and verification
-              </p>
-            </div>
+            <p class="text-xs text-gray-600">This will be used for document authorship</p>
           </div>
 
-          <div class="checkbox-group">
-            <Checkbox
-              id="auto-sign"
-              v-model:checked="userData.autoSign"
+          <div class="space-y-2">
+            <Label for="user-email">Email Address</Label>
+            <Input
+              id="user-email"
+              v-model="userData.email"
+              type="email"
+              placeholder="your.email@example.com"
             />
-            <div class="checkbox-content">
-              <Label for="auto-sign">Auto-sign documents</Label>
-              <p class="field-help">
-                Automatically sign new documents with your cryptographic signature
-              </p>
-            </div>
+            <p class="text-xs text-gray-600">Optional, for contact and verification purposes</p>
           </div>
 
-          <div class="checkbox-group">
-            <Checkbox
-              id="backup-keys"
-              v-model:checked="userData.backupKeys"
+          <div class="space-y-2">
+            <Label for="user-organization">Organization</Label>
+            <Input
+              id="user-organization"
+              v-model="userData.organization"
+              placeholder="Your organization or company"
             />
-            <div class="checkbox-content">
-              <Label for="backup-keys">Enable key backup</Label>
-              <p class="field-help">
-                Store encrypted backup of your keys for recovery purposes
-              </p>
-            </div>
+            <p class="text-xs text-gray-600">Optional, appears in document metadata</p>
+          </div>
+
+          <div class="space-y-2">
+            <Label for="user-title">Professional Title</Label>
+            <Input
+              id="user-title"
+              v-model="userData.title"
+              placeholder="Your job title or role"
+            />
+            <p class="text-xs text-gray-600">Optional, for professional documents</p>
           </div>
         </div>
 
-        <div class="privacy-section">
-          <h3>Privacy & Usage</h3>
-          
-          <div class="checkbox-group">
-            <Checkbox
-              id="analytics"
-              v-model:checked="userData.analytics"
-            />
-            <div class="checkbox-content">
-              <Label for="analytics">Anonymous usage analytics</Label>
-              <p class="field-help">
-                Help improve ChainPaper by sharing anonymous usage data
-              </p>
+        <!-- Security Settings -->
+        <div class="border-t border-gray-200 pt-6">
+          <h3 class="text-base font-semibold text-gray-900 mb-4">Security Settings</h3>
+          <div class="space-y-4">
+            <div class="flex items-start space-x-3">
+              <Checkbox
+                id="generate-keys"
+                v-model:checked="userData.generateKeys"
+              />
+              <div class="flex-1">
+                <Label for="generate-keys" class="font-medium cursor-pointer">Generate cryptographic keys</Label>
+                <p class="text-xs text-gray-600 mt-1">
+                  Automatically generate a key pair for document signing and verification
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div class="checkbox-group">
-            <Checkbox
-              id="updates"
-              v-model:checked="userData.updates"
-            />
-            <div class="checkbox-content">
-              <Label for="updates">Receive update notifications</Label>
-              <p class="field-help">
-                Get notified about new features and security updates
-              </p>
+            <div class="flex items-start space-x-3">
+              <Checkbox
+                id="auto-sign"
+                v-model:checked="userData.autoSign"
+              />
+              <div class="flex-1">
+                <Label for="auto-sign" class="font-medium cursor-pointer">Auto-sign documents</Label>
+                <p class="text-xs text-gray-600 mt-1">
+                  Automatically sign new documents with your cryptographic signature
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-3">
+              <Checkbox
+                id="backup-keys"
+                v-model:checked="userData.backupKeys"
+              />
+              <div class="flex-1">
+                <Label for="backup-keys" class="font-medium cursor-pointer">Enable key backup</Label>
+                <p class="text-xs text-gray-600 mt-1">
+                  Store encrypted backup of your keys for recovery purposes
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="terms-section">
-          <div class="checkbox-group">
+        <!-- Privacy & Usage -->
+        <div class="border-t border-gray-200 pt-6">
+          <h3 class="text-base font-semibold text-gray-900 mb-4">Privacy & Usage</h3>
+          <div class="space-y-4">
+            <div class="flex items-start space-x-3">
+              <Checkbox
+                id="analytics"
+                v-model:checked="userData.analytics"
+              />
+              <div class="flex-1">
+                <Label for="analytics" class="font-medium cursor-pointer">Anonymous usage analytics</Label>
+                <p class="text-xs text-gray-600 mt-1">
+                  Help improve ChainPaper by sharing anonymous usage data
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start space-x-3">
+              <Checkbox
+                id="updates"
+                v-model:checked="userData.updates"
+              />
+              <div class="flex-1">
+                <Label for="updates" class="font-medium cursor-pointer">Receive update notifications</Label>
+                <p class="text-xs text-gray-600 mt-1">
+                  Get notified about new features and security updates
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div class="border-t border-gray-200 pt-6">
+          <div class="flex items-start space-x-3">
             <Checkbox
               id="terms"
               v-model:checked="acceptedTerms"
               required
             />
-            <div class="checkbox-content">
-              <Label for="terms">I accept the Terms of Service and Privacy Policy *</Label>
-              <p class="field-help">
-                <a href="#" @click.prevent="showTerms">View Terms</a> • 
-                <a href="#" @click.prevent="showPrivacy">View Privacy Policy</a>
+            <div class="flex-1">
+              <Label for="terms" class="font-medium cursor-pointer">I accept the Terms of Service and Privacy Policy *</Label>
+              <p class="text-xs text-gray-600 mt-1">
+                <button @click="showTerms" class="text-blue-600 hover:underline">View Terms</button> • 
+                <button @click="showPrivacy" class="text-blue-600 hover:underline">View Privacy Policy</button>
               </p>
             </div>
           </div>
@@ -262,98 +270,3 @@ function showPrivacy() {
   window.open('#privacy', '_blank')
 }
 </script>
-
-<style scoped>
-.user-setup-dialog {
-  max-width: 600px;
-  max-height: 80vh;
-  overflow: hidden;
-}
-
-.setup-content {
-  overflow-y: auto;
-  max-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.field-help {
-  font-size: 0.75rem;
-  color: #6b7280;
-  margin: 0;
-  margin-top: 0.25rem;
-}
-
-.security-section,
-.privacy-section,
-.terms-section {
-  border-top: 1px solid #e5e7eb;
-  padding-top: 1.5rem;
-}
-
-.security-section h3,
-.privacy-section h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.checkbox-group {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-}
-
-.checkbox-content {
-  flex: 1;
-}
-
-.checkbox-content label {
-  margin: 0;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.checkbox-content .field-help {
-  margin-top: 0.25rem;
-}
-
-.terms-section .checkbox-content .field-help a {
-  color: #3b82f6;
-  text-decoration: none;
-}
-
-.terms-section .checkbox-content .field-help a:hover {
-  text-decoration: underline;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .security-section,
-  .privacy-section,
-  .terms-section {
-    border-top-color: #374151;
-  }
-  
-  .security-section h3,
-  .privacy-section h3 {
-    color: #f9fafb;
-  }
-  
-  .field-help {
-    color: #9ca3af;
-  }
-  
-  .terms-section .checkbox-content .field-help a {
-    color: #60a5fa;
-  }
-}
-</style>

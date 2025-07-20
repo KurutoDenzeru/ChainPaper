@@ -1,56 +1,56 @@
 <template>
-  <Menubar class="menu-bar">
+  <Menubar class="px-2 sm:px-4 py-4">
     <!-- File Menu -->
     <MenubarMenu>
       <MenubarTrigger>File</MenubarTrigger>
       <MenubarContent>
-        <MenubarItem @click="$emit('new-document')" class="menu-item">
-          <span class="menu-icon">📄</span>
+        <MenubarItem @click="$emit('new-document')" class="flex items-center gap-2">
+          <FileText class="w-4 h-4" />
           New Document
           <MenubarShortcut>Ctrl+N</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem @click="$emit('open-document')" class="menu-item">
-          <span class="menu-icon">📂</span>
+        <MenubarItem @click="$emit('open-document')" class="flex items-center gap-2">
+          <FolderOpen class="w-4 h-4" />
           Open
           <MenubarShortcut>Ctrl+O</MenubarShortcut>
         </MenubarItem>
         <MenubarSeparator />
-        <MenubarItem @click="$emit('save-document')" class="menu-item" :disabled="!isDirty">
-          <span class="menu-icon">💾</span>
+        <MenubarItem @click="$emit('save-document')" class="flex items-center gap-2" :disabled="!isDirty">
+          <Save class="w-4 h-4" />
           Save
           <MenubarShortcut>Ctrl+S</MenubarShortcut>
         </MenubarItem>
         <MenubarSeparator />
         <MenubarSub>
-          <MenubarSubTrigger>
-            <span class="menu-icon">📤</span>
+          <MenubarSubTrigger class="flex items-center gap-2">
+            <Upload class="w-4 h-4" />
             Export As
           </MenubarSubTrigger>
           <MenubarSubContent>
-            <MenubarItem @click="$emit('export-document', 'json')">
-              <span class="menu-icon">📋</span>
+            <MenubarItem @click="$emit('export-document', 'json')" class="flex items-center gap-2">
+              <FileJson class="w-4 h-4" />
               ChainPaper JSON
             </MenubarItem>
-            <MenubarItem @click="$emit('export-document', 'pdf')">
-              <span class="menu-icon">📕</span>
+            <MenubarItem @click="$emit('export-document', 'pdf')" class="flex items-center gap-2">
+              <FileImage class="w-4 h-4" />
               PDF Document
             </MenubarItem>
-            <MenubarItem @click="$emit('export-document', 'docx')">
-              <span class="menu-icon">📘</span>
+            <MenubarItem @click="$emit('export-document', 'docx')" class="flex items-center gap-2">
+              <FileText class="w-4 h-4" />
               Word Document
             </MenubarItem>
-            <MenubarItem @click="$emit('export-document', 'html')">
-              <span class="menu-icon">🌐</span>
+            <MenubarItem @click="$emit('export-document', 'html')" class="flex items-center gap-2">
+              <Globe class="w-4 h-4" />
               HTML Page
             </MenubarItem>
-            <MenubarItem @click="$emit('export-document', 'markdown')">
-              <span class="menu-icon">📝</span>
+            <MenubarItem @click="$emit('export-document', 'markdown')" class="flex items-center gap-2">
+              <Hash class="w-4 h-4" />
               Markdown
             </MenubarItem>
           </MenubarSubContent>
         </MenubarSub>
-        <MenubarItem @click="$emit('import-document')" class="menu-item">
-          <span class="menu-icon">📥</span>
+        <MenubarItem @click="$emit('import-document')" class="flex items-center gap-2">
+          <Download class="w-4 h-4" />
           Import Document
         </MenubarItem>
       </MenubarContent>
@@ -60,40 +60,40 @@
     <MenubarMenu>
       <MenubarTrigger>Edit</MenubarTrigger>
       <MenubarContent>
-        <MenubarItem @click="handleUndo" class="menu-item">
-          <span class="menu-icon">↩️</span>
+        <MenubarItem @click="handleUndo" class="flex items-center gap-2">
+          <Undo2 class="w-4 h-4" />
           Undo
           <MenubarShortcut>Ctrl+Z</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem @click="handleRedo" class="menu-item">
-          <span class="menu-icon">↪️</span>
+        <MenubarItem @click="handleRedo" class="flex items-center gap-2">
+          <Redo2 class="w-4 h-4" />
           Redo
           <MenubarShortcut>Ctrl+Y</MenubarShortcut>
         </MenubarItem>
         <MenubarSeparator />
-        <MenubarItem @click="handleCut" class="menu-item">
-          <span class="menu-icon">✂️</span>
+        <MenubarItem @click="handleCut" class="flex items-center gap-2">
+          <Scissors class="w-4 h-4" />
           Cut
           <MenubarShortcut>Ctrl+X</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem @click="handleCopy" class="menu-item">
-          <span class="menu-icon">📋</span>
+        <MenubarItem @click="handleCopy" class="flex items-center gap-2">
+          <Copy class="w-4 h-4" />
           Copy
           <MenubarShortcut>Ctrl+C</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem @click="handlePaste" class="menu-item">
-          <span class="menu-icon">📄</span>
+        <MenubarItem @click="handlePaste" class="flex items-center gap-2">
+          <Clipboard class="w-4 h-4" />
           Paste
           <MenubarShortcut>Ctrl+V</MenubarShortcut>
         </MenubarItem>
         <MenubarSeparator />
-        <MenubarItem @click="handleSelectAll" class="menu-item">
-          <span class="menu-icon">📌</span>
+        <MenubarItem @click="handleSelectAll" class="flex items-center gap-2">
+          <MousePointer class="w-4 h-4" />
           Select All
           <MenubarShortcut>Ctrl+A</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem @click="handleFind" class="menu-item">
-          <span class="menu-icon">🔍</span>
+        <MenubarItem @click="handleFind" class="flex items-center gap-2">
+          <Search class="w-4 h-4" />
           Find & Replace
           <MenubarShortcut>Ctrl+F</MenubarShortcut>
         </MenubarItem>
@@ -104,23 +104,23 @@
     <MenubarMenu>
       <MenubarTrigger>View</MenubarTrigger>
       <MenubarContent>
-        <MenubarItem @click="toggleSidebar" class="menu-item">
-          <span class="menu-icon">📑</span>
+        <MenubarItem @click="toggleSidebar" class="flex items-center gap-2">
+          <Sidebar class="w-4 h-4" />
           Toggle Sidebar
         </MenubarItem>
         <MenubarSeparator />
-        <MenubarCheckboxItem v-model:checked="showToolbar">
-          <span class="menu-icon">🛠️</span>
+        <MenubarCheckboxItem v-model:checked="showToolbar" class="flex items-center gap-2">
+          <Wrench class="w-4 h-4" />
           Show Toolbar
         </MenubarCheckboxItem>
-        <MenubarCheckboxItem v-model:checked="showStatusBar">
-          <span class="menu-icon">📊</span>
+        <MenubarCheckboxItem v-model:checked="showStatusBar" class="flex items-center gap-2">
+          <BarChart3 class="w-4 h-4" />
           Show Status Bar
         </MenubarCheckboxItem>
         <MenubarSeparator />
         <MenubarSub>
-          <MenubarSubTrigger>
-            <span class="menu-icon">🔍</span>
+          <MenubarSubTrigger class="flex items-center gap-2">
+            <ZoomIn class="w-4 h-4" />
             Zoom
           </MenubarSubTrigger>
           <MenubarSubContent>
@@ -133,12 +133,12 @@
           </MenubarSubContent>
         </MenubarSub>
         <MenubarSeparator />
-        <MenubarCheckboxItem v-model:checked="typewriterMode">
-          <span class="menu-icon">⌨️</span>
+        <MenubarCheckboxItem v-model:checked="typewriterMode" class="flex items-center gap-2">
+          <Type class="w-4 h-4" />
           Typewriter Mode
         </MenubarCheckboxItem>
-        <MenubarCheckboxItem v-model:checked="focusMode">
-          <span class="menu-icon">🎯</span>
+        <MenubarCheckboxItem v-model:checked="focusMode" class="flex items-center gap-2">
+          <Target class="w-4 h-4" />
           Focus Mode
         </MenubarCheckboxItem>
       </MenubarContent>
@@ -148,34 +148,34 @@
     <MenubarMenu>
       <MenubarTrigger>Insert</MenubarTrigger>
       <MenubarContent>
-        <MenubarItem @click="insertTable" class="menu-item">
-          <span class="menu-icon">📊</span>
+        <MenubarItem @click="insertTable" class="flex items-center gap-2">
+          <Table class="w-4 h-4" />
           Table
         </MenubarItem>
-        <MenubarItem @click="insertImage" class="menu-item">
-          <span class="menu-icon">🖼️</span>
+        <MenubarItem @click="insertImage" class="flex items-center gap-2">
+          <ImageIcon class="w-4 h-4" />
           Image
         </MenubarItem>
-        <MenubarItem @click="insertLink" class="menu-item">
-          <span class="menu-icon">🔗</span>
+        <MenubarItem @click="insertLink" class="flex items-center gap-2">
+          <Link class="w-4 h-4" />
           Link
         </MenubarItem>
         <MenubarSeparator />
-        <MenubarItem @click="insertCodeBlock" class="menu-item">
-          <span class="menu-icon">💻</span>
+        <MenubarItem @click="insertCodeBlock" class="flex items-center gap-2">
+          <Code2 class="w-4 h-4" />
           Code Block
         </MenubarItem>
-        <MenubarItem @click="insertMath" class="menu-item">
-          <span class="menu-icon">🧮</span>
+        <MenubarItem @click="insertMath" class="flex items-center gap-2">
+          <Calculator class="w-4 h-4" />
           Math Formula
         </MenubarItem>
         <MenubarSeparator />
-        <MenubarItem @click="insertDate" class="menu-item">
-          <span class="menu-icon">📅</span>
+        <MenubarItem @click="insertDate" class="flex items-center gap-2">
+          <Calendar class="w-4 h-4" />
           Date & Time
         </MenubarItem>
-        <MenubarItem @click="insertPageBreak" class="menu-item">
-          <span class="menu-icon">📄</span>
+        <MenubarItem @click="insertPageBreak" class="flex items-center gap-2">
+          <FileText class="w-4 h-4" />
           Page Break
         </MenubarItem>
       </MenubarContent>
@@ -185,25 +185,25 @@
     <MenubarMenu>
       <MenubarTrigger>Format</MenubarTrigger>
       <MenubarContent>
-        <MenubarItem @click="toggleBold" class="menu-item">
-          <span class="menu-icon">𝐁</span>
+        <MenubarItem @click="toggleBold" class="flex items-center gap-2">
+          <Bold class="w-4 h-4" />
           Bold
           <MenubarShortcut>Ctrl+B</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem @click="toggleItalic" class="menu-item">
-          <span class="menu-icon">𝐼</span>
+        <MenubarItem @click="toggleItalic" class="flex items-center gap-2">
+          <Italic class="w-4 h-4" />
           Italic
           <MenubarShortcut>Ctrl+I</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem @click="toggleUnderline" class="menu-item">
-          <span class="menu-icon">U̲</span>
+        <MenubarItem @click="toggleUnderline" class="flex items-center gap-2">
+          <Underline class="w-4 h-4" />
           Underline
           <MenubarShortcut>Ctrl+U</MenubarShortcut>
         </MenubarItem>
         <MenubarSeparator />
         <MenubarSub>
-          <MenubarSubTrigger>
-            <span class="menu-icon">📝</span>
+          <MenubarSubTrigger class="flex items-center gap-2">
+            <Heading class="w-4 h-4" />
             Paragraph
           </MenubarSubTrigger>
           <MenubarSubContent>
@@ -215,12 +215,12 @@
           </MenubarSubContent>
         </MenubarSub>
         <MenubarSeparator />
-        <MenubarItem @click="toggleBulletList" class="menu-item">
-          <span class="menu-icon">•</span>
+        <MenubarItem @click="toggleBulletList" class="flex items-center gap-2">
+          <List class="w-4 h-4" />
           Bullet List
         </MenubarItem>
-        <MenubarItem @click="toggleOrderedList" class="menu-item">
-          <span class="menu-icon">1.</span>
+        <MenubarItem @click="toggleOrderedList" class="flex items-center gap-2">
+          <ListOrdered class="w-4 h-4" />
           Numbered List
         </MenubarItem>
       </MenubarContent>
@@ -230,27 +230,27 @@
     <MenubarMenu>
       <MenubarTrigger>Tools</MenubarTrigger>
       <MenubarContent>
-        <MenubarItem @click="spellCheck" class="menu-item">
-          <span class="menu-icon">📖</span>
+        <MenubarItem @click="spellCheck" class="flex items-center gap-2">
+          <BookOpen class="w-4 h-4" />
           Spell Check
           <MenubarShortcut>F7</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem @click="wordCount" class="menu-item">
-          <span class="menu-icon">🔢</span>
+        <MenubarItem @click="wordCount" class="flex items-center gap-2">
+          <Hash class="w-4 h-4" />
           Word Count
         </MenubarItem>
         <MenubarSeparator />
-        <MenubarItem @click="verifyAuthorship" class="menu-item">
-          <span class="menu-icon">🔐</span>
+        <MenubarItem @click="verifyAuthorship" class="flex items-center gap-2">
+          <ShieldCheck class="w-4 h-4" />
           Verify Authorship
         </MenubarItem>
-        <MenubarItem @click="generateProof" class="menu-item">
-          <span class="menu-icon">📜</span>
+        <MenubarItem @click="generateProof" class="flex items-center gap-2">
+          <FileSignature class="w-4 h-4" />
           Generate Proof
         </MenubarItem>
         <MenubarSeparator />
-        <MenubarItem @click="$emit('settings')" class="menu-item">
-          <span class="menu-icon">⚙️</span>
+        <MenubarItem @click="$emit('settings')" class="flex items-center gap-2">
+          <Settings class="w-4 h-4" />
           Preferences
           <MenubarShortcut>Ctrl+,</MenubarShortcut>
         </MenubarItem>
@@ -261,36 +261,39 @@
     <MenubarMenu>
       <MenubarTrigger>Help</MenubarTrigger>
       <MenubarContent>
-        <MenubarItem @click="showKeyboardShortcuts" class="menu-item">
-          <span class="menu-icon">⌨️</span>
+        <MenubarItem @click="showKeyboardShortcuts" class="flex items-center gap-2">
+          <Keyboard class="w-4 h-4" />
           Keyboard Shortcuts
         </MenubarItem>
-        <MenubarItem @click="showDocumentation" class="menu-item">
-          <span class="menu-icon">📚</span>
+        <MenubarItem @click="showDocumentation" class="flex items-center gap-2">
+          <BookOpen class="w-4 h-4" />
           Documentation
         </MenubarItem>
         <MenubarSeparator />
-        <MenubarItem @click="$emit('about')" class="menu-item">
-          <span class="menu-icon">ℹ️</span>
+        <MenubarItem @click="$emit('about')" class="flex items-center gap-2">
+          <Info class="w-4 h-4" />
           About ChainPaper
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
 
     <!-- Document Title -->
-    <div class="document-title-section">
-      <div class="document-title">
-        {{ documentTitle || 'Untitled Document' }}
-        <span v-if="isDirty" class="dirty-indicator">•</span>
+    <div class="flex-1 flex flex-col items-center justify-center px-4">
+      <div class="flex items-center text-sm font-medium text-gray-900">
+        <span>{{ documentTitle || 'Untitled Document' }}</span>
+        <span v-if="isDirty" class="ml-1 text-orange-500">•</span>
       </div>
-      <div class="document-info">
-        <span v-if="user.name" class="user-name">{{ user.name }}</span>
+      <div class="text-xs text-gray-500">
+        <span v-if="user.name">{{ user.name }}</span>
       </div>
     </div>
 
     <!-- User Menu -->
-    <div class="user-section">
-      <div class="user-avatar" :title="user.name || 'Anonymous'">
+    <div class="flex items-center">
+      <div 
+        class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-blue-700 transition-colors"
+        :title="user.name || 'Anonymous'"
+      >
         {{ (user.name || 'A').charAt(0).toUpperCase() }}
       </div>
     </div>
@@ -299,6 +302,15 @@
 
 <script setup lang="ts">
 import { ref, defineEmits, defineProps } from 'vue'
+import {
+  FileText, FolderOpen, Save, Upload, Download, FileJson, FileImage, Globe, Hash,
+  Undo2, Redo2, Scissors, Copy, Clipboard, MousePointer, Search,
+  Sidebar, Wrench, BarChart3, ZoomIn, Type, Target,
+  Table, ImageIcon, Link, Code2, Calculator, Calendar,
+  Bold, Italic, Underline, Heading, List, ListOrdered,
+  BookOpen, ShieldCheck, FileSignature, Settings,
+  Keyboard, Info
+} from 'lucide-vue-next'
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -464,135 +476,3 @@ function showDocumentation() {
   window.open('https://github.com/chainpaper/docs', '_blank')
 }
 </script>
-
-<style scoped>
-.menu-bar {
-  border-bottom: 1px solid #e5e7eb;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1rem;
-  height: 3rem;
-  flex-shrink: 0;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.menu-item:hover {
-  background-color: #f3f4f6;
-}
-
-.menu-icon {
-  font-size: 1rem;
-  width: 1.25rem;
-  text-align: center;
-}
-
-.document-title-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  margin: 0 2rem;
-  min-width: 0;
-}
-
-.document-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-.dirty-indicator {
-  color: #ef4444;
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
-.document-info {
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.user-name {
-  font-weight: 500;
-}
-
-.user-section {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.user-avatar {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.user-avatar:hover {
-  transform: scale(1.05);
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .menu-bar {
-    background: #1f2937;
-    border-bottom-color: #374151;
-  }
-  
-  .document-title {
-    color: #f9fafb;
-  }
-  
-  .document-info {
-    color: #9ca3af;
-  }
-  
-  .menu-item:hover {
-    background-color: #374151;
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .document-title-section {
-    margin: 0 1rem;
-  }
-  
-  .document-title {
-    font-size: 0.875rem;
-  }
-  
-  .user-avatar {
-    width: 1.75rem;
-    height: 1.75rem;
-    font-size: 0.75rem;
-  }
-}
-</style>

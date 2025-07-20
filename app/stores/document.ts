@@ -12,7 +12,8 @@ import type {
   DocumentBookmark,
   DocumentAnnotation,
   FootnoteEndnote,
-  EditSession
+  EditSession,
+  ExportOptions
 } from '~/types/document'
 import type { AuthorBlock, AuthorshipProof, VerificationResult } from '~/types/authorship'
 import { ChainPaperCrypto } from '~/utils/cryptography'

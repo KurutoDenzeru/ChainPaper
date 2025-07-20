@@ -11,6 +11,11 @@ export interface DocumentMetadata {
   characterCount: number
   pageCount: number
   language: string
+  description?: string
+  tags?: string[]
+  category?: string
+  created?: Date
+  modified?: Date
 }
 
 export interface DocumentContent {
@@ -107,6 +112,7 @@ export interface DocumentSettings {
     right: number
   }
   lineSpacing: number
+  lineHeight?: number
   fontSize: number
   fontFamily: string
   theme: 'light' | 'dark' | 'sepia'
@@ -172,6 +178,13 @@ export interface DocumentSecurity {
   }
   digitalSignature?: string
   certificates?: Certificate[]
+  author?: string
+  created?: Date
+  modified?: Date
+  version?: string | number
+  hash?: string
+  signature?: string
+  isVerified?: boolean
 }
 
 export interface Certificate {
@@ -211,6 +224,7 @@ export interface DocumentIndex {
   tables: TableEntry[]
   references: ReferenceEntry[]
   glossary: GlossaryEntry[]
+  lastUpdated?: Date
 }
 
 export interface TOCEntry {
@@ -219,6 +233,7 @@ export interface TOCEntry {
   title: string
   pageNumber: number
   position: number
+  page?: number
 }
 
 export interface FigureEntry {
@@ -227,6 +242,8 @@ export interface FigureEntry {
   type: 'image' | 'chart' | 'diagram'
   pageNumber: number
   position: number
+  page?: number
+  src?: string
 }
 
 export interface TableEntry {
@@ -236,6 +253,7 @@ export interface TableEntry {
   position: number
   rows: number
   columns: number
+  page?: number
 }
 
 export interface ReferenceEntry {

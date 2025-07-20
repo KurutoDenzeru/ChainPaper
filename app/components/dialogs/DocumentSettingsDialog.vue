@@ -1,28 +1,34 @@
 <template>
   <Dialog v-model:open="open">
-    <DialogContent class="settings-dialog">
+    <DialogContent class="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
       <DialogHeader>
         <DialogTitle>Document Settings</DialogTitle>
         <DialogDescription>
-          Configure document settings and security options
+          Configure document preferences and security settings
         </DialogDescription>
       </DialogHeader>
 
-      <div class="settings-content">
-        <div class="settings-tabs">
+      <div class="flex-1 overflow-hidden flex flex-col">
+        <!-- Tabs -->
+        <div class="flex border-b border-gray-200 mb-6">
           <button
             v-for="tab in tabs"
             :key="tab.id"
             @click="activeTab = tab.id"
-            :class="['tab-button', { active: activeTab === tab.id }]"
+            :class="[
+              'px-4 py-3 border-b-2 font-medium text-sm transition-colors',
+              activeTab === tab.id
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-blue-600'
+            ]"
           >
             {{ tab.label }}
           </button>
         </div>
 
         <!-- General Settings -->
-        <div v-if="activeTab === 'general'" class="tab-content">
-          <div class="form-group">
+        <div v-if="activeTab === 'general'" class="flex-1 overflow-y-auto space-y-6">
+          <div class="space-y-2">
             <Label for="document-title">Document Title</Label>
             <Input
               id="document-title"
@@ -31,7 +37,7 @@
             />
           </div>
 
-          <div class="form-group">
+          <div class="space-y-2">
             <Label for="document-description">Description</Label>
             <Textarea
               id="document-description"
@@ -41,7 +47,7 @@
             />
           </div>
 
-          <div class="form-group">
+          <div class="space-y-2">
             <Label for="document-language">Language</Label>
             <Select v-model="localSettings.language">
               <SelectTrigger>
@@ -58,18 +64,16 @@
             </Select>
           </div>
 
-          <div class="form-group">
-            <div class="checkbox-group">
+          <div class="space-y-4">
+            <div class="flex items-center space-x-2">
               <Checkbox
                 id="auto-save"
                 v-model:checked="localSettings.autoSave"
               />
               <Label for="auto-save">Auto-save document</Label>
             </div>
-          </div>
 
-          <div class="form-group">
-            <div class="checkbox-group">
+            <div class="flex items-center space-x-2">
               <Checkbox
                 id="spell-check"
                 v-model:checked="localSettings.spellCheck"
@@ -80,8 +84,8 @@
         </div>
 
         <!-- Formatting Settings -->
-        <div v-if="activeTab === 'formatting'" class="tab-content">
-          <div class="form-group">
+        <div v-if="activeTab === 'formatting'" class="flex-1 overflow-y-auto space-y-6">
+          <div class="space-y-2">
             <Label for="font-family">Font Family</Label>
             <Select v-model="localSettings.fontFamily">
               <SelectTrigger>
@@ -97,7 +101,7 @@
             </Select>
           </div>
 
-          <div class="form-group">
+          <div class="space-y-2">
             <Label for="font-size">Font Size</Label>
             <Select v-model="localSettings.fontSize">
               <SelectTrigger>
@@ -118,7 +122,7 @@
             </Select>
           </div>
 
-          <div class="form-group">
+          <div class="space-y-2">
             <Label for="line-spacing">Line Spacing</Label>
             <Select v-model="localSettings.lineSpacing">
               <SelectTrigger>
@@ -137,19 +141,17 @@
         </div>
 
         <!-- Security Settings -->
-        <div v-if="activeTab === 'security'" class="tab-content">
-          <div class="form-group">
-            <div class="checkbox-group">
+        <div v-if="activeTab === 'security'" class="flex-1 overflow-y-auto space-y-6">
+          <div class="space-y-4">
+            <div class="flex items-center space-x-2">
               <Checkbox
                 id="enable-signing"
                 v-model:checked="localSecurity.enableSigning"
               />
               <Label for="enable-signing">Enable document signing</Label>
             </div>
-          </div>
 
-          <div class="form-group">
-            <div class="checkbox-group">
+            <div class="flex items-center space-x-2">
               <Checkbox
                 id="require-verification"
                 v-model:checked="localSecurity.requireVerification"
@@ -158,7 +160,7 @@
             </div>
           </div>
 
-          <div class="form-group">
+          <div class="space-y-2">
             <Label for="encryption-level">Encryption Level</Label>
             <Select v-model="localSecurity.encryptionLevel">
               <SelectTrigger>
@@ -173,7 +175,7 @@
             </Select>
           </div>
 
-          <div class="form-group">
+          <div class="space-y-2">
             <Label for="backup-frequency">Backup Frequency</Label>
             <Select v-model="localSecurity.backupFrequency">
               <SelectTrigger>
@@ -271,71 +273,3 @@ function saveSettings() {
   emit('save', localSettings.value, localSecurity.value)
 }
 </script>
-
-<style scoped>
-.settings-dialog {
-  max-width: 600px;
-  max-height: 80vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.settings-content {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.settings-tabs {
-  display: flex;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 1.5rem;
-}
-
-.tab-button {
-  padding: 0.75rem 1rem;
-  border: none;
-  background: none;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
-  font-weight: 500;
-  color: #6b7280;
-}
-
-.tab-button:hover {
-  color: #3b82f6;
-}
-
-.tab-button.active {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
-}
-
-.tab-content {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.checkbox-group {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.checkbox-group label {
-  margin: 0;
-  cursor: pointer;
-}
-</style>

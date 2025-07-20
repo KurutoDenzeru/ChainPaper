@@ -1,14 +1,12 @@
-// Import file-saver only on client side to avoid SSR issues
-let saveAs: any = null
-
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx'
-import * as mammoth from 'mammoth'
+// Dynamic imports for browser-only libraries
+// import jsPDF from 'jspdf'
+// import html2canvas from 'html2canvas'
+// import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx'
+// import * as mammoth from 'mammoth'
 import type { 
   DocumentContent, 
   DocumentMetadata, 
-  DocumentType,
+  ExportOptions, 
   DocumentNode,
   DocumentStatistics,
   DocumentIndex,
@@ -17,21 +15,25 @@ import type {
   TableEntry
 } from '~/types/document'
 
-export class DocumentParser {
-  /**
-   * Initialize file-saver for client-side only
-   */
-  private static async ensureFileSaver() {
-    if (!process.client) {
-      throw new Error('Export is only available on the client side')
-    }
-    
-    if (!saveAs) {
-      const { saveAs: fileSaver } = await import('file-saver')
-      saveAs = fileSaver
-    }
+// Client-side only file download function
+function downloadFile(blob: Blob, fileName: string) {
+  if (typeof window === 'undefined') {
+    console.warn('downloadFile called on server side')
+    return
   }
+  
+  // Simple fallback without file-saver
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = fileName
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
 
+export class DocumentParser {
   /**
    * Get comprehensive document statistics
    */
@@ -56,870 +58,870 @@ export class DocumentParser {
     }
 
     const processNode = (node: DocumentNode) => {
-      if (node.type === 'text') {
-        const text = node.text || ''
-        stats.characterCount += text.length
-        stats.characterCountNoSpaces += text.replace(/\s/g, '').length
-        
-        // Word count (split by whitespace and filter empty strings)
-        const words = text.split(/\s+/).filter(word => word.length > 0)
-        stats.wordCount += words.length
-        
-        // Sentence count (rough estimation based on sentence-ending punctuation)
-        const sentences = text.split(/[.!?]+/).filter(sentence => sentence.trim().length > 0)
-        stats.sentenceCount += sentences.length
+      switch (node.type) {
+        case 'paragraph':
+          stats.paragraphCount++
+          break
+        case 'heading':
+          const level = node.attrs?.level || 1
+          stats.headingCount[level] = (stats.headingCount[level] || 0) + 1
+          stats.sectionCount++
+          break
+        case 'bullet_list':
+        case 'ordered_list':
+          stats.listCount++
+          break
+        case 'table':
+          stats.tableCount++
+          break
+        case 'image':
+          stats.imageCount++
+          break
+        case 'text':
+          const text = node.text || ''
+          stats.characterCount += text.length
+          stats.characterCountNoSpaces += text.replace(/\s/g, '').length
+          stats.wordCount += text.split(/\s+/).filter(word => word.length > 0).length
+          stats.sentenceCount += text.split(/[.!?]+/).filter(sentence => sentence.trim().length > 0).length
+          
+          // Count links in marks
+          if (node.marks) {
+            stats.linkCount += node.marks.filter(mark => mark.type === 'link').length
+          }
+          break
       }
-      
-      if (node.type === 'paragraph') {
-        stats.paragraphCount++
-      }
-      
-      if (node.type === 'heading') {
-        stats.headerCount++
-      }
-      
-      if (node.type === 'image') {
-        stats.imageCount++
-      }
-      
-      if (node.type === 'table') {
-        stats.tableCount++
-      }
-      
-      if (node.type === 'link') {
-        stats.linkCount++
-      }
-      
-      if (node.type === 'footnote') {
-        stats.footnoteCount++
-      }
-      
-      // Process child nodes
+
       if (node.content) {
         node.content.forEach(processNode)
       }
     }
 
-    if (doc.content) {
-      doc.content.forEach(processNode)
-    }
+    doc.content.forEach(processNode)
 
-    // Calculate reading time (average 200 words per minute)
-    stats.readingTime = Math.ceil(stats.wordCount / 200)
+    // Estimate page count (assuming ~250 words per page)
+    stats.pageCount = Math.max(1, Math.ceil(stats.wordCount / 250))
     
-    // Estimate page count (roughly 500 words per page)
-    stats.pageCount = Math.max(1, Math.ceil(stats.wordCount / 500))
+    // Estimate reading time (assuming 200 words per minute)
+    stats.readingTime = Math.ceil(stats.wordCount / 200)
 
     return stats
   }
 
   /**
-   * Generate document index with table of contents and other references
+   * Extract plain text from document
+   */
+  static extractPlainText(doc: DocumentContent): string {
+    const extractText = (node: DocumentNode): string => {
+      if (node.text) {
+        return node.text
+      }
+      
+      if (node.content) {
+        return node.content.map(extractText).join('')
+      }
+      
+      return ''
+    }
+    
+    return extractText(doc)
+  }
+
+  /**
+   * Generate document index (TOC, figures, tables, etc.)
    */
   static generateIndex(doc: DocumentContent): DocumentIndex {
-    const tableOfContents: TOCEntry[] = []
-    const figures: FigureEntry[] = []
-    const tables: TableEntry[] = []
-    
-    let figureCounter = 1
-    let tableCounter = 1
-
-    const processNode = (node: DocumentNode, position: number = 0) => {
-      if (node.type === 'heading') {
-        const level = node.attrs?.level || 1
-        const title = this.extractTextFromNode(node)
-        
-        tableOfContents.push({
-          id: `heading-${tableOfContents.length + 1}`,
-          title,
-          level,
-          position,
-          page: Math.ceil(position / 500) + 1
-        })
-      }
-      
-      if (node.type === 'image') {
-        const caption = node.attrs?.alt || node.attrs?.title || `Figure ${figureCounter}`
-        figures.push({
-          id: `figure-${figureCounter}`,
-          caption,
-          position,
-          page: Math.ceil(position / 500) + 1,
-          src: node.attrs?.src || ''
-        })
-        figureCounter++
-      }
-      
-      if (node.type === 'table') {
-        const caption = node.attrs?.caption || `Table ${tableCounter}`
-        tables.push({
-          id: `table-${tableCounter}`,
-          caption,
-          position,
-          page: Math.ceil(position / 500) + 1,
-          rows: node.content?.length || 0,
-          columns: node.content?.[0]?.content?.length || 0
-        })
-        tableCounter++
-      }
-      
-      // Process child nodes
-      if (node.content) {
-        node.content.forEach((child, index) => {
-          processNode(child, position + index)
-        })
-      }
+    const index: DocumentIndex = {
+      tableOfContents: [],
+      figures: [],
+      tables: [],
+      references: [],
+      glossary: []
     }
 
-    if (doc.content) {
-      doc.content.forEach((node, index) => {
-        processNode(node, index)
-      })
-    }
+    let position = 0
+    let pageNumber = 1
+    let wordCount = 0
 
-    return {
-      tableOfContents,
-      figures,
-      tables,
-      lastUpdated: new Date()
-    }
-  }
+    const processNode = (node: DocumentNode) => {
+      const nodeStart = position
 
-  /**
-   * Extract plain text from a document node
-   */
-  private static extractTextFromNode(node: DocumentNode): string {
-    if (node.type === 'text') {
-      return node.text || ''
-    }
-    
-    if (node.content) {
-      return node.content.map(child => this.extractTextFromNode(child)).join('')
-    }
-    
-    return ''
-  }
-
-  /**
-   * Calculate reading statistics
-   */
-  static calculateStatistics(content: DocumentContent): DocumentStatistics {
-    return this.getStatistics(content)
-  }
-
-  /**
-   * Export document to JSON format
-   */
-  static async exportToJSON(document: DocumentType, fileName: string = 'document.json'): Promise<void> {
-    try {
-      await this.ensureFileSaver()
-
-      const exportData = {
-        metadata: document.metadata,
-        content: document.content,
-        authorship: document.authorship,
-        settings: document.settings,
-        comments: document.comments,
-        statistics: this.calculateStatistics(document.content),
-        version: '1.0.0',
-        exportDate: new Date().toISOString()
-      }
-
-      const jsonString = JSON.stringify(exportData, null, 2)
-      const blob = new Blob([jsonString], { type: 'application/json' })
-      
-      saveAs(blob, fileName)
-    } catch (error) {
-      console.error('Error exporting to JSON:', error)
-      throw error
-    }
-  }
-
-  /**
-   * Import document from JSON format
-   */
-  static async importFromJSON(file: File): Promise<DocumentType> {
-    try {
-      const text = await file.text()
-      const data = JSON.parse(text)
-      
-      // Validate the imported data structure
-      if (!data.metadata || !data.content) {
-        throw new Error('Invalid document format: missing required fields')
-      }
-      
-      return {
-        id: data.metadata.id || crypto.randomUUID(),
-        title: data.metadata.title || 'Untitled Document',
-        metadata: data.metadata,
-        content: data.content,
-        authorship: data.authorship || {
-          author: 'Unknown',
-          created: new Date(),
-          modified: new Date(),
-          version: '1.0.0',
-          hash: '',
-          signature: '',
-          isVerified: false
-        },
-        settings: data.settings || {
-          pageSize: 'A4',
-          margins: { top: 25.4, right: 25.4, bottom: 25.4, left: 25.4 },
-          fontSize: 12,
-          fontFamily: 'Times New Roman',
-          lineHeight: 1.5,
-          language: 'en-US'
-        },
-        comments: data.comments || [],
-        lastModified: new Date(),
-        isDirty: false
-      }
-    } catch (error) {
-      console.error('Error importing from JSON:', error)
-      throw error
-    }
-  }
-
-  /**
-   * Export document to HTML format
-   */
-  static async exportToHTML(document: DocumentType, fileName: string = 'document.html'): Promise<void> {
-    try {
-      await this.ensureFileSaver()
-
-      const html = this.convertToHTML(document)
-      const blob = new Blob([html], { type: 'text/html' })
-      
-      saveAs(blob, fileName)
-    } catch (error) {
-      console.error('Error exporting to HTML:', error)
-      throw error
-    }
-  }
-
-  /**
-   * Convert document to HTML
-   */
-  private static convertToHTML(document: DocumentType): string {
-    const metadata = document.metadata
-    const content = this.contentToHTML(document.content)
-    
-    return `<!DOCTYPE html>
-<html lang="${document.settings.language || 'en-US'}">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${metadata.title}</title>
-    <meta name="author" content="${metadata.author}">
-    <meta name="description" content="${metadata.description || ''}">
-    <meta name="keywords" content="${metadata.tags?.join(', ') || ''}">
-    <style>
-        body {
-            font-family: ${document.settings.fontFamily || 'Times New Roman'}, serif;
-            font-size: ${document.settings.fontSize || 12}pt;
-            line-height: ${document.settings.lineHeight || 1.5};
-            max-width: 8.5in;
-            margin: 0 auto;
-            padding: 1in;
-            background: white;
-            color: #333;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            color: #2c3e50;
-            margin-top: 1.5em;
-            margin-bottom: 0.5em;
-        }
-        p {
-            margin-bottom: 1em;
-            text-align: justify;
-        }
-        blockquote {
-            border-left: 4px solid #3498db;
-            padding-left: 1em;
-            margin: 1em 0;
-            font-style: italic;
-            background: #f8f9fa;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 1em 0;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 0.5em;
-            text-align: left;
-        }
-        th {
-            background: #f8f9fa;
-            font-weight: bold;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 1em auto;
-        }
-        code {
-            background: #f8f9fa;
-            padding: 0.2em 0.4em;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-        }
-        pre {
-            background: #f8f9fa;
-            padding: 1em;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-        .page-break {
-            page-break-before: always;
-        }
-        @media print {
-            body {
-                margin: 0;
-                padding: 0;
+      switch (node.type) {
+        case 'heading':
+          const level = node.attrs?.level || 1
+          const title = node.content ? this.extractPlainText({ type: 'doc', content: node.content }) : ''
+          
+          index.tableOfContents.push({
+            id: `heading-${index.tableOfContents.length}`,
+            level,
+            title,
+            pageNumber,
+            position
+          })
+          break
+          
+        case 'image':
+          const caption = node.attrs?.alt || `Figure ${index.figures.length + 1}`
+          index.figures.push({
+            id: `figure-${index.figures.length}`,
+            caption,
+            type: 'image',
+            pageNumber,
+            position
+          })
+          break
+          
+        case 'table':
+          let rows = 0
+          let columns = 0
+          if (node.content) {
+            rows = node.content.length
+            if (node.content[0] && node.content[0].content) {
+              columns = node.content[0].content.length
             }
-        }
-    </style>
+          }
+          
+          index.tables.push({
+            id: `table-${index.tables.length}`,
+            caption: `Table ${index.tables.length + 1}`,
+            pageNumber,
+            position,
+            rows,
+            columns
+          })
+          break
+          
+        case 'text':
+          const text = node.text || ''
+          position += text.length
+          wordCount += text.split(/\s+/).filter(word => word.length > 0).length
+          
+          // Update page number based on word count (rough estimation)
+          pageNumber = Math.max(1, Math.ceil(wordCount / 250))
+          break
+      }
+
+      if (node.content) {
+        node.content.forEach(processNode)
+      }
+    }
+
+    doc.content.forEach(processNode)
+    return index
+  }
+
+  /**
+   * Convert ProseMirror document to plain text
+   */
+  static toPlainText(doc: DocumentContent): string {
+    return this.extractPlainText(doc)
+  }
+
+  /**
+   * Convert ProseMirror document to HTML
+   */
+  static toHTML(doc: DocumentContent): string {
+    const nodeToHTML = (node: DocumentNode): string => {
+      switch (node.type) {
+        case 'paragraph':
+          const content = node.content ? node.content.map(nodeToHTML).join('') : ''
+          return `<p>${content}</p>`
+          
+        case 'heading':
+          const level = node.attrs?.level || 1
+          const headingContent = node.content ? node.content.map(nodeToHTML).join('') : ''
+          return `<h${level}>${headingContent}</h${level}>`
+          
+        case 'text':
+          let text = node.text || ''
+          if (node.marks) {
+            for (const mark of node.marks) {
+              switch (mark.type) {
+                case 'bold':
+                  text = `<strong>${text}</strong>`
+                  break
+                case 'italic':
+                  text = `<em>${text}</em>`
+                  break
+                case 'underline':
+                  text = `<u>${text}</u>`
+                  break
+                case 'link':
+                  text = `<a href="${mark.attrs?.href || ''}">${text}</a>`
+                  break
+              }
+            }
+          }
+          return text
+          
+        case 'hard_break':
+          return '<br>'
+          
+        case 'bullet_list':
+          const bulletItems = node.content ? node.content.map(nodeToHTML).join('') : ''
+          return `<ul>${bulletItems}</ul>`
+          
+        case 'ordered_list':
+          const orderedItems = node.content ? node.content.map(nodeToHTML).join('') : ''
+          return `<ol>${orderedItems}</ol>`
+          
+        case 'list_item':
+          const itemContent = node.content ? node.content.map(nodeToHTML).join('') : ''
+          return `<li>${itemContent}</li>`
+          
+        case 'blockquote':
+          const quoteContent = node.content ? node.content.map(nodeToHTML).join('') : ''
+          return `<blockquote>${quoteContent}</blockquote>`
+          
+        case 'code_block':
+          const codeContent = node.content ? node.content.map(nodeToHTML).join('') : ''
+          return `<pre><code>${codeContent}</code></pre>`
+          
+        case 'table':
+          const tableContent = node.content ? node.content.map(nodeToHTML).join('') : ''
+          return `<table>${tableContent}</table>`
+          
+        case 'table_row':
+          const rowContent = node.content ? node.content.map(nodeToHTML).join('') : ''
+          return `<tr>${rowContent}</tr>`
+          
+        case 'table_cell':
+        case 'table_header':
+          const cellContent = node.content ? node.content.map(nodeToHTML).join('') : ''
+          const tag = node.type === 'table_header' ? 'th' : 'td'
+          return `<${tag}>${cellContent}</${tag}>`
+          
+        case 'image':
+          return `<img src="${node.attrs?.src || ''}" alt="${node.attrs?.alt || ''}" />`
+          
+        default:
+          if (node.content) {
+            return node.content.map(nodeToHTML).join('')
+          }
+          return ''
+      }
+    }
+    
+    const html = doc.content.map(nodeToHTML).join('')
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ChainPaper Document</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1, h2, h3, h4, h5, h6 { color: #333; }
+    blockquote { border-left: 4px solid #ddd; margin: 0; padding-left: 20px; color: #666; }
+    code { background: #f4f4f4; padding: 2px 4px; border-radius: 3px; }
+    pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>${metadata.title}</h1>
-        <p><strong>Author:</strong> ${metadata.author}</p>
-        <p><strong>Created:</strong> ${metadata.created?.toLocaleDateString()}</p>
-        ${metadata.description ? `<p><strong>Description:</strong> ${metadata.description}</p>` : ''}
-    </header>
-    
-    <main>
-        ${content}
-    </main>
-    
-    <footer>
-        <hr>
-        <p><small>Generated by ChainPaper on ${new Date().toLocaleDateString()}</small></p>
-    </footer>
+${html}
 </body>
 </html>`
   }
 
   /**
-   * Convert document content to HTML
+   * Convert ProseMirror document to Markdown
    */
-  private static contentToHTML(content: DocumentContent): string {
-    if (!content?.content) return ''
-    
-    return content.content.map(node => this.nodeToHTML(node)).join('')
-  }
-
-  /**
-   * Convert a single node to HTML
-   */
-  private static nodeToHTML(node: DocumentNode): string {
-    switch (node.type) {
-      case 'paragraph':
-        const pContent = node.content ? node.content.map(child => this.nodeToHTML(child)).join('') : ''
-        return `<p>${pContent}</p>`
-      
-      case 'heading':
-        const level = Math.min(6, Math.max(1, node.attrs?.level || 1))
-        const hContent = node.content ? node.content.map(child => this.nodeToHTML(child)).join('') : ''
-        return `<h${level}>${hContent}</h${level}>`
-      
-      case 'text':
-        let text = node.text || ''
-        if (node.marks) {
-          for (const mark of node.marks) {
-            switch (mark.type) {
-              case 'bold':
-                text = `<strong>${text}</strong>`
-                break
-              case 'italic':
-                text = `<em>${text}</em>`
-                break
-              case 'underline':
-                text = `<u>${text}</u>`
-                break
-              case 'code':
-                text = `<code>${text}</code>`
-                break
-              case 'link':
-                text = `<a href="${mark.attrs?.href || '#'}">${text}</a>`
-                break
+  static toMarkdown(doc: DocumentContent): string {
+    const nodeToMarkdown = (node: DocumentNode): string => {
+      switch (node.type) {
+        case 'paragraph':
+          const content = node.content ? node.content.map(nodeToMarkdown).join('') : ''
+          return content + '\n\n'
+          
+        case 'heading':
+          const level = node.attrs?.level || 1
+          const headingContent = node.content ? node.content.map(nodeToMarkdown).join('') : ''
+          return '#'.repeat(level) + ' ' + headingContent + '\n\n'
+          
+        case 'text':
+          let text = node.text || ''
+          if (node.marks) {
+            for (const mark of node.marks) {
+              switch (mark.type) {
+                case 'bold':
+                  text = `**${text}**`
+                  break
+                case 'italic':
+                  text = `*${text}*`
+                  break
+                case 'code':
+                  text = `\`${text}\``
+                  break
+                case 'link':
+                  text = `[${text}](${mark.attrs?.href || ''})`
+                  break
+              }
             }
           }
-        }
-        return text
-      
-      case 'hard_break':
-        return '<br>'
-      
-      case 'image':
-        const src = node.attrs?.src || ''
-        const alt = node.attrs?.alt || ''
-        const title = node.attrs?.title || ''
-        return `<img src="${src}" alt="${alt}" title="${title}">`
-      
-      case 'blockquote':
-        const bqContent = node.content ? node.content.map(child => this.nodeToHTML(child)).join('') : ''
-        return `<blockquote>${bqContent}</blockquote>`
-      
-      case 'bullet_list':
-        const ulContent = node.content ? node.content.map(child => this.nodeToHTML(child)).join('') : ''
-        return `<ul>${ulContent}</ul>`
-      
-      case 'ordered_list':
-        const olContent = node.content ? node.content.map(child => this.nodeToHTML(child)).join('') : ''
-        return `<ol>${olContent}</ol>`
-      
-      case 'list_item':
-        const liContent = node.content ? node.content.map(child => this.nodeToHTML(child)).join('') : ''
-        return `<li>${liContent}</li>`
-      
-      case 'table':
-        const tableContent = node.content ? node.content.map(child => this.nodeToHTML(child)).join('') : ''
-        return `<table>${tableContent}</table>`
-      
-      case 'table_row':
-        const trContent = node.content ? node.content.map(child => this.nodeToHTML(child)).join('') : ''
-        return `<tr>${trContent}</tr>`
-      
-      case 'table_cell':
-        const tdContent = node.content ? node.content.map(child => this.nodeToHTML(child)).join('') : ''
-        return `<td>${tdContent}</td>`
-      
-      case 'table_header':
-        const thContent = node.content ? node.content.map(child => this.nodeToHTML(child)).join('') : ''
-        return `<th>${thContent}</th>`
-      
-      case 'code_block':
-        const codeContent = node.content ? node.content.map(child => this.nodeToHTML(child)).join('') : ''
-        return `<pre><code>${codeContent}</code></pre>`
-      
-      default:
-        // For unknown node types, try to render content if available
-        if (node.content) {
-          return node.content.map(child => this.nodeToHTML(child)).join('')
-        }
-        return ''
+          return text
+          
+        case 'hard_break':
+          return '\n'
+          
+        case 'bullet_list':
+          const bulletItems = node.content ? node.content.map(nodeToMarkdown).join('') : ''
+          return bulletItems + '\n'
+          
+        case 'ordered_list':
+          const orderedItems = node.content ? node.content.map(nodeToMarkdown).join('') : ''
+          return orderedItems + '\n'
+          
+        case 'list_item':
+          const itemContent = node.content ? node.content.map(nodeToMarkdown).join('') : ''
+          return `- ${itemContent}\n`
+          
+        case 'blockquote':
+          const quoteContent = node.content ? node.content.map(nodeToMarkdown).join('') : ''
+          return `> ${quoteContent}\n\n`
+          
+        case 'code_block':
+          const codeContent = node.content ? node.content.map(nodeToMarkdown).join('') : ''
+          const language = node.attrs?.language || ''
+          return `\`\`\`${language}\n${codeContent}\n\`\`\`\n\n`
+          
+        case 'horizontal_rule':
+          return '---\n\n'
+          
+        case 'image':
+          return `![${node.attrs?.alt || ''}](${node.attrs?.src || ''})\n\n`
+          
+        default:
+          if (node.content) {
+            return node.content.map(nodeToMarkdown).join('')
+          }
+          return ''
+      }
     }
+    
+    return doc.content.map(nodeToMarkdown).join('').trim()
+  }
+}
+
+export class DocumentExporter {
+  /**
+   * Export document as JSON
+   */
+  static async exportAsJSON(
+    data: any,
+    options: ExportOptions = {},
+    filename?: string
+  ): Promise<void> {
+    const exportData = {
+      chainPaper: true,
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      ...data,
+      options
+    }
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: 'application/json'
+    })
+    
+    const fileName = filename || `${data.metadata?.title || 'document'}.chainpaper.json`
+    downloadFile(blob, fileName)
   }
 
   /**
-   * Export document to PDF format
+   * Export document as PDF
    */
-  static async exportToPDF(document: DocumentType, fileName: string = 'document.pdf'): Promise<void> {
+  static async exportAsPDF(
+    data: any,
+    options: ExportOptions = {},
+    filename?: string
+  ): Promise<void> {
+    // Only run in browser environment
+    if (typeof window === 'undefined') {
+      console.warn('PDF export not available in SSR')
+      return
+    }
+    
+    // Create HTML content for PDF generation
+    const htmlContent = DocumentParser.toHTML(data.content)
+    
+    // Create temporary element for rendering
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = htmlContent
+    tempDiv.style.position = 'absolute'
+    tempDiv.style.left = '-9999px'
+    tempDiv.style.width = '210mm' // A4 width
+    tempDiv.style.fontFamily = 'Times New Roman, serif'
+    tempDiv.style.fontSize = '12pt'
+    tempDiv.style.lineHeight = '1.5'
+    tempDiv.style.padding = '25mm'
+    tempDiv.style.background = 'white'
+    
+    document.body.appendChild(tempDiv)
+    
     try {
-      await this.ensureFileSaver()
-
-      // Create HTML content
-      const html = this.convertToHTML(document)
+      // Dynamic imports for browser-only libraries
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf')
+      ])
       
-      // Create a temporary container
-      const container = globalThis.document.createElement('div')
-      container.innerHTML = html
-      container.style.position = 'absolute'
-      container.style.left = '-9999px'
-      container.style.width = '8.5in'
-      globalThis.document.body.appendChild(container)
-      
-      // Convert to canvas
-      const canvas = await html2canvas(container, {
-        useCORS: true,
+      const canvas = await html2canvas(tempDiv, {
         scale: 2,
-        logging: false
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
       })
       
-      // Remove temporary container
-      globalThis.document.body.removeChild(container)
-      
-      // Create PDF
-      const pdf = new jsPDF('p', 'mm', 'a4')
-      const imgWidth = 210 // A4 width in mm
-      const pageHeight = 295 // A4 height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width
-      let heightLeft = imgHeight
-      
-      let position = 0
-      
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight)
-      heightLeft -= pageHeight
-      
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight
-        pdf.addPage()
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight)
-        heightLeft -= pageHeight
-      }
-      
-      const pdfBlob = pdf.output('blob')
-      saveAs(pdfBlob, fileName)
-    } catch (error) {
-      console.error('Error exporting to PDF:', error)
-      throw error
-    }
-  }
-
-  /**
-   * Export document to DOCX format
-   */
-  static async exportToDOCX(document: DocumentType, fileName: string = 'document.docx'): Promise<void> {
-    try {
-      await this.ensureFileSaver()
-
-      const docxDoc = new Document({
-        creator: document.metadata.author,
-        title: document.metadata.title,
-        description: document.metadata.description,
-        sections: [{
-          properties: {},
-          children: this.contentToDOCX(document.content)
-        }]
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: options.pageSize?.toLowerCase() || 'a4'
       })
       
-      const buffer = await Packer.toBuffer(docxDoc)
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = pdf.internal.pageSize.getHeight()
+      const imgWidth = canvas.width
+      const imgHeight = canvas.height
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight)
+      const imgX = (pdfWidth - imgWidth * ratio) / 2
+      const imgY = 0
       
-      saveAs(blob, fileName)
-    } catch (error) {
-      console.error('Error exporting to DOCX:', error)
-      throw error
-    }
-  }
-
-  /**
-   * Convert document content to DOCX paragraphs
-   */
-  private static contentToDOCX(content: DocumentContent): Paragraph[] {
-    if (!content?.content) return []
-    
-    const paragraphs: Paragraph[] = []
-    
-    for (const node of content.content) {
-      const para = this.nodeToDOCX(node)
-      if (para) {
-        if (Array.isArray(para)) {
-          paragraphs.push(...para)
-        } else {
-          paragraphs.push(para)
-        }
+      // Add metadata header if requested
+      if (options.includeMetadata && data.metadata) {
+        pdf.setFontSize(8)
+        pdf.setTextColor(128, 128, 128)
+        pdf.text(`${data.metadata.title} - ${data.metadata.author}`, 10, 5)
+        pdf.text(`Generated: ${new Date().toLocaleDateString()}`, pdfWidth - 40, 5)
       }
-    }
-    
-    return paragraphs
-  }
-
-  /**
-   * Convert a single node to DOCX paragraph
-   */
-  private static nodeToDOCX(node: DocumentNode): Paragraph | Paragraph[] | null {
-    switch (node.type) {
-      case 'paragraph':
-        return new Paragraph({
-          children: node.content ? this.nodeContentToTextRuns(node.content) : []
-        })
       
-      case 'heading':
-        const level = Math.min(6, Math.max(1, node.attrs?.level || 1)) as HeadingLevel
-        return new Paragraph({
-          heading: level,
-          children: node.content ? this.nodeContentToTextRuns(node.content) : []
-        })
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio)
       
-      default:
-        if (node.content) {
-          return this.contentToDOCX(node.content)
-        }
-        return null
+      const fileName = filename || `${data.metadata?.title || 'document'}.pdf`
+      pdf.save(fileName)
+      
+    } finally {
+      document.body.removeChild(tempDiv)
     }
   }
 
   /**
-   * Convert node content to TextRun objects
+   * Export document as DOCX
    */
-  private static nodeContentToTextRuns(content: DocumentNode[]): TextRun[] {
-    const textRuns: TextRun[] = []
+  static async exportAsDOCX(
+    data: any,
+    options: ExportOptions = {},
+    filename?: string
+  ): Promise<void> {
+    // Only run in browser environment
+    if (typeof window === 'undefined') {
+      console.warn('DOCX export not available in SSR')
+      return
+    }
     
-    for (const node of content) {
-      if (node.type === 'text') {
-        const text = node.text || ''
-        const formatting: any = {}
-        
-        if (node.marks) {
-          for (const mark of node.marks) {
-            switch (mark.type) {
-              case 'bold':
-                formatting.bold = true
-                break
-              case 'italic':
-                formatting.italics = true
-                break
-              case 'underline':
-                formatting.underline = {}
-                break
-            }
+    // Dynamic import for docx library
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = await import('docx')
+    
+    const docElements: any[] = []
+    
+    // Add metadata if requested
+    if (options.includeMetadata && data.metadata) {
+      docElements.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: data.metadata.title,
+              bold: true,
+              size: 32
+            })
+          ],
+          heading: HeadingLevel.TITLE
+        }),
+        new Paragraph({
+          children: [
+            new TextRun(`Author: ${data.metadata.author}`),
+            new TextRun({ text: "\n", break: 1 }),
+            new TextRun(`Created: ${new Date(data.metadata.createdAt).toLocaleDateString()}`),
+            new TextRun({ text: "\n", break: 1 }),
+            new TextRun(`Version: ${data.metadata.version}`)
+          ]
+        }),
+        new Paragraph({ text: "" }) // Empty paragraph for spacing
+      )
+    }
+    
+    // Convert content to DOCX paragraphs
+    const convertNode = (node: DocumentNode): any[] => {
+      const elements: any[] = []
+      
+      switch (node.type) {
+        case 'paragraph':
+          const children: any[] = []
+          if (node.content) {
+            node.content.forEach(child => {
+              if (child.type === 'text') {
+                children.push(new TextRun({
+                  text: child.text || '',
+                  bold: child.marks?.some(m => m.type === 'bold'),
+                  italics: child.marks?.some(m => m.type === 'italic'),
+                  underline: child.marks?.some(m => m.type === 'underline') ? {} : undefined
+                }))
+              }
+            })
           }
-        }
-        
-        textRuns.push(new TextRun({
-          text,
-          ...formatting
-        }))
+          elements.push(new Paragraph({ children }))
+          break
+          
+        case 'heading':
+          const level = node.attrs?.level || 1
+          const headingChildren: any[] = []
+          if (node.content) {
+            node.content.forEach(child => {
+              if (child.type === 'text') {
+                headingChildren.push(new TextRun({
+                  text: child.text || '',
+                  bold: true,
+                  size: 32 - (level * 2)
+                }))
+              }
+            })
+          }
+          elements.push(new Paragraph({
+            children: headingChildren,
+            heading: level === 1 ? HeadingLevel.HEADING_1 : 
+                     level === 2 ? HeadingLevel.HEADING_2 :
+                     level === 3 ? HeadingLevel.HEADING_3 : HeadingLevel.HEADING_4
+          }))
+          break
+          
+        default:
+          if (node.content) {
+            node.content.forEach(child => {
+              elements.push(...convertNode(child))
+            })
+          }
       }
+      
+      return elements
     }
     
-    return textRuns
+    if (data.content && data.content.content) {
+      data.content.content.forEach((node: DocumentNode) => {
+        docElements.push(...convertNode(node))
+      })
+    }
+    
+    const doc = new Document({
+      sections: [{
+        properties: {},
+        children: docElements
+      }]
+    })
+    
+    const buffer = await Packer.toBuffer(doc)
+    const blob = new Blob([buffer], {
+      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    })
+    
+    const fileName = filename || `${data.metadata?.title || 'document'}.docx`
+    downloadFile(blob, fileName)
   }
 
   /**
-   * Import document from DOCX format
+   * Export document as HTML
    */
-  static async importFromDOCX(file: File): Promise<DocumentType> {
-    try {
-      const arrayBuffer = await file.arrayBuffer()
-      const result = await mammoth.convertToHtml({ arrayBuffer })
-      
-      // Parse the HTML and convert to our document format
-      const parser = new DOMParser()
-      const doc = parser.parseFromString(result.value, 'text/html')
-      
-      const content = this.htmlToContent(doc.body)
-      
+  static async exportAsHTML(
+    data: any,
+    options: ExportOptions = {},
+    filename?: string
+  ): Promise<void> {
+    let htmlContent = DocumentParser.toHTML(data.content)
+    
+    // Add metadata if requested
+    if (options.includeMetadata && data.metadata) {
+      const metadataHtml = `
+        <div class="document-metadata">
+          <h1>${data.metadata.title}</h1>
+          <p><strong>Author:</strong> ${data.metadata.author}</p>
+          <p><strong>Created:</strong> ${new Date(data.metadata.createdAt).toLocaleDateString()}</p>
+          <p><strong>Version:</strong> ${data.metadata.version}</p>
+          <p><strong>Word Count:</strong> ${data.metadata.wordCount}</p>
+        </div>
+        <hr>
+      `
+      htmlContent = htmlContent.replace('<body>', `<body>${metadataHtml}`)
+    }
+    
+    // Add comments if requested
+    if (options.includeComments && data.comments && data.comments.length > 0) {
+      const commentsHtml = `
+        <div class="document-comments">
+          <h2>Comments</h2>
+          ${data.comments.map((comment: any) => `
+            <div class="comment">
+              <strong>${comment.author}</strong> - ${new Date(comment.timestamp).toLocaleString()}
+              <p>${comment.content}</p>
+            </div>
+          `).join('')}
+        </div>
+      `
+      htmlContent = htmlContent.replace('</body>', `${commentsHtml}</body>`)
+    }
+    
+    const blob = new Blob([htmlContent], { type: 'text/html' })
+    const fileName = filename || `${data.metadata?.title || 'document'}.html`
+    downloadFile(blob, fileName)
+  }
+
+  /**
+   * Export document as Markdown
+   */
+  static async exportAsMarkdown(
+    data: any,
+    options: ExportOptions = {},
+    filename?: string
+  ): Promise<void> {
+    let markdownContent = DocumentParser.toMarkdown(data.content)
+    
+    // Add metadata if requested
+    if (options.includeMetadata && data.metadata) {
+      const metadataMarkdown = `---
+title: ${data.metadata.title}
+author: ${data.metadata.author}
+created: ${new Date(data.metadata.createdAt).toISOString()}
+version: ${data.metadata.version}
+wordCount: ${data.metadata.wordCount}
+---
+
+`
+      markdownContent = metadataMarkdown + markdownContent
+    }
+    
+    // Add comments if requested
+    if (options.includeComments && data.comments && data.comments.length > 0) {
+      const commentsMarkdown = `
+
+## Comments
+
+${data.comments.map((comment: any) => `
+**${comment.author}** - ${new Date(comment.timestamp).toLocaleString()}
+> ${comment.content}
+`).join('')}
+`
+      markdownContent += commentsMarkdown
+    }
+    
+    const blob = new Blob([markdownContent], { type: 'text/markdown' })
+    const fileName = filename || `${data.metadata?.title || 'document'}.md`
+    downloadFile(blob, fileName)
+  }
+
+  /**
+   * Export document as plain text
+   */
+  static async exportAsText(
+    data: any,
+    options: ExportOptions = {},
+    filename?: string
+  ): Promise<void> {
+    let textContent = DocumentParser.toPlainText(data.content)
+    
+    // Add metadata if requested
+    if (options.includeMetadata && data.metadata) {
+      const metadataText = `${data.metadata.title}
+Author: ${data.metadata.author}
+Created: ${new Date(data.metadata.createdAt).toLocaleDateString()}
+Version: ${data.metadata.version}
+Word Count: ${data.metadata.wordCount}
+
+---
+
+`
+      textContent = metadataText + textContent
+    }
+    
+    const blob = new Blob([textContent], { type: 'text/plain' })
+    const fileName = filename || `${data.metadata?.title || 'document'}.txt`
+    downloadFile(blob, fileName)
+  }
+}
+
+export class DocumentImporter {
+  /**
+   * Import document from JSON
+   */
+  static async importFromJSON(file: File): Promise<any> {
+    const text = await file.text()
+    const data = JSON.parse(text)
+    
+    if (data.chainPaper) {
+      return data
+    } else {
+      // Handle generic JSON import
       return {
+        chainPaper: true,
+        metadata: {
+          id: crypto.randomUUID(),
+          title: file.name.replace('.json', ''),
+          author: 'Imported',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          version: 1,
+          hash: '',
+          authorshipProof: '',
+          wordCount: 0,
+          characterCount: 0,
+          pageCount: 1,
+          language: 'en'
+        },
+        content: data,
+        settings: {},
+        comments: [],
+        authorshipBlocks: []
+      }
+    }
+  }
+
+  /**
+   * Import document from DOCX
+   */
+  static async importFromDOCX(file: File): Promise<any> {
+    // Only run in browser environment
+    if (typeof window === 'undefined') {
+      throw new Error('DOCX import not available in SSR')
+    }
+    
+    // Dynamic import for mammoth library
+    const mammoth = await import('mammoth')
+    
+    const arrayBuffer = await file.arrayBuffer()
+    const result = await mammoth.convertToHtml({ arrayBuffer })
+    
+    // Convert HTML to ProseMirror format (simplified)
+    const content = {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [
+            {
+              type: 'text',
+              text: result.value
+            }
+          ]
+        }
+      ]
+    }
+    
+    return {
+      chainPaper: true,
+      metadata: {
         id: crypto.randomUUID(),
         title: file.name.replace('.docx', ''),
-        metadata: {
-          id: crypto.randomUUID(),
-          title: file.name.replace('.docx', ''),
-          author: 'Unknown',
-          created: new Date(),
-          modified: new Date(),
-          description: '',
-          tags: [],
-          category: '',
-          language: 'en-US',
-          version: '1.0.0'
-        },
-        content,
-        authorship: {
-          author: 'Unknown',
-          created: new Date(),
-          modified: new Date(),
-          version: '1.0.0',
-          hash: '',
-          signature: '',
-          isVerified: false
-        },
-        settings: {
-          pageSize: 'A4',
-          margins: { top: 25.4, right: 25.4, bottom: 25.4, left: 25.4 },
-          fontSize: 12,
-          fontFamily: 'Times New Roman',
-          lineHeight: 1.5,
-          language: 'en-US'
-        },
-        comments: [],
-        lastModified: new Date(),
-        isDirty: false
-      }
-    } catch (error) {
-      console.error('Error importing from DOCX:', error)
-      throw error
+        author: 'Imported',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        version: 1,
+        hash: '',
+        authorshipProof: '',
+        wordCount: 0,
+        characterCount: 0,
+        pageCount: 1,
+        language: 'en'
+      },
+      content,
+      settings: {},
+      comments: [],
+      authorshipBlocks: []
     }
   }
 
   /**
-   * Convert HTML to our document content format
+   * Import document from HTML
    */
-  private static htmlToContent(element: Element): DocumentContent {
-    const content: DocumentNode[] = []
+  static async importFromHTML(file: File): Promise<any> {
+    const htmlContent = await file.text()
     
-    for (const child of Array.from(element.childNodes)) {
-      const node = this.htmlNodeToDocumentNode(child)
-      if (node) {
-        content.push(node)
-      }
-    }
-    
-    return { content }
-  }
-
-  /**
-   * Convert HTML node to document node
-   */
-  private static htmlNodeToDocumentNode(node: Node): DocumentNode | null {
-    if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent?.trim()
-      if (text) {
-        return {
-          type: 'text',
-          text
-        }
-      }
-      return null
-    }
-    
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const element = node as Element
-      const tagName = element.tagName.toLowerCase()
-      
-      switch (tagName) {
-        case 'p':
-          return {
-            type: 'paragraph',
-            content: this.getChildNodes(element)
-          }
-        
-        case 'h1':
-        case 'h2':
-        case 'h3':
-        case 'h4':
-        case 'h5':
-        case 'h6':
-          return {
-            type: 'heading',
-            attrs: { level: parseInt(tagName.charAt(1)) },
-            content: this.getChildNodes(element)
-          }
-        
-        case 'strong':
-        case 'b':
-          const boldContent = this.getChildNodes(element)
-          return boldContent.length === 1 && boldContent[0].type === 'text' ? {
-            type: 'text',
-            text: boldContent[0].text,
-            marks: [{ type: 'bold' }]
-          } : {
-            type: 'paragraph',
-            content: boldContent.map(child => ({
-              ...child,
-              marks: [...(child.marks || []), { type: 'bold' }]
-            }))
-          }
-        
-        case 'em':
-        case 'i':
-          const italicContent = this.getChildNodes(element)
-          return italicContent.length === 1 && italicContent[0].type === 'text' ? {
-            type: 'text',
-            text: italicContent[0].text,
-            marks: [{ type: 'italic' }]
-          } : {
-            type: 'paragraph',
-            content: italicContent.map(child => ({
-              ...child,
-              marks: [...(child.marks || []), { type: 'italic' }]
-            }))
-          }
-        
-        case 'br':
-          return {
-            type: 'hard_break'
-          }
-        
-        default:
-          // For other elements, try to extract child content
-          const children = this.getChildNodes(element)
-          if (children.length > 0) {
-            return {
-              type: 'paragraph',
-              content: children
+    // Basic HTML to ProseMirror conversion (simplified)
+    const content = {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [
+            {
+              type: 'text',
+              text: htmlContent.replace(/<[^>]*>/g, '') // Strip HTML tags
             }
-          }
-          return null
-      }
+          ]
+        }
+      ]
     }
     
-    return null
-  }
-
-  /**
-   * Get child nodes from HTML element
-   */
-  private static getChildNodes(element: Element): DocumentNode[] {
-    const nodes: DocumentNode[] = []
-    
-    for (const child of Array.from(element.childNodes)) {
-      const node = this.htmlNodeToDocumentNode(child)
-      if (node) {
-        nodes.push(node)
-      }
-    }
-    
-    return nodes
-  }
-
-  /**
-   * Import document from various formats
-   */
-  static async importDocument(file: File): Promise<DocumentType> {
-    const extension = file.name.split('.').pop()?.toLowerCase()
-    
-    switch (extension) {
-      case 'json':
-        return this.importFromJSON(file)
-      case 'docx':
-        return this.importFromDOCX(file)
-      case 'html':
-      case 'htm':
-        return this.importFromHTML(file)
-      default:
-        throw new Error(`Unsupported file format: ${extension}`)
-    }
-  }
-
-  /**
-   * Import document from HTML format
-   */
-  static async importFromHTML(file: File): Promise<DocumentType> {
-    try {
-      const text = await file.text()
-      const parser = new DOMParser()
-      const doc = parser.parseFromString(text, 'text/html')
-      
-      const title = doc.querySelector('title')?.textContent || file.name.replace('.html', '')
-      const content = this.htmlToContent(doc.body || doc.documentElement)
-      
-      return {
+    return {
+      chainPaper: true,
+      metadata: {
         id: crypto.randomUUID(),
-        title,
-        metadata: {
-          id: crypto.randomUUID(),
-          title,
-          author: 'Unknown',
-          created: new Date(),
-          modified: new Date(),
-          description: '',
-          tags: [],
-          category: '',
-          language: 'en-US',
-          version: '1.0.0'
-        },
-        content,
-        authorship: {
-          author: 'Unknown',
-          created: new Date(),
-          modified: new Date(),
-          version: '1.0.0',
-          hash: '',
-          signature: '',
-          isVerified: false
-        },
-        settings: {
-          pageSize: 'A4',
-          margins: { top: 25.4, right: 25.4, bottom: 25.4, left: 25.4 },
-          fontSize: 12,
-          fontFamily: 'Times New Roman',
-          lineHeight: 1.5,
-          language: 'en-US'
-        },
-        comments: [],
-        lastModified: new Date(),
-        isDirty: false
-      }
-    } catch (error) {
-      console.error('Error importing from HTML:', error)
-      throw error
+        title: file.name.replace('.html', ''),
+        author: 'Imported',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        version: 1,
+        hash: '',
+        authorshipProof: '',
+        wordCount: 0,
+        characterCount: 0,
+        pageCount: 1,
+        language: 'en'
+      },
+      content,
+      settings: {},
+      comments: [],
+      authorshipBlocks: []
+    }
+  }
+
+  /**
+   * Import document from plain text
+   */
+  static async importFromText(file: File): Promise<any> {
+    const textContent = await file.text()
+    const paragraphs = textContent.split('\n\n').filter(p => p.trim())
+    
+    const content = {
+      type: 'doc',
+      content: paragraphs.map(paragraph => ({
+        type: 'paragraph',
+        content: [
+          {
+            type: 'text',
+            text: paragraph.trim()
+          }
+        ]
+      }))
+    }
+    
+    return {
+      chainPaper: true,
+      metadata: {
+        id: crypto.randomUUID(),
+        title: file.name.replace('.txt', ''),
+        author: 'Imported',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        version: 1,
+        hash: '',
+        authorshipProof: '',
+        wordCount: 0,
+        characterCount: 0,
+        pageCount: 1,
+        language: 'en'
+      },
+      content,
+      settings: {},
+      comments: [],
+      authorshipBlocks: []
     }
   }
 }
