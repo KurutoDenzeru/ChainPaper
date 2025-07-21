@@ -1,5 +1,5 @@
 <template>
-  <Menubar class="px-2 sm:px-4 py-4">
+  <Menubar class="px-2 sm:px-4 py-6 border-none rounded-none">
     <!-- File Menu -->
     <MenubarMenu>
       <MenubarTrigger>File</MenubarTrigger>
@@ -290,10 +290,9 @@
 
     <!-- User Menu -->
     <div class="flex items-center">
-      <div 
+      <div
         class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-blue-700 transition-colors"
-        :title="user.name || 'Anonymous'"
-      >
+        :title="user.name || 'Anonymous'">
         {{ (user.name || 'A').charAt(0).toUpperCase() }}
       </div>
     </div>
@@ -301,178 +300,178 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, defineProps } from 'vue'
-import {
-  FileText, FolderOpen, Save, Upload, Download, FileJson, FileImage, Globe, Hash,
-  Undo2, Redo2, Scissors, Copy, Clipboard, MousePointer, Search,
-  Sidebar, Wrench, BarChart3, ZoomIn, Type, Target,
-  Table, ImageIcon, Link, Code2, Calculator, Calendar,
-  Bold, Italic, Underline, Heading, List, ListOrdered,
-  BookOpen, ShieldCheck, FileSignature, Settings,
-  Keyboard, Info
-} from 'lucide-vue-next'
-import {
-  Menubar,
-  MenubarCheckboxItem,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
-  MenubarTrigger,
-} from '@/components/ui/menubar'
+  import { ref, defineEmits, defineProps } from 'vue'
+  import {
+    FileText, FolderOpen, Save, Upload, Download, FileJson, FileImage, Globe, Hash,
+    Undo2, Redo2, Scissors, Copy, Clipboard, MousePointer, Search,
+    Sidebar, Wrench, BarChart3, ZoomIn, Type, Target,
+    Table, ImageIcon, Link, Code2, Calculator, Calendar,
+    Bold, Italic, Underline, Heading, List, ListOrdered,
+    BookOpen, ShieldCheck, FileSignature, Settings,
+    Keyboard, Info
+  } from 'lucide-vue-next'
+  import {
+    Menubar,
+    MenubarCheckboxItem,
+    MenubarContent,
+    MenubarItem,
+    MenubarMenu,
+    MenubarSeparator,
+    MenubarShortcut,
+    MenubarSub,
+    MenubarSubContent,
+    MenubarSubTrigger,
+    MenubarTrigger,
+  } from '@/components/ui/menubar'
 
-const props = defineProps<{
-  documentTitle: string
-  isDirty: boolean
-  user: {
-    name: string
-    email?: string
-    avatar?: string
+  const props = defineProps<{
+    documentTitle: string
+    isDirty: boolean
+    user: {
+      name: string
+      email?: string
+      avatar?: string
+    }
+  }>()
+
+  const emit = defineEmits<{
+    'new-document': []
+    'open-document': []
+    'save-document': []
+    'export-document': [format: string]
+    'import-document': []
+    'settings': []
+    'about': []
+  }>()
+
+  // View state
+  const showToolbar = ref(true)
+  const showStatusBar = ref(true)
+  const typewriterMode = ref(false)
+  const focusMode = ref(false)
+
+  // Editor actions
+  function handleUndo() {
+    document.execCommand('undo')
   }
-}>()
 
-const emit = defineEmits<{
-  'new-document': []
-  'open-document': []
-  'save-document': []
-  'export-document': [format: string]
-  'import-document': []
-  'settings': []
-  'about': []
-}>()
+  function handleRedo() {
+    document.execCommand('redo')
+  }
 
-// View state
-const showToolbar = ref(true)
-const showStatusBar = ref(true)
-const typewriterMode = ref(false)
-const focusMode = ref(false)
+  function handleCut() {
+    document.execCommand('cut')
+  }
 
-// Editor actions
-function handleUndo() {
-  document.execCommand('undo')
-}
+  function handleCopy() {
+    document.execCommand('copy')
+  }
 
-function handleRedo() {
-  document.execCommand('redo')
-}
+  function handlePaste() {
+    document.execCommand('paste')
+  }
 
-function handleCut() {
-  document.execCommand('cut')
-}
+  function handleSelectAll() {
+    document.execCommand('selectAll')
+  }
 
-function handleCopy() {
-  document.execCommand('copy')
-}
+  function handleFind() {
+    // This would trigger the find dialog in the editor
+    window.dispatchEvent(new CustomEvent('editor:find'))
+  }
 
-function handlePaste() {
-  document.execCommand('paste')
-}
+  function toggleSidebar() {
+    window.dispatchEvent(new CustomEvent('editor:toggle-sidebar'))
+  }
 
-function handleSelectAll() {
-  document.execCommand('selectAll')
-}
+  function setZoom(level: number) {
+    window.dispatchEvent(new CustomEvent('editor:zoom', { detail: level }))
+  }
 
-function handleFind() {
-  // This would trigger the find dialog in the editor
-  window.dispatchEvent(new CustomEvent('editor:find'))
-}
+  // Insert actions
+  function insertTable() {
+    window.dispatchEvent(new CustomEvent('editor:insert-table'))
+  }
 
-function toggleSidebar() {
-  window.dispatchEvent(new CustomEvent('editor:toggle-sidebar'))
-}
+  function insertImage() {
+    window.dispatchEvent(new CustomEvent('editor:insert-image'))
+  }
 
-function setZoom(level: number) {
-  window.dispatchEvent(new CustomEvent('editor:zoom', { detail: level }))
-}
+  function insertLink() {
+    window.dispatchEvent(new CustomEvent('editor:insert-link'))
+  }
 
-// Insert actions
-function insertTable() {
-  window.dispatchEvent(new CustomEvent('editor:insert-table'))
-}
+  function insertCodeBlock() {
+    window.dispatchEvent(new CustomEvent('editor:insert-code-block'))
+  }
 
-function insertImage() {
-  window.dispatchEvent(new CustomEvent('editor:insert-image'))
-}
+  function insertMath() {
+    window.dispatchEvent(new CustomEvent('editor:insert-math'))
+  }
 
-function insertLink() {
-  window.dispatchEvent(new CustomEvent('editor:insert-link'))
-}
+  function insertDate() {
+    window.dispatchEvent(new CustomEvent('editor:insert-date'))
+  }
 
-function insertCodeBlock() {
-  window.dispatchEvent(new CustomEvent('editor:insert-code-block'))
-}
+  function insertPageBreak() {
+    window.dispatchEvent(new CustomEvent('editor:insert-page-break'))
+  }
 
-function insertMath() {
-  window.dispatchEvent(new CustomEvent('editor:insert-math'))
-}
+  // Format actions
+  function toggleBold() {
+    document.execCommand('bold')
+  }
 
-function insertDate() {
-  window.dispatchEvent(new CustomEvent('editor:insert-date'))
-}
+  function toggleItalic() {
+    document.execCommand('italic')
+  }
 
-function insertPageBreak() {
-  window.dispatchEvent(new CustomEvent('editor:insert-page-break'))
-}
+  function toggleUnderline() {
+    document.execCommand('underline')
+  }
 
-// Format actions
-function toggleBold() {
-  document.execCommand('bold')
-}
+  function setHeading(level: number) {
+    window.dispatchEvent(new CustomEvent('editor:set-heading', { detail: level }))
+  }
 
-function toggleItalic() {
-  document.execCommand('italic')
-}
+  function setParagraph() {
+    window.dispatchEvent(new CustomEvent('editor:set-paragraph'))
+  }
 
-function toggleUnderline() {
-  document.execCommand('underline')
-}
+  function setBlockquote() {
+    window.dispatchEvent(new CustomEvent('editor:set-blockquote'))
+  }
 
-function setHeading(level: number) {
-  window.dispatchEvent(new CustomEvent('editor:set-heading', { detail: level }))
-}
+  function toggleBulletList() {
+    window.dispatchEvent(new CustomEvent('editor:toggle-bullet-list'))
+  }
 
-function setParagraph() {
-  window.dispatchEvent(new CustomEvent('editor:set-paragraph'))
-}
+  function toggleOrderedList() {
+    window.dispatchEvent(new CustomEvent('editor:toggle-ordered-list'))
+  }
 
-function setBlockquote() {
-  window.dispatchEvent(new CustomEvent('editor:set-blockquote'))
-}
+  // Tool actions
+  function spellCheck() {
+    window.dispatchEvent(new CustomEvent('editor:spell-check'))
+  }
 
-function toggleBulletList() {
-  window.dispatchEvent(new CustomEvent('editor:toggle-bullet-list'))
-}
+  function wordCount() {
+    window.dispatchEvent(new CustomEvent('editor:word-count'))
+  }
 
-function toggleOrderedList() {
-  window.dispatchEvent(new CustomEvent('editor:toggle-ordered-list'))
-}
+  function verifyAuthorship() {
+    window.dispatchEvent(new CustomEvent('editor:verify-authorship'))
+  }
 
-// Tool actions
-function spellCheck() {
-  window.dispatchEvent(new CustomEvent('editor:spell-check'))
-}
+  function generateProof() {
+    window.dispatchEvent(new CustomEvent('editor:generate-proof'))
+  }
 
-function wordCount() {
-  window.dispatchEvent(new CustomEvent('editor:word-count'))
-}
+  function showKeyboardShortcuts() {
+    window.dispatchEvent(new CustomEvent('app:show-shortcuts'))
+  }
 
-function verifyAuthorship() {
-  window.dispatchEvent(new CustomEvent('editor:verify-authorship'))
-}
-
-function generateProof() {
-  window.dispatchEvent(new CustomEvent('editor:generate-proof'))
-}
-
-function showKeyboardShortcuts() {
-  window.dispatchEvent(new CustomEvent('app:show-shortcuts'))
-}
-
-function showDocumentation() {
-  window.open('https://github.com/chainpaper/docs', '_blank')
-}
+  function showDocumentation() {
+    window.open('https://github.com/chainpaper/docs', '_blank')
+  }
 </script>

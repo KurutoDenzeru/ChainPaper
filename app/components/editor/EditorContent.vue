@@ -35,35 +35,38 @@
         </div>
 
         <!-- Status Bar -->
-        <div class="fixed bottom-0 left-0 right-0 flex flex-col sm:flex-row sm:justify-between sm:items-center px-4 py-2 bg-white border-t border-gray-200 text-xs text-gray-600 gap-2 shadow-lg z-40">
-          <div class="flex items-center gap-2 sm:gap-4 flex-wrap">
+        <div class="fixed bottom-0 left-0 right-0 flex items-center px-4 py-2 bg-white border-t border-gray-200 text-xs text-gray-600 shadow-lg z-20">
+          <!-- Left Section: Page and Word Count -->
+          <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
             <div class="flex items-center whitespace-nowrap">
               Page {{ currentPage }} of {{ documentStats.pageCount }}
             </div>
+            <div class="text-gray-400">|</div>
             <div class="flex items-center whitespace-nowrap">
               {{ documentStats.wordCount }} words
             </div>
-            <div class="hidden sm:flex items-center whitespace-nowrap">
+            <div class="text-gray-400">|</div>
+            <div class="flex items-center whitespace-nowrap">
               {{ documentStats.characterCount }} characters
             </div>
           </div>
           
-          <div class="flex-1 flex justify-center">
-            <div v-if="documentStore.isAutoSaving" class="flex items-center text-blue-600">
+          <!-- Center Section: Auto-saving -->
+          <div class="flex-shrink-0 mx-2">
+            <div v-if="documentStore.isAutoSaving" class="flex items-center text-blue-600 text-xs">
               Auto-saving...
             </div>
           </div>
           
-          <div class="flex items-center gap-2">
-            <div class="flex items-center gap-1">
-              <Button variant="ghost" size="sm" @click="adjustZoom(-10)" class="h-6 w-6 p-0">
-                <Minus class="w-3 h-3" />
-              </Button>
-              <span class="min-w-12 text-center font-medium text-gray-900">{{ Math.round(editorSettings.zoom * 100) }}%</span>
-              <Button variant="ghost" size="sm" @click="adjustZoom(10)" class="h-6 w-6 p-0">
-                <Plus class="w-3 h-3" />
-              </Button>
-            </div>
+          <!-- Right Section: Zoom Controls -->
+          <div class="flex items-center gap-1 flex-shrink-0">
+            <Button variant="ghost" size="sm" @click="adjustZoom(-10)" class="h-6 w-6 p-0">
+              <Minus class="w-3 h-3" />
+            </Button>
+            <span class="min-w-10 text-center font-medium text-gray-900 text-xs">{{ Math.round(editorSettings.zoom * 100) }}%</span>
+            <Button variant="ghost" size="sm" @click="adjustZoom(10)" class="h-6 w-6 p-0">
+              <Plus class="w-3 h-3" />
+            </Button>
           </div>
         </div>
       </div>
