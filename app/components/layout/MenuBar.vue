@@ -1,25 +1,24 @@
 <template>
-  <Menubar class="px-2 sm:px-4 py-11 border-none rounded-none bg-white border-b border-gray-200">
+  <Menubar class="px-2 sm:px-4 py-9 border-none rounded-none bg-white border-b border-gray-200">
     <div class="flex flex-row items-start w-full">
       <!-- Left Side: Brand Icon (spans two rows) -->
-      <div class="flex flex-col items-center justify-start mr-6">
+      <div class="flex flex-col items-center justify-start mr-3">
         <NuxtImg src="/Palimphest.png" alt="ChainPaper Logo" loading="lazy"
           class="w-18 h-18 flex items-center justify-center" />
       </div>
       <!-- Right Side: Two rows -->
-      <div class="flex flex-col flex-1">
+      <div class="flex flex-col self-center flex-1">
         <!-- First Row: Document Title Input -->
         <div class="flex items-center gap-2 mb-1">
           <div v-if="!isEditingTitle" @click="startEditingTitle"
-            class="flex items-center gap-2 px-3 py-1 rounded hover:bg-gray-100 cursor-pointer transition-colors">
-            <span class="text-lg text-gray-900">{{ documentTitle || 'Untitled Document' }}</span>
+            class="flex items-center gap-2 px-3 rounded hover:bg-gray-100 cursor-pointer transition-colors">
+            <span class="text-lg text-gray-900 font-medium -ml-2">{{ documentTitle || 'Untitled Document' }}</span>
             <Edit3 class="w-4 h-4 text-gray-500" />
             <span v-if="isDirty" class="text-orange-500">•</span>
           </div>
           <div v-else class="flex items-center gap-2">
             <Input ref="titleInput" v-model="editingTitle" @blur="saveTitle" @keyup.enter="saveTitle"
-              @keyup.escape="cancelEdit"
-              class="text-lg bg-transparent border-2 rounded-md outline-none px-1 min-w-48"
+              @keyup.escape="cancelEdit" class="text-lg bg-transparent border-2 rounded-md outline-none px-1 min-w-48"
               :placeholder="'Untitled Document'" />
             <!-- <Edit3 class="w-4 h-4 text-blue-500" /> -->
           </div>
@@ -305,13 +304,13 @@
         </div>
       </div>
       <!-- Right Side: User Menu -->
-      <div class="flex items-center ml-auto">
+      <!-- <div class="flex self-center ml-auto">
         <div
           class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-blue-700 transition-colors"
           :title="user.name || 'Anonymous'">
           {{ (user.name || 'A').charAt(0).toUpperCase() }}
         </div>
-      </div>
+      </div> -->
     </div>
   </Menubar>
 </template>

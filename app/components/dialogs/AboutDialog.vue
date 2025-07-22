@@ -1,6 +1,6 @@
 <template>
   <Dialog v-model:open="open">
-    <DialogContent class="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+    <DialogContent class="max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-3 text-2xl font-bold">
           <div class="flex items-center gap-2">
@@ -87,31 +87,23 @@
         <div class="space-y-4">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Links</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <button 
-              @click="openGitHub" 
-              class="flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-md text-gray-700 dark:text-gray-300 text-sm transition-colors border border-transparent hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400"
-            >
+            <button @click="openGitHub"
+              class="flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-md text-gray-700 dark:text-gray-300 text-sm transition-colors border border-transparent hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400">
               <Github class="w-4 h-4 flex-shrink-0" stroke-width="1.5" />
               GitHub Repository
             </button>
-            <button 
-              @click="openDocumentation" 
-              class="flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-md text-gray-700 dark:text-gray-300 text-sm transition-colors border border-transparent hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400"
-            >
+            <button @click="openDocumentation"
+              class="flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-md text-gray-700 dark:text-gray-300 text-sm transition-colors border border-transparent hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400">
               <BookOpen class="w-4 h-4 flex-shrink-0" stroke-width="1.5" />
               Documentation
             </button>
-            <button 
-              @click="openSupport" 
-              class="flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-md text-gray-700 dark:text-gray-300 text-sm transition-colors border border-transparent hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400"
-            >
+            <button @click="openSupport"
+              class="flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-md text-gray-700 dark:text-gray-300 text-sm transition-colors border border-transparent hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400">
               <MessageCircle class="w-4 h-4 flex-shrink-0" stroke-width="1.5" />
               Support & Feedback
             </button>
-            <button 
-              @click="openLicense" 
-              class="flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-md text-gray-700 dark:text-gray-300 text-sm transition-colors border border-transparent hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400"
-            >
+            <button @click="openLicense"
+              class="flex items-center gap-2 p-3 bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-md text-gray-700 dark:text-gray-300 text-sm transition-colors border border-transparent hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400">
               <Lock class="w-4 h-4 flex-shrink-0" stroke-width="1.5" />
               License (MIT)
             </button>
@@ -122,15 +114,15 @@
         <div class="space-y-4">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Credits</h3>
           <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-            ChainPaper is built with open-source technologies and libraries. 
-            Special thanks to the Vue.js, Nuxt.js, and ProseMirror communities 
+            ChainPaper is built with open-source technologies and libraries.
+            Special thanks to the Vue.js, Nuxt.js, and ProseMirror communities
             for their excellent work.
           </p>
         </div>
       </div>
 
       <DialogFooter>
-        <Button @click="open = false">
+        <Button @click="open = false" class="w-full">
           Close
         </Button>
       </DialogFooter>
@@ -139,59 +131,59 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, defineEmits, defineProps } from 'vue'
-import {
-  Shield, Database, FileText, Download, Search, Puzzle,
-  Github, BookOpen, MessageCircle, Lock
-} from 'lucide-vue-next'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
+  import { ref, watch, defineEmits, defineProps } from 'vue'
+  import {
+    Shield, Database, FileText, Download, Search, Puzzle,
+    Github, BookOpen, MessageCircle, Lock
+  } from 'lucide-vue-next'
+  import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+  } from '@/components/ui/dialog'
+  import { Button } from '@/components/ui/button'
 
-const props = defineProps<{
-  open: boolean
-}>()
+  const props = defineProps<{
+    open: boolean
+  }>()
 
-const emit = defineEmits<{
-  'update:open': [value: boolean]
-}>()
+  const emit = defineEmits<{
+    'update:open': [value: boolean]
+  }>()
 
-const open = ref(props.open)
+  const open = ref(props.open)
 
-// Watch for prop changes
-watch(() => props.open, (newValue) => {
-  open.value = newValue
-})
+  // Watch for prop changes
+  watch(() => props.open, (newValue) => {
+    open.value = newValue
+  })
 
-// Watch for open changes and emit
-watch(open, (newValue) => {
-  emit('update:open', newValue)
-})
+  // Watch for open changes and emit
+  watch(open, (newValue) => {
+    emit('update:open', newValue)
+  })
 
-function getBuildInfo() {
-  const now = new Date()
-  return `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`
-}
+  function getBuildInfo() {
+    const now = new Date()
+    return `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`
+  }
 
-function openGitHub() {
-  window.open('https://github.com/chainpaper/chainpaper', '_blank')
-}
+  function openGitHub() {
+    window.open('https://github.com/chainpaper/chainpaper', '_blank')
+  }
 
-function openDocumentation() {
-  window.open('https://docs.chainpaper.io', '_blank')
-}
+  function openDocumentation() {
+    window.open('https://docs.chainpaper.io', '_blank')
+  }
 
-function openSupport() {
-  window.open('https://github.com/chainpaper/chainpaper/issues', '_blank')
-}
+  function openSupport() {
+    window.open('https://github.com/chainpaper/chainpaper/issues', '_blank')
+  }
 
-function openLicense() {
-  window.open('https://github.com/chainpaper/chainpaper/blob/main/LICENSE', '_blank')
-}
+  function openLicense() {
+    window.open('https://github.com/chainpaper/chainpaper/blob/main/LICENSE', '_blank')
+  }
 </script>
