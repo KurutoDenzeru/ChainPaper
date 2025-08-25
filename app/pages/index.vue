@@ -1,32 +1,42 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col">
-    <!-- Menubar (top) -->
-    <MenuBar
-      :documentTitle="documentTitle"
-      :isDirty="isDirty"
-      :user="user"
-      @select-all="onSelectAll"
-      @update-title="onUpdateTitle"
-      @save-document="onSaveDocument"
-      @new-document="onNewDocument"
-      @open-document="onOpenDocument"
-      @export-document="onExport"
-      @import-document="onImport"
-      @settings="onSettings"
-      @about="onAbout"
-    />
+    <!-- Fixed top area: Menubar + EditorToolbar (both floating) -->
+    <div class="fixed inset-x-4 top-2 z-50 pointer-events-none">
+      <div ref="menuWrapper" v-show="menuVisible" class="pointer-events-auto">
+        <MenuBar
+          :documentTitle="documentTitle"
+          :isDirty="isDirty"
+          :user="user"
+          @select-all="onSelectAll"
+          @update-title="onUpdateTitle"
+          @save-document="onSaveDocument"
+          @new-document="onNewDocument"
+          @open-document="onOpenDocument"
+          @export-document="onExport"
+          @import-document="onImport"
+          @settings="onSettings"
+          @about="onAbout"
+        />
+      </div>
 
-    <!-- Editor toolbar (below menubar) -->
-    <EditorToolbar
-      @toggle-sidebar="toggleSidebar"
-      @toggle-find="toggleFind"
-      @insert-link="onInsertLink"
-      @insert-image="onInsertImage"
-      @insert-table="onInsertTable"
-    />
+  <div ref="toolbarWrapper" :class="[menuVisible ? 'mt-2' : 'mt-0', 'pointer-events-auto']">
+        <EditorToolbar
+          :isMenuVisible="menuVisible"
+          @toggle-menubar="toggleMenu"
+          @toggle-sidebar="toggleSidebar"
+          @toggle-find="toggleFind"
+          @insert-link="onInsertLink"
+          @insert-image="onInsertImage"
+          @insert-table="onInsertTable"
+        />
+      </div>
+    </div>
 
-    <!-- Document pages area: multiple Letter-sized canvases (scrollable) -->
-    <main class="flex-1 overflow-auto p-6 pb-24">
+  <!-- spacer to keep main content below fixed top controls -->
+  <div aria-hidden="true" :style="{ height: topPadding + 'px' }"></div>
+
+  <!-- Document pages area: multiple Letter-sized canvases (scrollable) -->
+  <main class="flex-1 overflow-auto p-6 pb-24">
       <!-- container switches layout based on viewMode -->
       <div :class="['w-full', viewMode === 'grid' ? 'pages-grid' : 'flex flex-col items-center gap-6']">
         <div v-for="(content, idx) in pageContents" :key="idx" :class="['page-wrapper', viewMode === 'grid' ? 'grid-item' : '']">
@@ -281,6 +291,28 @@ function onAbout() {
 const sidebarVisible = ref(false)
 const findVisible = ref(false)
 
+// Menubar visible and measuring refs for sticky top area
+const menuVisible = ref(true)
+const menuWrapper = ref<HTMLElement | null>(null)
+const toolbarWrapper = ref<HTMLElement | null>(null)
+const topPadding = ref<number>(0)
+
+const updateTopPadding = async () => {
+  await nextTick()
+  const m = menuWrapper.value
+  const t = toolbarWrapper.value
+  const mh = m && m.offsetHeight ? m.offsetHeight : 0
+  const th = t && t.offsetHeight ? t.offsetHeight : 0
+  // add a small gap so content isn't flush
+  topPadding.value = mh + th + 16
+}
+
+function toggleMenu() {
+  menuVisible.value = !menuVisible.value
+  // recompute padding after DOM updates
+  updateTopPadding()
+}
+
 function toggleSidebar() {
   sidebarVisible.value = !sidebarVisible.value
   console.log('toggle-sidebar ->', sidebarVisible.value)
@@ -321,6 +353,10 @@ onMounted(async () => {
   // initialize with empty pages; placeholder text shown via CSS when empty
   distributeTextToPages('')
   computeCountsFromAllPages()
+  // compute top padding for fixed menubar + toolbar
+  updateTopPadding()
+  // update on window resize
+  window.addEventListener('resize', updateTopPadding)
 })
 </script>
 

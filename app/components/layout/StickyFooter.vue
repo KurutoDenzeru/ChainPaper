@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-x-0 bottom-4 z-40 pointer-events-none">
+  <div class="fixed inset-x-0 bottom-2 z-40 pointer-events-none">
     <div class="w-full mx-auto pointer-events-auto px-4">
       <div
         class="flex items-center justify-between bg-white border border-gray-200 rounded-lg shadow-sm h-12 px-3 md:h-10">

@@ -1,9 +1,9 @@
 <template>
-  <Menubar class="px-2 sm:px-4 py-9 border-none rounded-none bg-white border-b border-gray-200">
+  <Menubar class="px-2 sm:px-4 py-9 bg-white border border-gray-200 rounded-lg shadow-sm">
     <div class="flex flex-row items-start w-full">
       <!-- Left Side: Brand Icon (spans two rows) -->
       <div class="flex flex-col items-center justify-start mr-3">
-        <NuxtImg src="/Palimphest.png" alt="ChainPaper Logo" loading="lazy"
+  <NuxtImg src="/Palimphest.png" alt="ChainPaper Logo" loading="eager"
           class="w-18 h-18 flex items-center justify-center" />
       </div>
       <!-- Right Side: Two rows -->
@@ -342,16 +342,45 @@
     }
   }>()
 
-  const emit = defineEmits<{
-    'new-document': []
-    'open-document': []
-    'save-document': []
-    'export-document': [format: string]
-    'import-document': []
-    'settings': []
-    'about': []
-    'update-title': [title: string]
-  }>()
+  // typed emits (call-signature overloads) for SFC: list events emitted by this component
+  const emit = defineEmits<
+    {
+      (e: 'update-title', title: string): void
+      (e: 'new-document'): void
+      (e: 'open-document'): void
+      (e: 'save-document'): void
+      (e: 'import-document'): void
+      (e: 'undo'): void
+      (e: 'redo'): void
+      (e: 'cut'): void
+      (e: 'copy'): void
+      (e: 'paste'): void
+      (e: 'select-all'): void
+      (e: 'toggle-find'): void
+      (e: 'toggle-sidebar'): void
+      (e: 'set-zoom', level: number): void
+      (e: 'insert-table'): void
+      (e: 'insert-image'): void
+      (e: 'insert-link'): void
+      (e: 'insert-code-block'): void
+      (e: 'insert-math'): void
+      (e: 'insert-date'): void
+      (e: 'insert-page-break'): void
+      (e: 'format-bold'): void
+      (e: 'format-italic'): void
+      (e: 'format-underline'): void
+      (e: 'set-heading', level: number): void
+      (e: 'set-paragraph'): void
+      (e: 'set-blockquote'): void
+      (e: 'toggle-bullet-list'): void
+      (e: 'toggle-ordered-list'): void
+      (e: 'spell-check'): void
+      (e: 'word-count'): void
+      (e: 'verify-authorship'): void
+      (e: 'generate-proof'): void
+      (e: 'show-shortcuts'): void
+    }
+  >()
 
   // View state
   const showToolbar = ref(true)
@@ -511,6 +540,6 @@
 
   function showDocumentation() {
     // keep original behavior to open docs
-    window.open('https://github.com/chainpaper/docs', '_blank')
+    window.open('https://github.com/KurutoDenzeru/ChainPaper/blob/master/README.md', '_blank')
   }
 </script>

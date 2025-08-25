@@ -1,5 +1,5 @@
 <template>
-  <div class="flex px-12 sm:px-4 py-1 rounded-xl bg-white border-b border-gray-200 gap-1 sm:gap-2 overflow-x-auto">
+  <div class="flex items-center justify-between px-4 sm:px-2 py-1 rounded-xl bg-white border border-gray-200 gap-1 sm:gap-2 overflow-x-auto shadow-sm">
     <!-- Always Visible Controls -->
     <div class="flex gap-1 flex-shrink-0 items-center">
       <!-- View Controls -->
@@ -21,7 +21,7 @@
       </Button>
     </div>
 
-    <!-- Desktop Layout: Show all controls on large screens -->
+    <!-- Desktop Layout: Show all controls on large screens -->   
     <div class="hidden lg:flex gap-1 flex-1 items-center">
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
@@ -443,6 +443,13 @@
         </PopoverContent>
       </Popover>
     </div>
+    
+    <!-- Collapse Menubar button (far right) -->
+    <div class="flex items-center ml-2 flex-shrink-0">
+      <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('toggle-menubar')">
+        <component :is="menuVisible ? ArrowUp : ArrowDown" class="w-4 h-4" />
+      </Button>
+    </div>
   </div>
 </template>
 
@@ -452,7 +459,8 @@
     Bold, Italic, Underline, Strikethrough, Type, Highlighter,
     AlignLeft, AlignCenter, AlignRight, AlignJustify,
     List, ListOrdered, Indent, Link, ImageIcon as Image, Table,
-    Undo2, Redo2, MoreHorizontal, Minus, FileText, Hash, Sidebar, Search
+  Undo2, Redo2, MoreHorizontal, Minus, FileText, Hash, Sidebar, Search,
+  ArrowUp, ArrowDown
   } from 'lucide-vue-next'
   import { Button } from '@/components/ui/button'
   import {
@@ -480,6 +488,10 @@
 
   // emit helper for actions
   const emit = defineEmits()
+
+  // accept prop for whether the menubar is visible so we can flip the arrow
+  const props = defineProps<{ isMenuVisible?: boolean }>()
+  const menuVisible = computed(() => !!props.isMenuVisible)
 
   // Font options
   const fonts = [

@@ -41,9 +41,7 @@ export default defineNuxtConfig({
         { name: 'robots', content: 'index, follow' },
       ],
 
-      link: [
-        { rel: 'preload', href: '/Palimphest.png', as: 'image' },
-      ],
+  link: [],
     }
   },
 
