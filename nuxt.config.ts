@@ -42,7 +42,7 @@ export default defineNuxtConfig({
       ],
 
       link: [
-        { rel: 'preload', href: '/notebook-pen.svg', as: 'image' },
+        { rel: 'preload', href: '/Palimphest.png', as: 'image' },
       ],
     }
   },

@@ -303,14 +303,6 @@
           </MenubarMenu>
         </div>
       </div>
-      <!-- Right Side: User Menu -->
-      <!-- <div class="flex self-center ml-auto">
-        <div
-          class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium cursor-pointer hover:bg-blue-700 transition-colors"
-          :title="user.name || 'Anonymous'">
-          {{ (user.name || 'A').charAt(0).toUpperCase() }}
-        </div>
-      </div> -->
     </div>
   </Menubar>
 </template>
