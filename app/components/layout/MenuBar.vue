@@ -29,21 +29,48 @@
           <MenubarMenu>
             <MenubarTrigger>File</MenubarTrigger>
             <MenubarContent>
-              <MenubarItem @click="$emit('new-document')" class="flex items-center gap-2">
+        <MenubarItem @click="$emit('new-document')" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <FileText class="w-4 h-4" />
                 New Document
-                <MenubarShortcut>Ctrl+N</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">N</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
-              <MenubarItem @click="$emit('open-document')" class="flex items-center gap-2">
+        <MenubarItem @click="$emit('open-document')" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <FolderOpen class="w-4 h-4" />
                 Open
-                <MenubarShortcut>Ctrl+O</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">O</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
               <MenubarSeparator />
-              <MenubarItem @click="$emit('save-document')" class="flex items-center gap-2" :disabled="!isDirty">
+        <MenubarItem @click="$emit('save-document')" class="flex items-center justify-between gap-2 min-w-[220px]" :disabled="!isDirty">
                 <Save class="w-4 h-4" />
                 Save
-                <MenubarShortcut>Ctrl+S</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">S</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
               <MenubarSeparator />
               <MenubarSub>
@@ -74,7 +101,7 @@
                   </MenubarItem>
                 </MenubarSubContent>
               </MenubarSub>
-              <MenubarItem @click="$emit('import-document')" class="flex items-center gap-2">
+              <MenubarItem @click="$emit('import-document')" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <Download class="w-4 h-4" />
                 Import Document
               </MenubarItem>
@@ -85,42 +112,110 @@
           <MenubarMenu>
             <MenubarTrigger>Edit</MenubarTrigger>
             <MenubarContent>
-              <MenubarItem @click="handleUndo" class="flex items-center gap-2">
+              <MenubarItem @click="handleUndo" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <Undo2 class="w-4 h-4" />
                 Undo
-                <MenubarShortcut>Ctrl+Z</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">Z</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
-              <MenubarItem @click="handleRedo" class="flex items-center gap-2">
+              <MenubarItem @click="handleRedo" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <Redo2 class="w-4 h-4" />
                 Redo
-                <MenubarShortcut>Ctrl+Y</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <!-- Redo: mac uses Shift+Z, others use Ctrl+Y -->
+                    <template v-if="isMac">
+                      <span class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">⇧</span>
+                      <span class="text-xs mr-1">+</span>
+                      <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">Z</span>
+                    </template>
+                    <template v-else>
+                      <span class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                      <span class="text-xs mr-1">+</span>
+                      <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">Y</span>
+                    </template>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
               <MenubarSeparator />
-              <MenubarItem @click="handleCut" class="flex items-center gap-2">
+              <MenubarItem @click="handleCut" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <Scissors class="w-4 h-4" />
                 Cut
-                <MenubarShortcut>Ctrl+X</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">X</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
-              <MenubarItem @click="handleCopy" class="flex items-center gap-2">
+              <MenubarItem @click="handleCopy" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <Copy class="w-4 h-4" />
                 Copy
-                <MenubarShortcut>Ctrl+C</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">C</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
-              <MenubarItem @click="handlePaste" class="flex items-center gap-2">
+              <MenubarItem @click="handlePaste" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <Clipboard class="w-4 h-4" />
                 Paste
-                <MenubarShortcut>Ctrl+V</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">V</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
               <MenubarSeparator />
-              <MenubarItem @click="handleSelectAll" class="flex items-center gap-2">
+              <MenubarItem @click="handleSelectAll" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <MousePointer class="w-4 h-4" />
                 Select All
-                <MenubarShortcut>Ctrl+A</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">A</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
-              <MenubarItem @click="handleFind" class="flex items-center gap-2">
+              <MenubarItem @click="handleFind" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <Search class="w-4 h-4" />
                 Find & Replace
-                <MenubarShortcut>Ctrl+F</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">F</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
             </MenubarContent>
           </MenubarMenu>
@@ -210,20 +305,47 @@
           <MenubarMenu>
             <MenubarTrigger>Format</MenubarTrigger>
             <MenubarContent>
-              <MenubarItem @click="toggleBold" class="flex items-center gap-2">
+        <MenubarItem @click="toggleBold" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <Bold class="w-4 h-4" />
                 Bold
-                <MenubarShortcut>Ctrl+B</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-gray-200 text-xs font-semibold">B</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
               <MenubarItem @click="toggleItalic" class="flex items-center gap-2">
                 <Italic class="w-4 h-4" />
                 Italic
-                <MenubarShortcut>Ctrl+I</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center w-6 h-6 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center px-2 h-6 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-gray-200 text-xs font-semibold">I</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
               <MenubarItem @click="toggleUnderline" class="flex items-center gap-2">
                 <Underline class="w-4 h-4" />
                 Underline
-                <MenubarShortcut>Ctrl+U</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center w-6 h-6 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center px-2 h-6 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-gray-200 text-xs font-semibold">U</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
               <MenubarSeparator />
               <MenubarSub>
@@ -258,7 +380,9 @@
               <MenubarItem @click="spellCheck" class="flex items-center gap-2">
                 <BookOpen class="w-4 h-4" />
                 Spell Check
-                <MenubarShortcut>F7</MenubarShortcut>
+                <MenubarShortcut>
+                  <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-gray-200 text-xs font-semibold">F7</span>
+                </MenubarShortcut>
               </MenubarItem>
               <MenubarItem @click="wordCount" class="flex items-center gap-2">
                 <Hash class="w-4 h-4" />
@@ -274,10 +398,19 @@
                 Generate Proof
               </MenubarItem>
               <MenubarSeparator />
-              <MenubarItem @click="$emit('settings')" class="flex items-center gap-2">
+              <MenubarItem @click="$emit('settings')" class="flex items-center justify-between gap-2 min-w-[220px]">
                 <Settings class="w-4 h-4" />
                 Preferences
-                <MenubarShortcut>Ctrl+,</MenubarShortcut>
+                <MenubarShortcut>
+                  <div class="flex items-center">
+                    <span v-if="isMac" class="inline-flex items-center justify-center w-6 h-6 rounded bg-gray-100 text-xs mr-1">
+                      <Command class="w-3 h-3" />
+                    </span>
+                    <span v-else class="inline-flex items-center justify-center px-2 h-6 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
+                    <span class="text-xs mr-1">+</span>
+                    <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-gray-200 text-xs font-semibold">,</span>
+                  </div>
+                </MenubarShortcut>
               </MenubarItem>
             </MenubarContent>
           </MenubarMenu>
@@ -308,15 +441,15 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, defineEmits, defineProps, nextTick } from 'vue'
+  import { ref, defineEmits, defineProps, nextTick, onMounted } from 'vue'
   import {
-    FileText, FolderOpen, Save, Upload, Download, FileJson, FileImage, Globe, Hash,
+  FileText, FolderOpen, Save, Upload, Download, FileJson, FileImage, Globe,
     Undo2, Redo2, Scissors, Copy, Clipboard, MousePointer, Search,
     Sidebar, Wrench, BarChart3, ZoomIn, Type, Target,
     Table, ImageIcon, Link, Code2, Calculator, Calendar,
     Bold, Italic, Underline, Heading, List, ListOrdered,
     BookOpen, ShieldCheck, FileSignature, Settings,
-    Keyboard, Info, Edit3
+  Keyboard, Info, Edit3, Command, Grid2x2, Hash
   } from 'lucide-vue-next'
   import {
     Menubar,
@@ -392,6 +525,16 @@
   const isEditingTitle = ref(false)
   const editingTitle = ref('')
   const titleInput = ref<HTMLInputElement | null>(null)
+
+  // detect platform on client to show correct modifier icon in shortcuts
+  const isMac = ref(false)
+  onMounted(() => {
+    try {
+      isMac.value = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)
+    } catch (e) {
+      isMac.value = false
+    }
+  })
 
   // Title editing functions
   async function startEditingTitle() {
