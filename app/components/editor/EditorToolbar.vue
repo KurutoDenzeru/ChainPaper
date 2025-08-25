@@ -467,20 +467,19 @@
     PopoverContent,
     PopoverTrigger,
   } from '@/components/ui/popover'
-  import { useEditorStore } from '~/stores/editor'
-
   // Fix the ImageIcon import conflict
   const ImageIcon = Image
 
-  const editorStore = useEditorStore()
-
-  // State
+  // local UI state (component-only, emits events for actions)
   const selectedFont = ref('Times New Roman')
   const selectedFontSize = ref('12')
   const selectedHeading = ref('paragraph')
   const alignment = ref('left')
   const selectedTextColor = ref('#000000')
   const selectedHighlightColor = ref('#ffff00')
+
+  // emit helper for actions
+  const emit = defineEmits()
 
   // Font options
   const fonts = [
@@ -509,134 +508,124 @@
   ]
 
   // Computed properties for active states
-  const isBold = computed(() => editorStore.isFormatActive('bold'))
-  const isItalic = computed(() => editorStore.isFormatActive('italic'))
-  const isUnderline = computed(() => editorStore.isFormatActive('underline'))
-  const isStrikethrough = computed(() => editorStore.isFormatActive('strikethrough'))
-  const isBulletList = computed(() => editorStore.currentNodeType === 'bullet_list')
-  const isOrderedList = computed(() => editorStore.currentNodeType === 'ordered_list')
-  const canUndo = computed(() => editorStore.canUndo)
-  const canRedo = computed(() => editorStore.canRedo)
+  // UI-only active states (no editor store here)
+  const isBold = ref(false)
+  const isItalic = ref(false)
+  const isUnderline = ref(false)
+  const isStrikethrough = ref(false)
+  const isBulletList = ref(false)
+  const isOrderedList = ref(false)
+  const canUndo = ref(true)
+  const canRedo = ref(true)
 
   // Actions
   function undo() {
-    editorStore.undo()
+    emit('undo')
   }
 
   function redo() {
-    editorStore.redo()
+    emit('redo')
   }
 
   function toggleBold() {
-    editorStore.toggleBold()
+    isBold.value = !isBold.value
+    emit('format-bold')
   }
 
   function toggleItalic() {
-    editorStore.toggleItalic()
+    isItalic.value = !isItalic.value
+    emit('format-italic')
   }
 
   function toggleUnderline() {
-    editorStore.toggleUnderline()
+    isUnderline.value = !isUnderline.value
+    emit('format-underline')
   }
 
   function toggleStrikethrough() {
-    editorStore.toggleStrikethrough()
+    isStrikethrough.value = !isStrikethrough.value
+    emit('format-strikethrough')
   }
 
   function handleFontChange(font: any) {
     if (typeof font === 'string') {
-      editorStore.setFontFamily(font)
+      selectedFont.value = font
+      emit('set-font-family', font)
     }
   }
 
   function handleFontSizeChange(size: any) {
-    if (typeof size === 'string') {
-      editorStore.setFontSize(parseInt(size))
-    } else if (typeof size === 'number') {
-      editorStore.setFontSize(size)
-    }
+    const value = typeof size === 'string' ? parseInt(size) : size
+    selectedFontSize.value = String(value)
+    emit('set-font-size', value)
   }
 
   function handleHeadingChange(heading: any) {
+    selectedHeading.value = heading
     if (heading === 'paragraph') {
-      editorStore.setParagraph()
+      emit('set-paragraph')
     } else if (typeof heading === 'string') {
       const level = parseInt(heading.replace('heading', ''))
-      editorStore.setHeading(level)
+      emit('set-heading', level)
     }
   }
 
   function setAlignment(align: string) {
     alignment.value = align
-    editorStore.setAlignment(align)
+    emit('set-alignment', align)
   }
 
   function setTextColor(color: string) {
     selectedTextColor.value = color
-    editorStore.setTextColor(color)
+    emit('set-text-color', color)
   }
 
   function setHighlightColor(color: string) {
     selectedHighlightColor.value = color
-    editorStore.setHighlightColor(color)
+    emit('set-highlight-color', color)
   }
 
   function toggleBulletList() {
-    editorStore.toggleBulletList()
+    isBulletList.value = !isBulletList.value
+    emit('toggle-bullet-list')
   }
 
   function toggleOrderedList() {
-    editorStore.toggleOrderedList()
+    isOrderedList.value = !isOrderedList.value
+    emit('toggle-ordered-list')
   }
 
   function indent() {
-    editorStore.indent()
+    emit('indent')
   }
 
   function outdent() {
-    editorStore.outdent()
+    emit('outdent')
   }
 
   function insertLink() {
-    // Emit event to parent to handle link dialog
-    window.dispatchEvent(new CustomEvent('editor:insert-link'))
+    emit('insert-link')
   }
 
   function insertImage() {
-    // Emit event to parent to handle image dialog
-    window.dispatchEvent(new CustomEvent('editor:insert-image'))
+    emit('insert-image')
   }
 
   function insertTable() {
-    // Emit event to parent to handle table dialog
-    window.dispatchEvent(new CustomEvent('editor:insert-table'))
+    emit('insert-table')
   }
 
   function insertHorizontalRule() {
-    editorStore.insertHorizontalRule()
+    emit('insert-horizontal-rule')
   }
 
   function insertPageBreak() {
-    editorStore.insertPageBreak()
+    emit('insert-page-break')
   }
 
   function insertSymbol() {
-    // Emit event to parent to handle symbol dialog
-    window.dispatchEvent(new CustomEvent('editor:insert-symbol'))
+    emit('insert-symbol')
   }
 
-  // Events
-  defineEmits<{
-    'format-bold': []
-    'format-italic': []
-    'format-underline': []
-    'set-heading': [level: number]
-    'insert-link': []
-    'insert-image': []
-    'insert-table': []
-    'save': []
-    'export': []
-    'toggle-sidebar': []
-    'toggle-find': []
-  }>()
+  // expose emits for template listeners (toggle-sidebar/toggle-find are emitted from template with $emit)
 </script>

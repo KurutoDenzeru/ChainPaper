@@ -387,128 +387,130 @@
     editingTitle.value = props.documentTitle || 'Untitled Document'
   }
 
-  // Editor actions
+  // Editor actions emit events for parent to handle (use typed `emit` above)
+
   function handleUndo() {
-    document.execCommand('undo')
+    emit('undo')
   }
 
   function handleRedo() {
-    document.execCommand('redo')
+    emit('redo')
   }
 
   function handleCut() {
-    document.execCommand('cut')
+    emit('cut')
   }
 
   function handleCopy() {
-    document.execCommand('copy')
+    emit('copy')
   }
 
   function handlePaste() {
-    document.execCommand('paste')
+    emit('paste')
   }
 
   function handleSelectAll() {
-    document.execCommand('selectAll')
+    emit('select-all')
   }
 
   function handleFind() {
-    // This would trigger the find dialog in the editor
-    window.dispatchEvent(new CustomEvent('editor:find'))
+    emit('toggle-find')
   }
 
   function toggleSidebar() {
-    window.dispatchEvent(new CustomEvent('editor:toggle-sidebar'))
+    emit('toggle-sidebar')
   }
 
   function setZoom(level: number) {
-    window.dispatchEvent(new CustomEvent('editor:zoom', { detail: level }))
+    emit('set-zoom', level)
   }
 
   // Insert actions
+
   function insertTable() {
-    window.dispatchEvent(new CustomEvent('editor:insert-table'))
+    emit('insert-table')
   }
 
   function insertImage() {
-    window.dispatchEvent(new CustomEvent('editor:insert-image'))
+    emit('insert-image')
   }
 
   function insertLink() {
-    window.dispatchEvent(new CustomEvent('editor:insert-link'))
+    emit('insert-link')
   }
 
   function insertCodeBlock() {
-    window.dispatchEvent(new CustomEvent('editor:insert-code-block'))
+    emit('insert-code-block')
   }
 
   function insertMath() {
-    window.dispatchEvent(new CustomEvent('editor:insert-math'))
+    emit('insert-math')
   }
 
   function insertDate() {
-    window.dispatchEvent(new CustomEvent('editor:insert-date'))
+    emit('insert-date')
   }
 
   function insertPageBreak() {
-    window.dispatchEvent(new CustomEvent('editor:insert-page-break'))
+    emit('insert-page-break')
   }
 
   // Format actions
   function toggleBold() {
-    document.execCommand('bold')
+    emit('format-bold')
   }
 
   function toggleItalic() {
-    document.execCommand('italic')
+    emit('format-italic')
   }
 
   function toggleUnderline() {
-    document.execCommand('underline')
+    emit('format-underline')
   }
 
   function setHeading(level: number) {
-    window.dispatchEvent(new CustomEvent('editor:set-heading', { detail: level }))
+    emit('set-heading', level)
   }
 
   function setParagraph() {
-    window.dispatchEvent(new CustomEvent('editor:set-paragraph'))
+    emit('set-paragraph')
   }
 
   function setBlockquote() {
-    window.dispatchEvent(new CustomEvent('editor:set-blockquote'))
+    emit('set-blockquote')
   }
 
   function toggleBulletList() {
-    window.dispatchEvent(new CustomEvent('editor:toggle-bullet-list'))
+    emit('toggle-bullet-list')
   }
 
   function toggleOrderedList() {
-    window.dispatchEvent(new CustomEvent('editor:toggle-ordered-list'))
+    emit('toggle-ordered-list')
   }
 
   // Tool actions
   function spellCheck() {
-    window.dispatchEvent(new CustomEvent('editor:spell-check'))
+    emit('spell-check')
   }
 
   function wordCount() {
-    window.dispatchEvent(new CustomEvent('editor:word-count'))
+    emit('word-count')
   }
 
   function verifyAuthorship() {
-    window.dispatchEvent(new CustomEvent('editor:verify-authorship'))
+    emit('verify-authorship')
   }
 
   function generateProof() {
-    window.dispatchEvent(new CustomEvent('editor:generate-proof'))
+    emit('generate-proof')
   }
 
   function showKeyboardShortcuts() {
-    window.dispatchEvent(new CustomEvent('app:show-shortcuts'))
+    emit('show-shortcuts')
   }
 
   function showDocumentation() {
+    // keep original behavior to open docs
     window.open('https://github.com/chainpaper/docs', '_blank')
   }
 </script>
