@@ -117,7 +117,6 @@ export const menus = [
   {
     label: 'Tools',
     items: [
-  { label: 'Word Count', icon: FileText, emit: 'word-count' },
       { label: 'Word Count', icon: FileText, emit: 'word-count' },
       { type: 'separator' },
       { label: 'Verify Authorship', icon: ShieldCheck, emit: 'verify-authorship' },
