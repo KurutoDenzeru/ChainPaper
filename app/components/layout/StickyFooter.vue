@@ -36,8 +36,33 @@
             <Minus class="w-4 h-4 text-gray-600" />
           </Button>
 
-          <Input type="number" class="w-16 text-center text-sm rounded-md border border-gray-200 px-2 py-1"
-            :value="zoomPercent" readonly min="25" max="400" />
+          <Popover>
+            <PopoverTrigger as-child>
+              <div>
+                <!-- Keep the input editable but wrapped so clicks open the popover -->
+                <Input
+                  type="number"
+                  class="w-16 text-center text-sm rounded-md border border-gray-200 px-2 py-1"
+                  v-model="zoomModel"
+                  min="50"
+                  max="200"
+                  placeholder="100"
+                />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent class="w-32 p-2">
+              <div class="flex flex-col">
+                <button
+                  v-for="opt in zoomOptions"
+                  :key="opt"
+                  class="text-left px-2 py-1 rounded hover:bg-gray-100"
+                  @click="zoomModel = opt"
+                >
+                  {{ opt }}%
+                </button>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           <Button type="button"
             class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
@@ -55,6 +80,9 @@
   import { Minus, Plus, List, Grid } from 'lucide-vue-next'
   import { defineProps } from 'vue'
   import { Button } from '@/components/ui/button'
+  import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+  import { Input } from '@/components/ui/input'
+  import { computed } from 'vue'
 
   // props (accept current view and zoom for sync)
   const props = defineProps<{ wordCount?: number; pageCount?: number; view?: 'list' | 'grid'; zoom?: number }>()
@@ -62,6 +90,22 @@
   // percent value (e.g. 100) — initialize from prop when provided
   const zoomPercent = ref<number>(props.zoom ?? 100)
   const viewMode = ref<'list' | 'grid'>(props.view ?? 'list')
+
+  // Expose a computed model for the Input component so typed values are coerced and clamped
+  const zoomModel = computed<string | number>({
+    get: () => zoomPercent.value,
+    set: (v: string | number) => {
+      const n = Number(v)
+      if (Number.isNaN(n)) return
+      zoomPercent.value = Math.min(200, Math.max(50, Math.round(n)))
+    },
+  })
+
+  const zoomOptions = [50, 75, 100, 125, 150, 175, 200]
+
+  const changeZoom = (delta: number) => {
+    zoomPercent.value = Math.min(200, Math.max(50, zoomPercent.value + delta))
+  }
 
   // Footer is now display-only; keep passed props for visual display
 </script>
