@@ -19,16 +19,11 @@
     <!-- spacer to keep main content below fixed top controls -->
     <div aria-hidden="true" :style="{ height: topPadding + 'px' }"></div>
 
-    <!-- Document pages area: multiple Letter-sized canvases (scrollable) -->
-    <main class="flex-1 overflow-auto p-6 pb-24">
-      <!-- container switches layout based on viewMode -->
-      <div :class="['w-full', viewMode === 'grid' ? 'pages-grid' : 'flex flex-col items-center gap-6']">
-        <div v-for="(content, idx) in pageContents" :key="idx"
-          :class="['page-wrapper', viewMode === 'grid' ? 'grid-item' : '']">
-          <div :ref="el => setPageEl(el, idx)" class="page bg-white border border-gray-200 shadow-sm"
-            :contenteditable="true" @input="onPageInput(idx, $event)" role="textbox" aria-label="Document page"
-            :style="pageStyle"></div>
-        </div>
+    <!-- Document area removed — placeholder retained for layout -->
+    <main class="flex-1 p-6 pb-24 flex items-center justify-center">
+      <div class="w-full max-w-3xl text-center text-gray-500">
+        <p class="text-lg">Document area removed.</p>
+        <p class="text-sm mt-2">The editable page canvases and auto-pagination have been disabled.</p>
       </div>
     </main>
 
@@ -59,66 +54,6 @@
   const viewMode = ref<'list' | 'grid'>('list')
   const zoomPercent = ref<number>(100) // 100 == 1.0 scale
 
-  // computed inline style for pages to apply zoom scaling
-  const PAGE_WIDTH = 816
-  const PAGE_HEIGHT = 1056
-  const pageStyle = computed(() => {
-    const scale = zoomPercent.value / 100
-    // in grid mode, also set explicit width/height so wrapping accounts for scaled size
-    if (viewMode.value === 'grid') {
-      return {
-        transform: `scale(${scale})`,
-        transformOrigin: 'top left',
-        width: `${Math.round(PAGE_WIDTH * scale)}px`,
-        height: `${Math.round(PAGE_HEIGHT * scale)}px`
-      }
-    }
-    // list mode: center and preserve natural width but visually scale
-    return { transform: `scale(${scale})`, transformOrigin: 'top center' }
-  })
-
-  function setPageEl(el: Element | ComponentPublicInstance | null, idx: number) {
-    // normalize possible component instance to its root element
-    let htmlEl: HTMLElement | null = null
-    if (!el) {
-      htmlEl = null
-    } else if ((el as ComponentPublicInstance & { $el?: Element }).$el) {
-      htmlEl = ((el as ComponentPublicInstance & { $el?: Element }).$el as HTMLElement) || null
-    } else {
-      htmlEl = el as HTMLElement
-    }
-
-    pageEls.value[idx] = htmlEl
-
-    // ensure the element shows initial content without re-rendering while typing
-    if (htmlEl && pageContents.value[idx] !== undefined) {
-      // only set innerText initially if empty
-      if (!htmlEl.innerText || htmlEl.innerText.trim() === '') {
-        htmlEl.innerText = pageContents.value[idx]
-      }
-    }
-    // attach keydown for selection behaviors and focus tracking
-    if (htmlEl) {
-      htmlEl.addEventListener('focus', () => {
-        lastFocusedPage.value = idx
-      })
-      // use Event in the signature and narrow to KeyboardEvent inside to satisfy DOM types
-      htmlEl.addEventListener('keydown', (ev: Event) => {
-        const kev = ev as KeyboardEvent
-        // intercept Cmd/Ctrl+A to select only this page
-        const isMac = navigator.platform.toLowerCase().includes('mac')
-        const modifier = isMac ? kev.metaKey : kev.ctrlKey
-        if (modifier && kev.key.toLowerCase() === 'a') {
-          kev.preventDefault()
-          const range = document.createRange()
-          const sel = window.getSelection()
-          range.selectNodeContents(htmlEl as HTMLElement)
-          sel?.removeAllRanges()
-          sel?.addRange(range)
-        }
-      })
-    }
-  }
   const wordCount = ref(0)
   const pageCount = ref(1)
 
@@ -142,10 +77,6 @@
     pageContents.value = pages
   }
 
-  function updateCounts() {
-    computeCountsFromAllPages()
-  }
-
   function onSelectAll() {
     // select contents of the last focused page, or the first page if none
     const idx = lastFocusedPage.value ?? 0
@@ -158,49 +89,6 @@
       sel?.addRange(range)
       node.focus()
     }
-  }
-
-  function onPageInput(idx: number, event: Event) {
-    const el = event.target as HTMLElement
-    const text = el.innerText || ''
-    // update specific page content
-    pageContents.value[idx] = text
-
-    const all = pageContents.value.join('\n')
-    const words = all.trim().split(/\s+/).filter(Boolean)
-
-    // detect overflow of this element
-    const isOverflowing = el.scrollHeight > el.clientHeight + 2
-
-    if (isOverflowing || words.length > WORDS_PER_PAGE * pageContents.value.length) {
-      // redistribute words across pages
-      distributeTextToPages(all)
-      // after DOM updates, ensure each page element has the correct initial innerText
-      nextTick(() => {
-        pageContents.value.forEach((p, i) => {
-          const node = pageEls.value[i]
-          if (node) node.innerText = p
-        })
-        // focus the next page after the one that overflowed
-        const nextIdx = Math.min(pageContents.value.length - 1, idx + 1)
-        const nextEl = pageEls.value[nextIdx]
-        if (nextEl) {
-          nextEl.focus()
-          try {
-            const range = document.createRange()
-            const sel = window.getSelection()
-            range.selectNodeContents(nextEl)
-            range.collapse(true)
-            sel?.removeAllRanges()
-            sel?.addRange(range)
-          } catch (e) { }
-        }
-        computeCountsFromAllPages()
-      })
-      return
-    }
-
-    computeCountsFromAllPages()
   }
 
   function formatPageHtml(content: string) {
@@ -332,62 +220,3 @@
     window.addEventListener('resize', updateTopPadding)
   })
 </script>
-
-<style scoped>
-
-  /* Letter size: 8.5in x 11in at 96dpi -> convert to px approximately 816px x 1056px */
-  .page-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
-
-  .page {
-    width: 816px;
-    height: 1056px;
-    padding: 32px;
-    box-sizing: border-box;
-    overflow: hidden;
-    border-radius: 4px;
-  }
-
-  @media (max-width: 900px) {
-
-    /* scale down on small screens */
-    .page {
-      width: calc(100% - 32px);
-      height: auto;
-      min-height: 600px;
-      overflow: visible;
-    }
-  }
-
-  /* placeholder when page is empty */
-  .page:empty::before {
-    content: 'Start writing here...';
-    color: rgba(107, 114, 128, 0.7);
-    /* gray-500 */
-    pointer-events: none;
-  }
-
-  /* Grid mode: show pages in a responsive wrapping grid. Items will wrap as zoom changes. */
-  .pages-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    justify-content: flex-start;
-    align-items: flex-start;
-    padding: 12px;
-  }
-
-  .pages-grid .grid-item {
-    display: block;
-  }
-
-  .pages-grid .grid-item .page {
-    /* remove fixed width/height so computed inline styles control dimensions when scaled */
-    width: auto;
-    height: auto;
-    box-sizing: content-box;
-  }
-</style>

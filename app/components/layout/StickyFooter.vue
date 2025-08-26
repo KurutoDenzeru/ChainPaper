@@ -23,28 +23,26 @@
         <div class="flex items-center gap-2">
           <!-- Right: View toggle next to zoom controls -->
           <div class="hidden sm:flex items-center gap-2">
-            <Button variant="ghost" size="sm" :class="viewMode === 'list' ? 'bg-gray-100 border-gray-300' : ''"
-              @click="setView('list')" aria-label="List view">
-              <List class="w-4 h-4" />
+            <Button variant="ghost" size="sm" class="bg-transparent" aria-label="List view">
+              <List class="w-4 h-4 text-gray-600" />
             </Button>
-            <Button variant="ghost" size="sm" :class="viewMode === 'grid' ? 'bg-gray-100 border-gray-300' : ''"
-              @click="setView('grid')" aria-label="Grid view">
-              <Grid class="w-4 h-4" />
+            <Button variant="ghost" size="sm" class="bg-transparent" aria-label="Grid view">
+              <Grid class="w-4 h-4 text-gray-600" />
             </Button>
           </div>
-          <Button type="button" @click="decrease"
+          <Button type="button"
             class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
             aria-label="Zoom out">
-            <Minus class="w-4 h-4" />
+            <Minus class="w-4 h-4 text-gray-600" />
           </Button>
 
           <Input type="number" class="w-16 text-center text-sm rounded-md border border-gray-200 px-2 py-1"
-            v-model.number="zoomPercent" @change="onInputChange" min="25" max="400" />
+            :value="zoomPercent" readonly min="25" max="400" />
 
-          <Button type="button" @click="increase"
+          <Button type="button"
             class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
             aria-label="Zoom in">
-            <Plus class="w-4 h-4" />
+            <Plus class="w-4 h-4 text-gray-600" />
           </Button>
         </div>
       </div>
@@ -65,45 +63,7 @@
   const zoomPercent = ref<number>(props.zoom ?? 100)
   const viewMode = ref<'list' | 'grid'>(props.view ?? 'list')
 
-  const emit = defineEmits<{
-    'set-zoom': [level: number]
-    'set-view': [view: 'list' | 'grid']
-  }>()
-
-  const clamp = (v: number) => Math.min(400, Math.max(25, v))
-
-  const emitZoom = (percent: number) => {
-    // emit decimal (1.0 == 100%) to align with other components
-    emit('set-zoom', percent / 100)
-  }
-
-  const decrease = () => {
-    zoomPercent.value = clamp(zoomPercent.value - 25)
-    emitZoom(zoomPercent.value)
-  }
-
-  const increase = () => {
-    zoomPercent.value = clamp(zoomPercent.value + 25)
-    emitZoom(zoomPercent.value)
-  }
-
-  const onInputChange = () => {
-    zoomPercent.value = clamp(zoomPercent.value)
-    emitZoom(zoomPercent.value)
-  }
-
-  const setView = (v: 'list' | 'grid') => {
-    viewMode.value = v
-    emit('set-view', v)
-  }
-
-  // keep internal state in-sync if parent updates props
-  watch(() => props.zoom, (v) => {
-    if (typeof v === 'number') zoomPercent.value = clamp(v)
-  })
-  watch(() => props.view, (v) => {
-    if (v === 'list' || v === 'grid') viewMode.value = v
-  })
+  // Footer is now display-only; keep passed props for visual display
 </script>
 
 <style scoped>
