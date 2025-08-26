@@ -30,6 +30,7 @@
               <Grid class="w-4 h-4 text-gray-600" />
             </Button>
           </div>
+          <!-- Zoom controls -->
           <Button type="button"
             class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
             aria-label="Zoom out">

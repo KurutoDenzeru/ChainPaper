@@ -1,5 +1,6 @@
 <template>
-  <div class="flex items-center justify-between px-4 sm:px-2 py-1 rounded-xl bg-white border border-gray-200 gap-1 sm:gap-2 overflow-x-auto shadow-sm">
+  <div
+    class="flex items-center justify-between px-4 sm:px-2 py-1 rounded-xl bg-white border border-gray-200 gap-1 sm:gap-2 overflow-x-auto shadow-sm">
     <!-- Always Visible Controls -->
     <div class="flex gap-1 flex-shrink-0 items-center">
       <!-- View Controls -->
@@ -21,7 +22,7 @@
       </Button>
     </div>
 
-    <!-- Desktop Layout: Show all controls on large screens -->   
+    <!-- Desktop Layout: Show all controls on large screens -->
     <div class="hidden lg:flex gap-1 flex-1 items-center">
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
@@ -65,6 +66,35 @@
           <SelectItem value="heading6">Heading 6</SelectItem>
         </SelectContent>
       </Select>
+
+      <div class="h-6 w-px bg-gray-300 mx-1"></div>
+
+      <!-- Zoom controls (inline with formatting) -->
+      <div class="flex items-center gap-1 ml-2">
+        <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="changeZoom(-25)">
+          <Minus class="w-4 h-4" />
+        </Button>
+
+        <Popover>
+          <PopoverTrigger as-child>
+            <div>
+              <Input type="number" v-model="zoomModel" class="w-20 text-center h-8 rounded" />
+            </div>
+          </PopoverTrigger>
+          <PopoverContent class="w-32 p-2">
+            <div class="flex flex-col">
+              <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-gray-100"
+                @click="zoomModel = opt">
+                {{ opt }}%
+              </button>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="changeZoom(25)">
+          <Plus class="w-4 h-4" />
+        </Button>
+      </div>
 
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
@@ -126,23 +156,31 @@
 
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
-      <!-- Alignment -->
-      <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': alignment === 'left' }]"
-        @click="setAlignment('left')">
-        <AlignLeft class="w-4 h-4" />
-      </Button>
-      <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': alignment === 'center' }]"
-        @click="setAlignment('center')">
-        <AlignCenter class="w-4 h-4" />
-      </Button>
-      <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': alignment === 'right' }]"
-        @click="setAlignment('right')">
-        <AlignRight class="w-4 h-4" />
-      </Button>
-      <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': alignment === 'justify' }]"
-        @click="setAlignment('justify')">
-        <AlignJustify class="w-4 h-4" />
-      </Button>
+      <!-- Alignment: consolidated into a single popover button -->
+      <Popover>
+        <PopoverTrigger as-child>
+          <Button variant="ghost" size="sm" class="h-8 p-0 px-2 flex items-center gap-1">
+            <component :is="alignment === 'left' ? AlignLeft : alignment === 'center' ? AlignCenter : alignment === 'right' ? AlignRight : AlignJustify" class="w-4 h-4" />
+            <ArrowDown class="w-3 h-3 text-gray-500" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent class="w-36 p-2">
+          <div class="flex flex-col">
+            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('left')">
+              <AlignLeft class="w-4 h-4" /> Left
+            </button>
+            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('center')">
+              <AlignCenter class="w-4 h-4" /> Center
+            </button>
+            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('right')">
+              <AlignRight class="w-4 h-4" /> Right
+            </button>
+            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('justify')">
+              <AlignJustify class="w-4 h-4" /> Justify
+            </button>
+          </div>
+        </PopoverContent>
+      </Popover>
 
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
@@ -210,19 +248,31 @@
 
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
-      <!-- Alignment -->
-      <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': alignment === 'left' }]"
-        @click="setAlignment('left')">
-        <AlignLeft class="w-4 h-4" />
-      </Button>
-      <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': alignment === 'center' }]"
-        @click="setAlignment('center')">
-        <AlignCenter class="w-4 h-4" />
-      </Button>
-      <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': alignment === 'right' }]"
-        @click="setAlignment('right')">
-        <AlignRight class="w-4 h-4" />
-      </Button>
+      <!-- Alignment consolidated for medium screens -->
+      <Popover>
+        <PopoverTrigger as-child>
+          <Button variant="ghost" size="sm" class="h-8 p-0 px-2 flex items-center gap-1">
+            <component :is="alignment === 'left' ? AlignLeft : alignment === 'center' ? AlignCenter : alignment === 'right' ? AlignRight : AlignJustify" class="w-4 h-4" />
+            <ArrowDown class="w-3 h-3 text-gray-500" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent class="w-36 p-2">
+          <div class="flex flex-col">
+            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('left')">
+              <AlignLeft class="w-4 h-4" /> Left
+            </button>
+            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('center')">
+              <AlignCenter class="w-4 h-4" /> Center
+            </button>
+            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('right')">
+              <AlignRight class="w-4 h-4" /> Right
+            </button>
+            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('justify')">
+              <AlignJustify class="w-4 h-4" /> Justify
+            </button>
+          </div>
+        </PopoverContent>
+      </Popover>
 
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
@@ -443,7 +493,7 @@
         </PopoverContent>
       </Popover>
     </div>
-    
+
     <!-- Collapse Menubar button (far right) -->
     <div class="flex items-center ml-2 flex-shrink-0">
       <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('toggle-menubar')">
@@ -459,8 +509,8 @@
     Bold, Italic, Underline, Strikethrough, Type, Highlighter,
     AlignLeft, AlignCenter, AlignRight, AlignJustify,
     List, ListOrdered, Indent, Link, ImageIcon as Image, Table,
-  Undo2, Redo2, MoreHorizontal, Minus, FileText, Hash, Sidebar, Search,
-  ArrowUp, ArrowDown
+    Undo2, Redo2, MoreHorizontal, Minus, FileText, Hash, Sidebar, Search,
+    Plus, ArrowUp, ArrowDown
   } from 'lucide-vue-next'
   import { Button } from '@/components/ui/button'
   import {
@@ -475,6 +525,7 @@
     PopoverContent,
     PopoverTrigger,
   } from '@/components/ui/popover'
+  import { Input } from '@/components/ui/input'
   // Fix the ImageIcon import conflict
   const ImageIcon = Image
 
@@ -529,6 +580,23 @@
   const isOrderedList = ref(false)
   const canUndo = ref(true)
   const canRedo = ref(true)
+
+  // Zoom state (UI-only)
+  const zoomPercent = ref<number>(100)
+  const zoomModel = computed<string | number>({
+    get: () => zoomPercent.value,
+    set: (v: string | number) => {
+      const n = Number(v)
+      if (Number.isNaN(n)) return
+      zoomPercent.value = Math.min(200, Math.max(50, Math.round(n)))
+    },
+  })
+
+  const zoomOptions = [50, 75, 100, 125, 150, 175, 200]
+
+  const changeZoom = (delta: number) => {
+    zoomPercent.value = Math.min(200, Math.max(50, zoomPercent.value + delta))
+  }
 
   // Actions
   function undo() {
