@@ -1,19 +1,19 @@
 <template>
-  <Menubar class="px-2 sm:px-4 py-9 bg-white border border-gray-200 rounded-lg shadow-sm">
+  <Menubar class="px-2 sm:px-4 py-9 bg-white border border-gray-200 rounded-lg shadow-sm text-gray-600">
     <div class="flex flex-row items-start w-full">
       <!-- Left Side: Brand Icon (spans two rows) -->
       <div class="flex flex-col items-center justify-start mr-3">
-  <NuxtImg src="/Palimphest.png" alt="ChainPaper Logo" loading="eager"
+        <NuxtImg src="/Palimphest.png" alt="ChainPaper Logo" loading="eager"
           class="w-18 h-18 flex items-center justify-center" />
       </div>
       <!-- Right Side: Two rows -->
       <div class="flex flex-col self-center flex-1">
         <!-- First Row: Document Title Input -->
         <div class="flex items-center gap-2 mb-1">
-          <div v-if="!isEditingTitle" @click="startEditingTitle"
+            <div v-if="!isEditingTitle" @click="startEditingTitle"
             class="flex items-center gap-2 px-3 rounded hover:bg-gray-100 cursor-pointer transition-colors">
             <span class="text-lg text-gray-900 font-medium -ml-2">{{ documentTitle || 'Untitled Document' }}</span>
-            <Edit3 class="w-4 h-4 text-gray-500" />
+            <Edit3 class="w-4 h-4 text-gray-600" />
             <span v-if="isDirty" class="text-orange-500">•</span>
           </div>
           <div v-else class="flex items-center gap-2">
@@ -23,417 +23,75 @@
             <!-- <Edit3 class="w-4 h-4 text-blue-500" /> -->
           </div>
         </div>
-        <!-- Second Row: Menu Items -->
+        <!-- Second Row: Menu Items (rendered from composable) -->
         <div class="flex items-center gap-1">
-          <!-- File Menu -->
-          <MenubarMenu>
-            <MenubarTrigger>File</MenubarTrigger>
-            <MenubarContent>
-        <MenubarItem @click="$emit('new-document')" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <FileText class="w-4 h-4" />
-                New Document
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">N</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-        <MenubarItem @click="$emit('open-document')" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <FolderOpen class="w-4 h-4" />
-                Open
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">O</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarSeparator />
-        <MenubarItem @click="$emit('save-document')" class="flex items-center justify-between gap-2 min-w-[220px]" :disabled="!isDirty">
-                <Save class="w-4 h-4" />
-                Save
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">S</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarSub>
-                <MenubarSubTrigger class="flex items-center gap-2">
-                  <Upload class="w-4 h-4" />
-                  Export As
-                </MenubarSubTrigger>
-                <MenubarSubContent>
-                  <MenubarItem @click="$emit('export-document', 'json')" class="flex items-center gap-2">
-                    <FileJson class="w-4 h-4" />
-                    ChainPaper JSON
+          <template v-for="(menu, mi) in menus" :key="menu.label + mi">
+            <MenubarMenu>
+              <MenubarTrigger>{{ menu.label }}</MenubarTrigger>
+              <MenubarContent>
+                <template v-for="(item, idx) in menu.items" :key="menu.label + '-' + idx">
+                  <MenubarSeparator v-if="item.type === 'separator'" />
+
+                  <MenubarCheckboxItem v-else-if="item.type === 'checkbox'" v-model:checked="getBinding(item).value" class="flex items-center gap-2">
+                    <component :is="getIcon(item)" class="w-4 h-4 text-gray-600" v-if="getIcon(item)" />
+                    {{ item.label }}
+                  </MenubarCheckboxItem>
+
+                  <MenubarSub v-else-if="item.type === 'sub'">
+                    <MenubarSubTrigger class="flex items-center gap-2">
+                      <component :is="item.icon" class="w-4 h-4 text-gray-600" v-if="item.icon" />
+                      {{ item.label }}
+                    </MenubarSubTrigger>
+                    <MenubarSubContent>
+                      <MenubarItem
+                        v-for="(sub, sidx) in item.items"
+                        :key="menu.label + '-sub-' + sidx"
+                        @click="handleMenuEmit(sub)"
+                        class="flex items-center gap-2"
+                      >
+                        <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600" v-if="getIcon(sub)" />
+                        {{ sub.label }}
+                      </MenubarItem>
+                    </MenubarSubContent>
+                  </MenubarSub>
+
+                  <MenubarItem
+                    v-else
+                    class="flex items-center justify-between min-w-[250px]"
+                    :disabled="isDisabled(item)"
+                    @click="handleMenuEmit(item)"
+                  >
+                    <div class="flex items-center gap-2">
+                      <component :is="getIcon(item)" class="w-4 h-4 text-gray-600" v-if="getIcon(item)" />
+                      {{ item.label }}
+                    </div>
+
+                    <MenubarShortcut v-if="getShortcut(item)">
+                      <div class="flex items-center">
+                        <template v-if="isMac && getShortcut(item)?.mac">
+                          <div class="flex items-center mr-1">
+                            <template v-for="(mod, i) in getShortcut(item).mac" :key="i">
+                              <span v-if="mod === 'Command'" class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">
+                                <Command class="w-3 h-3 text-gray-600" />
+                              </span>
+                              <span v-else class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">{{ mod }}</span>
+                            </template>
+                          </div>
+                          <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
+                          <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{ getShortcut(item)?.key }}</span>
+                        </template>
+                        <template v-else>
+                          <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs font-medium mr-1">{{ getShortcut(item)?.pc || getShortcut(item)?.key || 'Ctrl' }}</span>
+                          <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
+                          <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{ getShortcut(item)?.key }}</span>
+                        </template>
+                      </div>
+                    </MenubarShortcut>
                   </MenubarItem>
-                  <MenubarItem @click="$emit('export-document', 'pdf')" class="flex items-center gap-2">
-                    <FileImage class="w-4 h-4" />
-                    PDF Document
-                  </MenubarItem>
-                  <MenubarItem @click="$emit('export-document', 'docx')" class="flex items-center gap-2">
-                    <FileText class="w-4 h-4" />
-                    Word Document
-                  </MenubarItem>
-                  <MenubarItem @click="$emit('export-document', 'html')" class="flex items-center gap-2">
-                    <Globe class="w-4 h-4" />
-                    HTML Page
-                  </MenubarItem>
-                  <MenubarItem @click="$emit('export-document', 'markdown')" class="flex items-center gap-2">
-                    <Hash class="w-4 h-4" />
-                    Markdown
-                  </MenubarItem>
-                </MenubarSubContent>
-              </MenubarSub>
-              <MenubarItem @click="$emit('import-document')" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <Download class="w-4 h-4" />
-                Import Document
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
-
-          <!-- Edit Menu -->
-          <MenubarMenu>
-            <MenubarTrigger>Edit</MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem @click="handleUndo" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <Undo2 class="w-4 h-4" />
-                Undo
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">Z</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem @click="handleRedo" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <Redo2 class="w-4 h-4" />
-                Redo
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <!-- Redo: mac uses Shift+Z, others use Ctrl+Y -->
-                    <template v-if="isMac">
-                      <span class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">⇧</span>
-                      <span class="text-xs mr-1">+</span>
-                      <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">Z</span>
-                    </template>
-                    <template v-else>
-                      <span class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                      <span class="text-xs mr-1">+</span>
-                      <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">Y</span>
-                    </template>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem @click="handleCut" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <Scissors class="w-4 h-4" />
-                Cut
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">X</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem @click="handleCopy" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <Copy class="w-4 h-4" />
-                Copy
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">C</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem @click="handlePaste" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <Clipboard class="w-4 h-4" />
-                Paste
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">V</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem @click="handleSelectAll" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <MousePointer class="w-4 h-4" />
-                Select All
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">A</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem @click="handleFind" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <Search class="w-4 h-4" />
-                Find & Replace
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">F</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
-
-          <!-- View Menu -->
-          <MenubarMenu>
-            <MenubarTrigger>View</MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem @click="toggleSidebar" class="flex items-center gap-2">
-                <Sidebar class="w-4 h-4" />
-                Toggle Sidebar
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarCheckboxItem v-model:checked="showToolbar" class="flex items-center gap-2">
-                <Wrench class="w-4 h-4" />
-                Show Toolbar
-              </MenubarCheckboxItem>
-              <MenubarCheckboxItem v-model:checked="showStatusBar" class="flex items-center gap-2">
-                <BarChart3 class="w-4 h-4" />
-                Show Status Bar
-              </MenubarCheckboxItem>
-              <MenubarSeparator />
-              <MenubarSub>
-                <MenubarSubTrigger class="flex items-center gap-2">
-                  <ZoomIn class="w-4 h-4" />
-                  Zoom
-                </MenubarSubTrigger>
-                <MenubarSubContent>
-                  <MenubarItem @click="setZoom(0.5)">50%</MenubarItem>
-                  <MenubarItem @click="setZoom(0.75)">75%</MenubarItem>
-                  <MenubarItem @click="setZoom(1)">100%</MenubarItem>
-                  <MenubarItem @click="setZoom(1.25)">125%</MenubarItem>
-                  <MenubarItem @click="setZoom(1.5)">150%</MenubarItem>
-                  <MenubarItem @click="setZoom(2)">200%</MenubarItem>
-                </MenubarSubContent>
-              </MenubarSub>
-              <MenubarSeparator />
-              <MenubarCheckboxItem v-model:checked="typewriterMode" class="flex items-center gap-2">
-                <Type class="w-4 h-4" />
-                Typewriter Mode
-              </MenubarCheckboxItem>
-              <MenubarCheckboxItem v-model:checked="focusMode" class="flex items-center gap-2">
-                <Target class="w-4 h-4" />
-                Focus Mode
-              </MenubarCheckboxItem>
-            </MenubarContent>
-          </MenubarMenu>
-
-          <!-- Insert Menu -->
-          <MenubarMenu>
-            <MenubarTrigger>Insert</MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem @click="insertTable" class="flex items-center gap-2">
-                <Table class="w-4 h-4" />
-                Table
-              </MenubarItem>
-              <MenubarItem @click="insertImage" class="flex items-center gap-2">
-                <ImageIcon class="w-4 h-4" />
-                Image
-              </MenubarItem>
-              <MenubarItem @click="insertLink" class="flex items-center gap-2">
-                <Link class="w-4 h-4" />
-                Link
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem @click="insertCodeBlock" class="flex items-center gap-2">
-                <Code2 class="w-4 h-4" />
-                Code Block
-              </MenubarItem>
-              <MenubarItem @click="insertMath" class="flex items-center gap-2">
-                <Calculator class="w-4 h-4" />
-                Math Formula
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem @click="insertDate" class="flex items-center gap-2">
-                <Calendar class="w-4 h-4" />
-                Date & Time
-              </MenubarItem>
-              <MenubarItem @click="insertPageBreak" class="flex items-center gap-2">
-                <FileText class="w-4 h-4" />
-                Page Break
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
-
-          <!-- Format Menu -->
-          <MenubarMenu>
-            <MenubarTrigger>Format</MenubarTrigger>
-            <MenubarContent>
-        <MenubarItem @click="toggleBold" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <Bold class="w-4 h-4" />
-                Bold
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center aspect-square w-8 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-gray-200 text-xs font-semibold">B</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem @click="toggleItalic" class="flex items-center gap-2">
-                <Italic class="w-4 h-4" />
-                Italic
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center w-6 h-6 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center px-2 h-6 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-gray-200 text-xs font-semibold">I</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem @click="toggleUnderline" class="flex items-center gap-2">
-                <Underline class="w-4 h-4" />
-                Underline
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center w-6 h-6 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center px-2 h-6 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-gray-200 text-xs font-semibold">U</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarSub>
-                <MenubarSubTrigger class="flex items-center gap-2">
-                  <Heading class="w-4 h-4" />
-                  Paragraph
-                </MenubarSubTrigger>
-                <MenubarSubContent>
-                  <MenubarItem @click="setHeading(1)">Heading 1</MenubarItem>
-                  <MenubarItem @click="setHeading(2)">Heading 2</MenubarItem>
-                  <MenubarItem @click="setHeading(3)">Heading 3</MenubarItem>
-                  <MenubarItem @click="setParagraph">Normal Text</MenubarItem>
-                  <MenubarItem @click="setBlockquote">Quote</MenubarItem>
-                </MenubarSubContent>
-              </MenubarSub>
-              <MenubarSeparator />
-              <MenubarItem @click="toggleBulletList" class="flex items-center gap-2">
-                <List class="w-4 h-4" />
-                Bullet List
-              </MenubarItem>
-              <MenubarItem @click="toggleOrderedList" class="flex items-center gap-2">
-                <ListOrdered class="w-4 h-4" />
-                Numbered List
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
-
-          <!-- Tools Menu -->
-          <MenubarMenu>
-            <MenubarTrigger>Tools</MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem @click="spellCheck" class="flex items-center gap-2">
-                <BookOpen class="w-4 h-4" />
-                Spell Check
-                <MenubarShortcut>
-                  <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-gray-200 text-xs font-semibold">F7</span>
-                </MenubarShortcut>
-              </MenubarItem>
-              <MenubarItem @click="wordCount" class="flex items-center gap-2">
-                <Hash class="w-4 h-4" />
-                Word Count
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem @click="verifyAuthorship" class="flex items-center gap-2">
-                <ShieldCheck class="w-4 h-4" />
-                Verify Authorship
-              </MenubarItem>
-              <MenubarItem @click="generateProof" class="flex items-center gap-2">
-                <FileSignature class="w-4 h-4" />
-                Generate Proof
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem @click="$emit('settings')" class="flex items-center justify-between gap-2 min-w-[220px]">
-                <Settings class="w-4 h-4" />
-                Preferences
-                <MenubarShortcut>
-                  <div class="flex items-center">
-                    <span v-if="isMac" class="inline-flex items-center justify-center w-6 h-6 rounded bg-gray-100 text-xs mr-1">
-                      <Command class="w-3 h-3" />
-                    </span>
-                    <span v-else class="inline-flex items-center justify-center px-2 h-6 rounded bg-gray-100 text-xs font-medium mr-1">Ctrl</span>
-                    <span class="text-xs mr-1">+</span>
-                    <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-gray-200 text-xs font-semibold">,</span>
-                  </div>
-                </MenubarShortcut>
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
-
-          <!-- Help Menu -->
-          <MenubarMenu>
-            <MenubarTrigger>Help</MenubarTrigger>
-            <MenubarContent>
-              <MenubarItem @click="showKeyboardShortcuts" class="flex items-center gap-2">
-                <Keyboard class="w-4 h-4" />
-                Keyboard Shortcuts
-              </MenubarItem>
-              <MenubarItem @click="showDocumentation" class="flex items-center gap-2">
-                <BookOpen class="w-4 h-4" />
-                Documentation
-              </MenubarItem>
-              <MenubarSeparator />
-              <MenubarItem @click="$emit('about')" class="flex items-center gap-2">
-                <Info class="w-4 h-4" />
-                About ChainPaper
-              </MenubarItem>
-            </MenubarContent>
-          </MenubarMenu>
+                </template>
+              </MenubarContent>
+            </MenubarMenu>
+          </template>
         </div>
       </div>
     </div>
@@ -442,15 +100,7 @@
 
 <script setup lang="ts">
   import { ref, defineEmits, defineProps, nextTick, onMounted } from 'vue'
-  import {
-  FileText, FolderOpen, Save, Upload, Download, FileJson, FileImage, Globe,
-    Undo2, Redo2, Scissors, Copy, Clipboard, MousePointer, Search,
-    Sidebar, Wrench, BarChart3, ZoomIn, Type, Target,
-    Table, ImageIcon, Link, Code2, Calculator, Calendar,
-    Bold, Italic, Underline, Heading, List, ListOrdered,
-    BookOpen, ShieldCheck, FileSignature, Settings,
-  Keyboard, Info, Edit3, Command, Grid2x2, Hash
-  } from 'lucide-vue-next'
+  import { Edit3, Command } from 'lucide-vue-next'
   import {
     Menubar,
     MenubarCheckboxItem,
@@ -464,6 +114,7 @@
     MenubarSubTrigger,
     MenubarTrigger,
   } from '@/components/ui/menubar'
+  import useMenuData from '@/composables/useMenuData'
 
   const props = defineProps<{
     documentTitle: string
@@ -518,8 +169,50 @@
   // View state
   const showToolbar = ref(true)
   const showStatusBar = ref(true)
-  const typewriterMode = ref(false)
-  const focusMode = ref(false)
+  // removed typewriterMode and focusMode per request
+
+  // import menu definitions (data-driven)
+  const { menus } = useMenuData()
+
+  // bindings for checkbox menu items (referenced by name in menu data)
+  const bindings: Record<string, { value: any }> = {
+    showToolbar: { value: showToolbar },
+    showStatusBar: { value: showStatusBar },
+  // typewriterMode and focusMode removed
+  }
+
+  // Generic emitter for menu items defined in the composable
+  function handleMenuEmit(item: any) {
+    if (!item) return
+    if (!item.emit) return
+    // preserve original behavior for documentation which opened a new window
+    if (item.emit === 'show-documentation') {
+      showDocumentation()
+      return
+    }
+    if (item.payload !== undefined) emit(item.emit as any, item.payload)
+    else emit(item.emit as any)
+  }
+
+  function isDisabled(item: any) {
+    if (!item || !item.disabledProp) return false
+    if (item.disabledProp === 'isDirty') return !props.isDirty
+    return false
+  }
+
+  function getBinding(item: any) {
+    if (!item || !item.bind) return { value: false }
+    return bindings[item.bind] ?? { value: false }
+  }
+
+  // safe accessor for menu item shortcuts to satisfy TS template type-checking
+  function getShortcut(item: any) {
+    return (item as any).shortcut
+  }
+
+  function getIcon(item: any) {
+    return item && (item as any).icon ? (item as any).icon : null
+  }
 
   // Title editing state
   const isEditingTitle = ref(false)
