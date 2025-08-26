@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue'
+  import { ref } from 'vue'
   import { Minus, Plus, List, Grid } from 'lucide-vue-next'
   import { defineProps } from 'vue'
   import { Button } from '@/components/ui/button'
