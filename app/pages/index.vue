@@ -19,11 +19,23 @@
     <!-- spacer to keep main content below fixed top controls -->
     <div aria-hidden="true" :style="{ height: topPadding + 'px' }"></div>
 
-    <!-- Document area removed — placeholder retained for layout -->
-    <main class="flex-1 p-6 pb-24 flex items-center justify-center">
-      <div class="w-full max-w-3xl text-center text-gray-500">
-        <p class="text-lg">Document area removed.</p>
-        <p class="text-sm mt-2">The editable page canvases and auto-pagination have been disabled.</p>
+    <!-- Document editor canvas: contenteditable center pane -->
+    <main class="flex-1 p-6 pb-24 flex items-start justify-center">
+      <div class="w-full max-w-4xl">
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 min-h-[60vh]">
+          <div class="prose max-w-none">
+            <div
+              ref="editor"
+              class="editor-content outline-none min-h-[40vh] text-gray-800"
+              :contenteditable="true"
+              role="textbox"
+              aria-multiline="true"
+              @input="onEditorInput"
+              @keydown="onEditorKeydown"
+              v-html="pages[0] || ''"
+            ></div>
+          </div>
+        </div>
       </div>
     </main>
 
@@ -31,17 +43,29 @@
       @set-zoom="onSetZoom" @set-view="onSetView" />
 
   </div>
+  <div v-if="showProofModal" class="fixed inset-0 z-60 flex items-center justify-center bg-black/40">
+    <div class="bg-white rounded-md shadow-lg w-11/12 max-w-2xl p-4">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-medium">Document Proofs</h3>
+        <button class="text-sm text-gray-500" @click="showProofModal = false">Close</button>
+      </div>
+      <AuthProofDialog />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
   import { ref, nextTick, onMounted, computed, type ComponentPublicInstance } from 'vue'
   import MenuBar from '@/components/layout/MenuBar.vue'
   import EditorToolbar from '@/components/editor/EditorToolbar.vue'
+  import AuthProofDialog from '@/components/editor/AuthProofDialog.vue'
   import StickyFooter from '@/components/layout/StickyFooter.vue'
+  import useDocument, { exportJSON, createProof, verifyProof } from '@/composables/useDocument'
 
   // Page state
   const documentTitle = ref('Untitled Document')
   const isDirty = ref(false)
+  const { title, pages, isDirty: docDirty } = useDocument()
   const user = ref({ name: 'Demo User', email: undefined, avatar: undefined })
   // pagination and content state
   const pageContents = ref<string[]>([''])
@@ -104,9 +128,11 @@
   // no single-page navigation — pages are scrollable like a document
 
   // Handlers for menubar events
-  function onUpdateTitle(title: string) {
-    documentTitle.value = title
+  function onUpdateTitle(newTitle: string) {
+    documentTitle.value = newTitle
+    title.value = newTitle
     isDirty.value = true
+    docDirty.value = true
   }
 
   function onSaveDocument() {
@@ -133,7 +159,19 @@
   }
 
   function onExport(format: string) {
+    // support 'json' export for now
     console.log('export-document', format)
+    if (format === 'json') {
+      exportJSON().then(({ obj, str }) => {
+        const blob = new Blob([str], { type: 'application/json' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = (documentTitle.value || 'document') + '.chainpaper.json'
+        a.click()
+        URL.revokeObjectURL(url)
+      })
+    }
   }
 
   function onImport() {
@@ -185,15 +223,102 @@
   }
 
   function onInsertLink() {
-    console.log('insert-link')
+    const url = prompt('Enter URL')
+    if (url) {
+      document.execCommand('createLink', false, url)
+      onEditorInput(new Event('input'))
+    }
   }
 
   function onInsertImage() {
-    console.log('insert-image')
+    const url = prompt('Enter image URL')
+    if (url) {
+      document.execCommand('insertImage', false, url)
+      onEditorInput(new Event('input'))
+    }
   }
 
   function onInsertTable() {
-    console.log('insert-table')
+    // simple 2x2 table insertion
+    const tableHtml = '<table class="min-w-full border-collapse"><tr><td class="border p-2"> </td><td class="border p-2"> </td></tr><tr><td class="border p-2"> </td><td class="border p-2"> </td></tr></table>'
+    document.execCommand('insertHTML', false, tableHtml)
+    onEditorInput(new Event('input'))
+  }
+
+  function toggleBold() { applyFormat('bold') }
+  function toggleItalic() { applyFormat('italic') }
+  function toggleUnderline() { applyFormat('underline') }
+  function toggleStrikethrough() { applyFormat('strikeThrough') }
+  function toggleBulletList() { applyFormat('insertUnorderedList') }
+  function toggleOrderedList() { applyFormat('insertOrderedList') }
+
+  // Editor element and basic editing handlers
+  const editor = ref<HTMLElement | null>(null)
+
+  function onEditorInput(e: Event) {
+    const html = editor.value?.innerHTML || ''
+    // update the first page content for now
+    pages.value[0] = html
+    pageContents.value = [html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()]
+    computeCountsFromAllPages()
+    isDirty.value = true
+    docDirty.value = true
+  }
+
+  function onEditorKeydown(e: Event) {
+    const ev = e as KeyboardEvent
+    // simple handling: Ctrl/Cmd+B/I/U map to formatting
+    const isMod = ev.metaKey || ev.ctrlKey
+    if (!isMod) return
+    const k = ev.key?.toLowerCase()
+    if (k === 'b') {
+      ev.preventDefault()
+      document.execCommand('bold')
+      return
+    }
+    if (k === 'i') {
+      ev.preventDefault()
+      document.execCommand('italic')
+      return
+    }
+    if (k === 'u') {
+      ev.preventDefault()
+      document.execCommand('underline')
+      return
+    }
+  }
+
+  // Wire format events from toolbar/menubar to execCommand
+  function applyFormat(command: string, value?: string) {
+    try {
+      document.execCommand(command, false, value)
+      onEditorInput(new InputEvent('input'))
+    } catch (e) {
+      console.warn('format not supported', command, e)
+    }
+  }
+
+  // Listen to toolbar/menu emits
+  // format actions
+  const stopListen = [] as Array<() => void>
+  // use a small tick to attach global listeners via DOM events from SFC emits
+  onMounted(() => {
+    // listen to window events emitted by MenuBar or EditorToolbar via $emit -> parent handlers
+    // the components already emit typed events which our template handlers call; we wire here by patching
+    // For demonstration, override global document-level custom events (if used)
+  })
+
+  // Proof modal
+  const showProofModal = ref(false)
+
+  async function onGenerateProof() {
+    // open modal which allows generating/inspecting proof
+    showProofModal.value = true
+  }
+
+  async function onVerifyAuthorship() {
+    // open modal to verify proof
+    showProofModal.value = true
   }
 
   function onSetZoom(level: number) {
@@ -220,3 +345,4 @@
     window.addEventListener('resize', updateTopPadding)
   })
 </script>
+

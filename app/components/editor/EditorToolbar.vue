@@ -70,7 +70,7 @@
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
       <!-- Zoom controls (inline with formatting) -->
-      <div class="flex items-center gap-1 ml-2">
+      <div class="flex items-center gap-1 ml-1">
         <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="changeZoom(-25)">
           <Minus class="w-4 h-4" />
         </Button>
@@ -160,7 +160,9 @@
       <Popover>
         <PopoverTrigger as-child>
           <Button variant="ghost" size="sm" class="h-8 p-0 px-2 flex items-center gap-1">
-            <component :is="alignment === 'left' ? AlignLeft : alignment === 'center' ? AlignCenter : alignment === 'right' ? AlignRight : AlignJustify" class="w-4 h-4" />
+            <component
+              :is="alignment === 'left' ? AlignLeft : alignment === 'center' ? AlignCenter : alignment === 'right' ? AlignRight : AlignJustify"
+              class="w-4 h-4" />
             <ArrowDown class="w-3 h-3 text-gray-500" />
           </Button>
         </PopoverTrigger>
@@ -175,7 +177,8 @@
             <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('right')">
               <AlignRight class="w-4 h-4" /> Right
             </button>
-            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('justify')">
+            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100"
+              @click="setAlignment('justify')">
               <AlignJustify class="w-4 h-4" /> Justify
             </button>
           </div>
@@ -252,7 +255,9 @@
       <Popover>
         <PopoverTrigger as-child>
           <Button variant="ghost" size="sm" class="h-8 p-0 px-2 flex items-center gap-1">
-            <component :is="alignment === 'left' ? AlignLeft : alignment === 'center' ? AlignCenter : alignment === 'right' ? AlignRight : AlignJustify" class="w-4 h-4" />
+            <component
+              :is="alignment === 'left' ? AlignLeft : alignment === 'center' ? AlignCenter : alignment === 'right' ? AlignRight : AlignJustify"
+              class="w-4 h-4" />
             <ArrowDown class="w-3 h-3 text-gray-500" />
           </Button>
         </PopoverTrigger>
@@ -267,7 +272,8 @@
             <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('right')">
               <AlignRight class="w-4 h-4" /> Right
             </button>
-            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlignment('justify')">
+            <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100"
+              @click="setAlignment('justify')">
               <AlignJustify class="w-4 h-4" /> Justify
             </button>
           </div>
