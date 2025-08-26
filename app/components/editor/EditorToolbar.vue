@@ -594,14 +594,16 @@
     set: (v: string | number) => {
       const n = Number(v)
       if (Number.isNaN(n)) return
-      zoomPercent.value = Math.min(200, Math.max(50, Math.round(n)))
+  zoomPercent.value = Math.min(200, Math.max(50, Math.round(n)))
+  emit && typeof emit === 'function' && emit('set-zoom', zoomPercent.value / 100)
     },
   })
 
   const zoomOptions = [50, 75, 100, 125, 150, 175, 200]
 
   const changeZoom = (delta: number) => {
-    zoomPercent.value = Math.min(200, Math.max(50, zoomPercent.value + delta))
+  zoomPercent.value = Math.min(200, Math.max(50, zoomPercent.value + delta))
+  emit && typeof emit === 'function' && emit('set-zoom', zoomPercent.value / 100)
   }
 
   // Actions

@@ -6,13 +6,33 @@
         <MenuBar :documentTitle="documentTitle" :isDirty="isDirty" :user="user" @select-all="onSelectAll"
           @update-title="onUpdateTitle" @save-document="onSaveDocument" @new-document="onNewDocument"
           @open-document="onOpenDocument" @export-document="onExport" @import-document="onImport" @settings="onSettings"
-          @about="onAbout" />
+          @about="onAbout"
+          @undo="doUndo" @redo="doRedo"
+          @format-bold="toggleBold" @format-italic="toggleItalic" @format-underline="toggleUnderline"
+          @toggle-bullet-list="toggleBulletList" @toggle-ordered-list="toggleOrderedList"
+          @insert-link="onInsertLink" @insert-image="onInsertImage" @insert-table="onInsertTable"
+        />
       </div>
 
       <div ref="toolbarWrapper" :class="[menuVisible ? 'mt-2' : 'mt-0', 'pointer-events-auto']">
         <EditorToolbar :isMenuVisible="menuVisible" @toggle-menubar="toggleMenu" @toggle-sidebar="toggleSidebar"
           @toggle-find="toggleFind" @insert-link="onInsertLink" @insert-image="onInsertImage"
-          @insert-table="onInsertTable" />
+          @insert-table="onInsertTable" @undo="doUndo" @redo="doRedo"
+          @format-bold="toggleBold"
+          @format-italic="toggleItalic"
+          @format-underline="toggleUnderline"
+          @format-strikethrough="toggleStrikethrough"
+          @set-font-family="setFontFamily"
+          @set-font-size="setFontSize"
+          @set-alignment="setAlignment"
+          @set-text-color="setTextColor"
+          @set-highlight-color="setHighlightColor"
+          @indent="indent"
+          @outdent="outdent"
+          @toggle-bullet-list="toggleBulletList"
+          @toggle-ordered-list="toggleOrderedList"
+          @set-zoom="onSetZoom"
+        />
       </div>
     </div>
 
@@ -24,16 +44,21 @@
       <div class="w-full max-w-4xl">
         <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 min-h-[60vh]">
           <div class="prose max-w-none">
-            <div
-              ref="editor"
-              class="editor-content outline-none min-h-[40vh] text-gray-800"
-              :contenteditable="true"
-              role="textbox"
-              aria-multiline="true"
-              @input="onEditorInput"
-              @keydown="onEditorKeydown"
-              v-html="pages[0] || ''"
-            ></div>
+              <div class="editor-viewport overflow-auto">
+                <div
+                  ref="editor"
+                  class="editor-content outline-none min-h-[40vh] text-gray-800"
+                  :contenteditable="true"
+                  role="textbox"
+                  aria-multiline="true"
+                  @input="onEditorInput"
+                  @keydown="onEditorKeydown"
+                  v-html="pages[0] || ''"
+                  :style="editorStyle"
+                ></div>
+              </div>
+              <!-- hidden file input for image uploads -->
+              <input ref="imageInput" type="file" accept="image/*" class="hidden" @change="onImageSelected" />
           </div>
         </div>
       </div>
@@ -66,6 +91,8 @@
   const documentTitle = ref('Untitled Document')
   const isDirty = ref(false)
   const { title, pages, isDirty: docDirty } = useDocument()
+  // toolbar state mirrors to keep buttons highlighted
+  const toolbarState = ref({ isBold: false, isItalic: false, isUnderline: false, isStrikethrough: false, isBulletList: false, isOrderedList: false })
   const user = ref({ name: 'Demo User', email: undefined, avatar: undefined })
   // pagination and content state
   const pageContents = ref<string[]>([''])
@@ -223,19 +250,41 @@
   }
 
   function onInsertLink() {
+    // If a selection exists, prompt for URL and wrap selection in anchor; otherwise insert placeholder link
+    const sel = window.getSelection()
+    const selectedText = sel?.toString()
     const url = prompt('Enter URL')
-    if (url) {
+    if (!url) return
+    if (selectedText && selectedText.length > 0) {
+      // wrap the selected text
       document.execCommand('createLink', false, url)
-      onEditorInput(new Event('input'))
+    } else {
+      // insert an <a> element with the URL as text
+      const html = `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+      document.execCommand('insertHTML', false, html)
     }
+    onEditorInput(new Event('input'))
   }
 
   function onInsertImage() {
-    const url = prompt('Enter image URL')
-    if (url) {
-      document.execCommand('insertImage', false, url)
-      onEditorInput(new Event('input'))
-    }
+    // trigger hidden file input to allow file upload
+    imageInput.value?.click()
+  }
+
+  async function onImageSelected(e: Event) {
+    const input = e.target as HTMLInputElement
+    if (!input.files || input.files.length === 0) return
+    const file = input.files[0]
+    if (!file) return
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(String(reader.result))
+      reader.onerror = () => reject(new Error('file read error'))
+      reader.readAsDataURL(file as Blob)
+    })
+    document.execCommand('insertImage', false, dataUrl)
+    input.value = ''
+    onEditorInput(new Event('input'))
   }
 
   function onInsertTable() {
@@ -252,8 +301,48 @@
   function toggleBulletList() { applyFormat('insertUnorderedList') }
   function toggleOrderedList() { applyFormat('insertOrderedList') }
 
+  function setFontFamily(f: string) {
+    document.execCommand('fontName', false, f)
+    onEditorInput(new Event('input'))
+  }
+
+  function setFontSize(size: number | string) {
+    // execCommand fontSize expects 1-7 for legacy; instead wrap selected text in span
+    const sz = typeof size === 'string' ? size : String(size)
+    document.execCommand('insertHTML', false, `<span style="font-size:${sz}px">${window.getSelection()?.toString() || ''}</span>`)
+    onEditorInput(new Event('input'))
+  }
+
+  function setTextColor(color: string) {
+    document.execCommand('foreColor', false, color)
+    onEditorInput(new Event('input'))
+  }
+
+  function setHighlightColor(color: string) {
+    document.execCommand('backColor', false, color)
+    onEditorInput(new Event('input'))
+  }
+
+  function setAlignment(align: 'left' | 'center' | 'right' | 'justify') {
+    const cmd = align === 'left' ? 'justifyLeft' : align === 'center' ? 'justifyCenter' : align === 'right' ? 'justifyRight' : 'justifyFull'
+    document.execCommand(cmd)
+    onEditorInput(new Event('input'))
+  }
+
+  function indent() { document.execCommand('indent'); onEditorInput(new Event('input')) }
+  function outdent() { document.execCommand('outdent'); onEditorInput(new Event('input')) }
+
   // Editor element and basic editing handlers
   const editor = ref<HTMLElement | null>(null)
+  const imageInput = ref<HTMLInputElement | null>(null)
+
+  const editorStyle = computed(() => {
+    const scale = (zoomPercent.value || 100) / 100
+    return {
+      transform: `scale(${scale})`,
+      transformOrigin: 'top left'
+    }
+  })
 
   function onEditorInput(e: Event) {
     const html = editor.value?.innerHTML || ''
@@ -287,6 +376,40 @@
       return
     }
   }
+
+  // Undo / Redo
+  function doUndo() {
+    try {
+      document.execCommand('undo')
+      onEditorInput(new Event('input'))
+    } catch (e) {
+      console.warn('undo failed', e)
+    }
+  }
+
+  function doRedo() {
+    try {
+      document.execCommand('redo')
+      onEditorInput(new Event('input'))
+    } catch (e) {
+      try { document.execCommand('forward'); onEditorInput(new Event('input')) } catch (e2) { console.warn('redo failed', e2) }
+    }
+  }
+
+  // update toolbar active states based on current selection
+  function updateToolbarState() {
+    toolbarState.value.isBold = document.queryCommandState('bold')
+    toolbarState.value.isItalic = document.queryCommandState('italic')
+    toolbarState.value.isUnderline = document.queryCommandState('underline')
+    toolbarState.value.isStrikethrough = document.queryCommandState('strikeThrough')
+    toolbarState.value.isBulletList = document.queryCommandState('insertUnorderedList')
+    toolbarState.value.isOrderedList = document.queryCommandState('insertOrderedList')
+  }
+
+  // listen to selection changes to update toolbar
+  onMounted(() => {
+    document.addEventListener('selectionchange', updateToolbarState)
+  })
 
   // Wire format events from toolbar/menubar to execCommand
   function applyFormat(command: string, value?: string) {
