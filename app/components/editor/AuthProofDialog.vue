@@ -60,7 +60,7 @@
                 <div class="text-sm text-gray-700">Paste public key from clipboard</div>
               </HoverCardContent>
             </HoverCard>
-            <Button variant="outline" size="sm" class="h-8" @click="showPublicKey = !showPublicKey">
+            <Button variant="outline" size="sm" class="h-9 px-3 text-sm" @click="showPublicKey = !showPublicKey">
               <span v-if="showPublicKey">Hide</span>
               <span v-else>View</span>
             </Button>
@@ -86,7 +86,7 @@
                 <div class="text-sm text-gray-700">Download public & private key files</div>
               </HoverCardContent>
             </HoverCard>
-            <Button variant="outline" size="sm" class="h-8" @click="showPrivateKey = !showPrivateKey">
+            <Button variant="outline" size="sm" class="h-9 px-3 text-sm" @click="showPrivateKey = !showPrivateKey">
               <span v-if="showPrivateKey">Hide</span>
               <span v-else>View</span>
             </Button>
@@ -102,24 +102,26 @@
     <!-- Compact toolbar for quick actions -->
     <div class="flex items-center gap-2 mt-3">
       <div class="flex items-center gap-2">
-        <Button variant="outline" size="sm" @click="generateKeys" class="px-3 py-2">
+        <Button variant="outline" size="sm" @click="generateKeys" class="h-9 px-3 text-sm">
           <Key class="w-4 h-4 mr-2" />
           Generate Keys
         </Button>
-        <Button variant="outline" size="sm" @click="pickProofFile" class="px-3 py-2">
+        <Button variant="outline" size="sm" @click="pickProofFile" class="h-9 px-3 text-sm">
           <FileText class="w-4 h-4 mr-2" />
           Import Proof
         </Button>
       </div>
 
       <div class="ml-auto flex items-center gap-2">
-        <Button @click="signExport" :disabled="!privateKey" class="px-3">
+        <Button @click="signExport" :disabled="!privateKey" class="h-9 px-3 text-sm">
           <FileText class="w-4 h-4 mr-2" />
           <span class="hidden sm:inline">Sign & Export</span>
+          <span class="sm:hidden">Sign</span>
         </Button>
-        <Button variant="secondary" @click="verifyCurrent" :disabled="!publicKeyB64 || !currentProof" class="px-3">
+        <Button variant="outline" @click="verifyCurrent" :disabled="!publicKeyB64 || !currentProof" class="h-9 px-3 text-sm">
           <CheckCircle class="w-4 h-4 mr-2" />
           <span class="hidden sm:inline">Verify Proof</span>
+          <span class="sm:hidden">Verify</span>
         </Button>
       </div>
     </div>
