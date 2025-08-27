@@ -218,9 +218,11 @@
       <Button variant="ghost" size="sm" @click="insertImage" class="h-8 w-8 p-0">
         <ImageIcon class="w-4 h-4" />
       </Button>
-      <Button variant="ghost" size="sm" @click="insertTable" class="h-8 w-8 p-0">
-        <Table class="w-4 h-4" />
-      </Button>
+      <TableInserter @insert-table="handleInsertTable">
+        <Button variant="ghost" size="sm" class="h-8 w-8 p-0">
+          <Table class="w-4 h-4" />
+        </Button>
+      </TableInserter>
     </div>
 
     <!-- Medium screens: Show essential formatting -->
@@ -536,6 +538,7 @@
     PopoverTrigger,
   } from '@/components/ui/popover'
   import { Input } from '@/components/ui/input'
+  import TableInserter from './TableInserter.vue'
   // Fix the ImageIcon import conflict
   const ImageIcon = Image
 
@@ -731,8 +734,12 @@
     emit('insert-image')
   }
 
+  function handleInsertTable(rows: number, cols: number) {
+    emit('insert-table', rows, cols)
+  }
+
   function insertTable() {
-    emit('insert-table')
+    emit('insert-table', 2, 2) // fallback for old calls
   }
 
   function insertHorizontalRule() {

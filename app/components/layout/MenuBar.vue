@@ -145,7 +145,7 @@
       (e: 'toggle-find'): void
       (e: 'toggle-sidebar'): void
       (e: 'set-zoom', level: number | 'fit'): void
-      (e: 'insert-table'): void
+      (e: 'insert-table', rows?: number, cols?: number): void
       (e: 'insert-image'): void
       (e: 'insert-link'): void
       (e: 'insert-code-block'): void
@@ -305,7 +305,7 @@
   // Insert actions
 
   function insertTable() {
-    emit('insert-table')
+    emit('insert-table', 2, 2) // default size when called from menu
   }
 
   function insertImage() {

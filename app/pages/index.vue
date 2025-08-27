@@ -3,14 +3,13 @@
     <!-- Fixed top area: Menubar + EditorToolbar (both floating) -->
     <div class="fixed inset-x-1 top-1 z-50 pointer-events-none">
       <div ref="menuWrapper" v-show="menuVisible" class="pointer-events-auto">
-      <MenuBar :documentTitle="documentTitle" :isDirty="isDirty" :user="user" @select-all="onSelectAll"
+        <MenuBar :documentTitle="documentTitle" :isDirty="isDirty" :user="user" @select-all="onSelectAll"
           @update-title="onUpdateTitle" @save-document="onSaveDocument" @new-document="onNewDocument"
           @open-document="onOpenDocument" @export-document="onExport" @import-document="onImport" @settings="onSettings"
           @about="onAbout" @undo="doUndo" @redo="doRedo" @format-bold="toggleBold" @format-italic="toggleItalic"
           @format-underline="toggleUnderline" @toggle-bullet-list="toggleBulletList"
           @toggle-ordered-list="toggleOrderedList" @insert-link="onInsertLink" @insert-image="onInsertImage"
-          @insert-table="onInsertTable" @set-zoom="onSetZoom"
-          @verify-authorship="onVerifyAuthorship" />
+          @insert-table="onInsertTable" @set-zoom="onSetZoom" @verify-authorship="onVerifyAuthorship" />
         <!-- listen for proof-related menu actions -->
         <!-- these are emitted from MenuBar and handled here -->
         <template v-if="false" />
@@ -54,13 +53,13 @@
 
   </div>
   <div v-if="showProofModal" class="fixed inset-0 z-60 flex items-center justify-center bg-black/40">
-      <AuthProofDialog @close="showProofModal = false" />
+    <AuthProofDialog @close="showProofModal = false" />
   </div>
 
 </template>
 
 <script setup lang="ts">
-  import { ref, nextTick, onMounted, computed, type ComponentPublicInstance } from 'vue'
+  import { ref, nextTick, onMounted, onUnmounted, computed, type ComponentPublicInstance } from 'vue'
   import MenuBar from '@/components/layout/MenuBar.vue'
   import EditorToolbar from '@/components/editor/EditorToolbar.vue'
   import AuthProofDialog from '@/components/editor/AuthProofDialog.vue'
@@ -277,9 +276,36 @@
     onEditorInput(new Event('input'))
   }
 
-  function onInsertTable() {
-    // simple 2x2 table insertion
-    const tableHtml = '<table class="min-w-full border-collapse"><tr><td class="border p-2"> </td><td class="border p-2"> </td></tr><tr><td class="border p-2"> </td><td class="border p-2"> </td></tr></table>'
+  function onInsertTable(rows: number = 2, cols: number = 2) {
+    console.log('Inserting table with rows:', rows, 'cols:', cols)
+    
+    // Generate table HTML that matches Shadcn Vue table structure but with borders
+    let tableHtml = `
+      <div class="relative w-full overflow-auto border border-gray-300 rounded-md">
+        <table class="w-full caption-bottom text-sm border-collapse">
+          <tbody>`
+    
+    for (let r = 0; r < rows; r++) {
+      tableHtml += '<tr class="border-b border-gray-200 transition-colors hover:bg-gray-50">'
+      for (let c = 0; c < cols; c++) {
+        tableHtml += '<td class="p-3 align-middle border-r border-gray-200 last:border-r-0"><p><br></p></td>'
+      }
+      tableHtml += '</tr>'
+    }
+    
+    tableHtml += `
+          </tbody>
+        </table>
+      </div>
+      <p><br></p>` // Add spacing after table
+    
+    console.log('Generated table HTML:', tableHtml)
+    
+    // Make sure we have focus on the editor
+    if (editor.value) {
+      editor.value.focus()
+    }
+    
     document.execCommand('insertHTML', false, tableHtml)
     onEditorInput(new Event('input'))
   }
@@ -288,11 +314,11 @@
   function toggleItalic() { applyFormat('italic') }
   function toggleUnderline() { applyFormat('underline') }
   function toggleStrikethrough() { applyFormat('strikeThrough') }
-  
+
   function toggleBulletList() {
     const selection = window.getSelection()
     const range = selection?.getRangeAt(0)
-    
+
     if (!range) {
       // No selection, create a new bullet list with an empty list item
       const bulletHtml = '<ul style="margin-left: 20px; padding-left: 20px;"><li><br></li></ul>'
@@ -300,10 +326,10 @@
     } else {
       // Check if we're already in a list
       const container = range.commonAncestorContainer
-      const listElement = container.nodeType === Node.TEXT_NODE 
-        ? container.parentElement?.closest('ul, ol') 
+      const listElement = container.nodeType === Node.TEXT_NODE
+        ? container.parentElement?.closest('ul, ol')
         : (container as Element)?.closest('ul, ol')
-      
+
       if (listElement) {
         // We're in a list, toggle it off
         document.execCommand('insertUnorderedList')
@@ -325,11 +351,11 @@
     }
     onEditorInput(new Event('input'))
   }
-  
+
   function toggleOrderedList() {
     const selection = window.getSelection()
     const range = selection?.getRangeAt(0)
-    
+
     if (!range) {
       // No selection, create a new numbered list with an empty list item
       const numberedHtml = '<ol style="margin-left: 20px; padding-left: 20px;"><li><br></li></ol>'
@@ -337,10 +363,10 @@
     } else {
       // Check if we're already in a list
       const container = range.commonAncestorContainer
-      const listElement = container.nodeType === Node.TEXT_NODE 
-        ? container.parentElement?.closest('ul, ol') 
+      const listElement = container.nodeType === Node.TEXT_NODE
+        ? container.parentElement?.closest('ul, ol')
         : (container as Element)?.closest('ul, ol')
-      
+
       if (listElement) {
         // We're in a list, toggle it off
         document.execCommand('insertOrderedList')
@@ -391,15 +417,15 @@
     onEditorInput(new Event('input'))
   }
 
-  function indent() { 
+  function indent() {
     const selection = window.getSelection()
     const range = selection?.getRangeAt(0)
     if (range) {
       const container = range.startContainer
-      const listItem = container.nodeType === Node.TEXT_NODE 
-        ? container.parentElement?.closest('li') 
+      const listItem = container.nodeType === Node.TEXT_NODE
+        ? container.parentElement?.closest('li')
         : (container as Element)?.closest('li')
-      
+
       if (listItem) {
         // Indent list item by creating nested list
         const currentList = listItem.closest('ul, ol')
@@ -407,14 +433,14 @@
           const isOrderedList = currentList.tagName === 'OL'
           const nestedList = document.createElement(isOrderedList ? 'ol' : 'ul')
           nestedList.style.cssText = 'margin-left: 20px; padding-left: 20px;'
-          
+
           const newListItem = document.createElement('li')
           newListItem.style.cssText = 'margin-bottom: 5px;'
           newListItem.innerHTML = '<br>'
-          
+
           nestedList.appendChild(newListItem)
           listItem.appendChild(nestedList)
-          
+
           // Move cursor to nested item
           const newRange = document.createRange()
           newRange.setStart(newListItem, 1)
@@ -430,27 +456,27 @@
     }
     onEditorInput(new Event('input'))
   }
-  
-  function outdent() { 
+
+  function outdent() {
     const selection = window.getSelection()
     const range = selection?.getRangeAt(0)
     if (range) {
       const container = range.startContainer
-      const listItem = container.nodeType === Node.TEXT_NODE 
-        ? container.parentElement?.closest('li') 
+      const listItem = container.nodeType === Node.TEXT_NODE
+        ? container.parentElement?.closest('li')
         : (container as Element)?.closest('li')
-      
+
       if (listItem) {
         // Outdent list item
         const parentList = listItem.closest('ul, ol')
         const grandparentListItem = parentList?.closest('li')
-        
+
         if (grandparentListItem) {
           // Move this item to parent level
           const grandparentList = grandparentListItem.closest('ul, ol')
           if (grandparentList) {
             grandparentList.insertBefore(listItem, grandparentListItem.nextSibling)
-            
+
             // If the nested list is now empty, remove it
             if (parentList && parentList.children.length === 0) {
               parentList.remove()
@@ -490,17 +516,17 @@
 
   function onEditorKeydown(e: Event) {
     const ev = e as KeyboardEvent
-    
+
     // Handle Enter key in lists
     if (ev.key === 'Enter') {
       const selection = window.getSelection()
       const range = selection?.getRangeAt(0)
       if (range) {
         const container = range.startContainer
-        const listItem = container.nodeType === Node.TEXT_NODE 
-          ? container.parentElement?.closest('li') 
+        const listItem = container.nodeType === Node.TEXT_NODE
+          ? container.parentElement?.closest('li')
           : (container as Element)?.closest('li')
-        
+
         if (listItem) {
           const list = listItem.closest('ul, ol')
           if (list) {
@@ -545,7 +571,7 @@
         }
       }
     }
-    
+
     // Handle formatting shortcuts
     const isMod = ev.metaKey || ev.ctrlKey
     if (!isMod) return
@@ -612,16 +638,6 @@
       console.warn('format not supported', command, e)
     }
   }
-
-  // Listen to toolbar/menu emits
-  // format actions
-  const stopListen = [] as Array<() => void>
-  // use a small tick to attach global listeners via DOM events from SFC emits
-  onMounted(() => {
-    // listen to window events emitted by MenuBar or EditorToolbar via $emit -> parent handlers
-    // the components already emit typed events which our template handlers call; we wire here by patching
-    // For demonstration, override global document-level custom events (if used)
-  })
 
   // Proof modal
   const showProofModal = ref(false)
@@ -705,22 +721,28 @@
 
   /* List styling for better formatting */
 
-  :deep(ul), :deep(ol) {
+  :deep(ul),
+  :deep(ol) {
     margin: 10px 0;
-    padding-left: 32px; /* leave space for native markers */
+    padding-left: 32px;
+    /* leave space for native markers */
     list-style-position: outside;
   }
 
   /* Use native list markers to avoid adding duplicate bullets when pasted HTML
      already contains inline bullet characters or markers. Keep simple spacing. */
-  :deep(ul li), :deep(ol li) {
+  :deep(ul li),
+  :deep(ol li) {
     margin-bottom: 6px;
     line-height: 1.5;
   }
 
 
   /* Nested list styling */
-  :deep(ul ul), :deep(ol ol), :deep(ul ol), :deep(ol ul) {
+  :deep(ul ul),
+  :deep(ol ol),
+  :deep(ul ol),
+  :deep(ol ul) {
     margin: 5px 0;
     padding-left: 20px;
   }
