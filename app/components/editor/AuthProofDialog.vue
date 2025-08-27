@@ -1,41 +1,55 @@
 <template>
-  <div class="bg-white rounded-lg shadow-sm p-4 max-w-full">
-    <!-- Header: icon + title + close -->
-    <div class="flex items-start gap-3 mb-3">
-      <div class="flex-shrink-0 mt-0.5">
-        <FileSignature class="w-6 h-6 text-indigo-600" />
-      </div>
-      <div class="flex-1">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold text-gray-900">Document Proofs</h3>
-          <div class="flex items-center gap-3">
+    <div class="bg-white rounded-lg shadow-sm p-4 max-w-full">
+      <!-- Header: icon + title + vertical status + close -->
+      <div class="flex flex-col md:flex-row md:items-start gap-3 mb-3">
+        <div class="flex flex-row md:flex-col items-center md:items-start gap-2 md:gap-0">
+          <FileSignature class="w-6 h-6 text-indigo-600" />
+        </div>
+        <div class="flex-1 flex flex-col">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900">Document Proofs</h3>
             <HoverCard>
               <HoverCardTrigger>
-                <Badge :class="statusClass" :variant="verified === true ? 'default' : verified === false ? 'destructive' : 'outline'">{{ verifiedText }}</Badge>
+                <Badge :class="badgeClass" :variant="verified === true ? 'default' : verified === false ? 'destructive' : 'outline'">
+                  <span class="inline-flex items-center gap-1">
+                    <template v-if="verified === true">
+                      <CheckCircle class="w-4 h-4 text-green-600" />
+                    </template>
+                    <template v-else-if="verified === false">
+                      <X class="w-4 h-4 text-red-600" />
+                    </template>
+                    <template v-else>
+                      <FileText class="w-4 h-4 text-gray-400" />
+                    </template>
+                    {{ verifiedText }}
+                  </span>
+                </Badge>
               </HoverCardTrigger>
               <HoverCardContent>
-                <div class="text-xs text-gray-700">
-                  <div><strong>Verification:</strong> {{ verifiedText }}</div>
-                  <div class="mt-1">Proof hash: <code class="break-words">{{ currentProof?.hash ?? '—' }}</code></div>
-                  <div class="mt-1">Computed hash: <code class="break-words">{{ computedHash ?? '—' }}</code></div>
+                <div class="text-sm text-gray-700">
+                  <div v-if="currentProof">Signature: <code>{{ currentProof.signature }}</code></div>
+                  <div v-if="currentProof">Proof hash: <code>{{ currentProof.hash }}</code></div>
+                  <div v-if="computedHash">Computed hash: <code>{{ computedHash }}</code></div>
+                  <div v-if="errorMessage" class="text-red-600">{{ errorMessage }}</div>
                 </div>
               </HoverCardContent>
             </HoverCard>
-            <HoverCard>
-              <HoverCardTrigger>
-                <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('close')" aria-label="Close dialog">
-                  <X class="w-4 h-4 text-gray-600" />
-                </Button>
-              </HoverCardTrigger>
-              <HoverCardContent>
-                <div class="text-xs text-gray-700">Close</div>
-              </HoverCardContent>
-            </HoverCard>
           </div>
+          <p class="text-sm text-gray-500 mt-1">Sign and verify document proofs using local keys — private keys never leave this device.</p>
         </div>
-        <p class="text-xs text-gray-500 mt-1">Sign and verify document proofs using local keys — private keys never leave this device.</p>
+        <div class="flex flex-col items-end gap-2 md:ml-4">
+          <HoverCard>
+            <HoverCardTrigger>
+              <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('close')" aria-label="Close dialog">
+                <X class="w-4 h-4 text-gray-500" />
+              </Button>
+            </HoverCardTrigger>
+            <HoverCardContent>
+              <div class="text-sm text-gray-700">Close</div>
+            </HoverCardContent>
+          </HoverCard>
+        </div>
       </div>
-    </div>
 
     <!-- Key inputs: responsive and collapsible to reduce bulk -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -50,7 +64,7 @@
                 </Button>
               </HoverCardTrigger>
               <HoverCardContent>
-                <div class="text-xs text-gray-700">Paste public key from clipboard</div>
+                <div class="text-sm text-gray-700">Paste public key from clipboard</div>
               </HoverCardContent>
             </HoverCard>
             <Button variant="outline" size="sm" class="h-8" @click="showPublicKey = !showPublicKey">
@@ -60,9 +74,9 @@
           </div>
         </div>
         <div v-show="showPublicKey">
-          <Textarea v-model="publicKeyB64" placeholder="Paste or generate a public key" rows="4" class="w-full" />
+          <Textarea v-model="publicKeyB64" placeholder="Paste or generate a public key" rows="4" class="w-full h-24 resize-none border border-gray-300 rounded focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition" />
         </div>
-        <div v-show="!showPublicKey" class="text-xs text-gray-500">Public key hidden — click View to show.</div>
+        <div v-show="!showPublicKey" class="text-sm text-gray-500">Public key hidden — click View to show.</div>
       </div>
 
       <div>
@@ -76,7 +90,7 @@
                 </Button>
               </HoverCardTrigger>
               <HoverCardContent>
-                <div class="text-xs text-gray-700">Download public & private key files</div>
+                <div class="text-sm text-gray-700">Download public & private key files</div>
               </HoverCardContent>
             </HoverCard>
             <Button variant="outline" size="sm" class="h-8" @click="showPrivateKey = !showPrivateKey">
@@ -86,9 +100,9 @@
           </div>
         </div>
         <div v-show="showPrivateKey">
-          <Textarea v-model="privateKeyB64" placeholder="(keeps local only)" rows="4" class="w-full" />
+          <Textarea v-model="privateKeyB64" placeholder="(keeps local only)" rows="4" class="w-full h-24 resize-none border border-gray-300 rounded focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition" />
         </div>
-        <div v-show="!showPrivateKey" class="text-xs text-gray-500">Private key hidden — keep this secret.</div>
+        <div v-show="!showPrivateKey" class="text-sm text-gray-500">Private key hidden — keep this secret.</div>
       </div>
     </div>
 
@@ -102,7 +116,7 @@
             </Button>
           </HoverCardTrigger>
           <HoverCardContent>
-            <div class="text-xs text-gray-700">Generate new key pair (private key stays local)</div>
+            <div class="text-sm text-gray-700">Generate new key pair (private key stays local)</div>
           </HoverCardContent>
         </HoverCard>
         <HoverCard>
@@ -112,7 +126,7 @@
             </Button>
           </HoverCardTrigger>
           <HoverCardContent>
-            <div class="text-xs text-gray-700">Import a proof JSON file</div>
+            <div class="text-sm text-gray-700">Import a proof JSON file</div>
           </HoverCardContent>
         </HoverCard>
       </div>
@@ -132,15 +146,13 @@
     <!-- Exported content + proof summary -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
       <div v-if="exported">
-        <div class="text-sm font-medium">Exported JSON</div>
-        <pre class="text-xs mt-2 max-h-36 overflow-auto bg-gray-50 p-2 rounded">{{ exported }}</pre>
+        <div class="text-sm font-medium mb-1">Exported JSON</div>
+        <Textarea :model-value="exported" disabled rows="6" class="w-full h-auto resize-none border border-gray-300 rounded bg-gray-50 text-sm p-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition" />
       </div>
 
       <div v-if="currentProof">
-        <div class="text-sm font-medium">Proof</div>
-        <div class="text-xs break-words mt-1">Signature: <code class="text-xs">{{ currentProof.signature }}</code></div>
-        <div class="text-xs">Proof hash: <code>{{ currentProof.hash }}</code></div>
-        <div class="text-xs mt-2">Computed document hash: <code>{{ computedHash ?? '—' }}</code></div>
+        <div class="text-sm font-medium mb-1">Proof</div>
+        <Textarea :model-value="proofText" disabled rows="6" class="w-full h-auto resize-none border border-gray-300 rounded bg-gray-50 text-sm p-2 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition" />
       </div>
     </div>
 
@@ -178,13 +190,26 @@ const errorMessage = ref<string | null>(null)
 const showPublicKey = ref(false)
 const showPrivateKey = ref(false)
 
+const proofText = computed(() => {
+  if (!currentProof.value) return ''
+  const sig = currentProof.value.signature ? `Signature: ${currentProof.value.signature}` : ''
+  const hash = currentProof.value.hash ? `Proof hash: ${currentProof.value.hash}` : ''
+  const docHash = computedHash.value ? `Computed document hash: ${computedHash.value}` : ''
+  return [sig, hash, docHash].filter(Boolean).join('\n')
+})
+
 const verifiedText = computed(() => {
   if (verified.value === true) return 'Valid'
   if (verified.value === false) return 'Invalid'
   return 'Not verified'
 })
 
-const statusClass = computed(() => (verified.value === true ? 'text-green-600' : verified.value === false ? 'text-red-600' : 'text-gray-600'))
+// Only color the border/background for destructive, not the text
+const badgeClass = computed(() => {
+  if (verified.value === true) return 'text-green-600'
+  if (verified.value === false) return 'text-gray-600 border-red-600 bg-red-50'
+  return 'text-gray-600'
+})
 
 async function generateKeys() {
   const kp = await generateKeyPair()
