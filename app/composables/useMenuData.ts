@@ -42,7 +42,7 @@ export const menus = [
     label: 'Edit',
     items: [
       { label: 'Undo', icon: Undo2, emit: 'undo', shortcut: { key: 'Z', mac: ['Command'], pc: 'Ctrl' } },
-      { label: 'Redo', icon: Redo2, emit: 'redo', shortcut: { key: 'Z', mac: ['⇧','Command'], pc: 'Ctrl+Y' } },
+      { label: 'Redo', icon: Redo2, emit: 'redo', shortcut: { key: 'Z', mac: ['⇧', 'Command'], pc: 'Ctrl+Y' } },
       { type: 'separator' },
       { label: 'Cut', icon: Scissors, emit: 'cut', shortcut: { key: 'X', mac: ['Command'], pc: 'Ctrl' } },
       { label: 'Copy', icon: Copy, emit: 'copy', shortcut: { key: 'C', mac: ['Command'], pc: 'Ctrl' } },
@@ -65,6 +65,8 @@ export const menus = [
         label: 'Zoom',
         icon: ZoomIn,
         items: [
+          { label: 'Fit', emit: 'set-zoom', payload: 'fit' },
+          { type: 'separator' },
           { label: '50%', emit: 'set-zoom', payload: 0.5 },
           { label: '75%', emit: 'set-zoom', payload: 0.75 },
           { label: '100%', emit: 'set-zoom', payload: 1 },
@@ -72,8 +74,7 @@ export const menus = [
           { label: '150%', emit: 'set-zoom', payload: 1.5 },
           { label: '200%', emit: 'set-zoom', payload: 2 }
         ]
-      },
-  { type: 'separator' }
+      }
     ]
   },
   {

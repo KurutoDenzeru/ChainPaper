@@ -82,13 +82,17 @@
             </div>
           </PopoverTrigger>
           <PopoverContent class="w-32 p-2">
-            <div class="flex flex-col">
-              <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-gray-100"
-                @click="zoomModel = opt">
-                {{ opt }}%
-              </button>
-            </div>
-          </PopoverContent>
+              <div class="flex flex-col">
+                <button class="text-left px-2 py-1 rounded hover:bg-gray-100 font-medium" @click="selectZoom('fit')">
+                  Fit
+                </button>
+                <div class="border-t my-1" />
+                <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-gray-100"
+                  @click="selectZoom(opt)">
+                  {{ opt }}%
+                </button>
+              </div>
+            </PopoverContent>
         </Popover>
 
         <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="changeZoom(25)">
@@ -546,9 +550,16 @@
   // emit helper for actions
   const emit = defineEmits()
 
-  // accept props (menubar visibility and current zoom percent)
-  const props = defineProps<{ isMenuVisible?: boolean; zoom?: number }>()
+  // accept props (menubar visibility and current zoom percent) and fitMode flag
+  const props = defineProps<{ isMenuVisible?: boolean; zoom?: number; fitMode?: boolean }>()
   const menuVisible = computed(() => !!props.isMenuVisible)
+
+  // Fit tracking
+  const isFit = ref<boolean>(!!props.fitMode)
+  watch(() => props.fitMode, (v) => {
+    isFit.value = !!v
+    if (isFit.value) zoomPercent.value = 100
+  })
 
   // Font options
   const fonts = [
@@ -591,7 +602,11 @@
   const zoomPercent = ref<number>(props.zoom ?? 100)
   // keep in sync if parent updates prop
   watch(() => props.zoom, (v) => {
-    if (typeof v === 'number') zoomPercent.value = Math.round(v)
+    if (typeof v === 'number') {
+      zoomPercent.value = Math.round(v)
+      // numeric update cancels Fit mode
+      isFit.value = false
+    }
   })
 
   const zoomModel = computed<string | number>({
@@ -608,6 +623,18 @@
 
   const changeZoom = (delta: number) => {
     zoomPercent.value = Math.min(200, Math.max(50, zoomPercent.value + delta))
+    emit('set-zoom', zoomPercent.value / 100)
+  }
+
+  const selectZoom = (opt: number | 'fit') => {
+    if (opt === 'fit') {
+      isFit.value = true
+      zoomPercent.value = 100
+      emit('set-zoom', 'fit')
+      return
+    }
+    isFit.value = false
+    zoomPercent.value = Math.min(200, Math.max(50, Math.round(opt)))
     emit('set-zoom', zoomPercent.value / 100)
   }
 

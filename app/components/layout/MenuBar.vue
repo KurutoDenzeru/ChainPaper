@@ -10,7 +10,7 @@
       <div class="flex flex-col self-center flex-1">
         <!-- First Row: Document Title Input -->
         <div class="flex items-center gap-2 mb-1">
-            <div v-if="!isEditingTitle" @click="startEditingTitle"
+          <div v-if="!isEditingTitle" @click="startEditingTitle"
             class="flex items-center gap-2 px-3 rounded hover:bg-gray-100 cursor-pointer transition-colors">
             <span class="text-lg text-gray-900 font-medium -ml-2">{{ documentTitle || 'Untitled Document' }}</span>
             <Edit3 class="w-4 h-4 text-gray-600" />
@@ -32,7 +32,8 @@
                 <template v-for="(item, idx) in menu.items" :key="menu.label + '-' + idx">
                   <MenubarSeparator v-if="item.type === 'separator'" />
 
-                  <MenubarCheckboxItem v-else-if="item.type === 'checkbox'" v-model:checked="getBinding(item).value" class="flex items-center gap-2">
+                  <MenubarCheckboxItem v-else-if="item.type === 'checkbox'" v-model:checked="getBinding(item).value"
+                    class="flex items-center gap-2">
                     <component :is="getIcon(item)" class="w-4 h-4 text-gray-600" v-if="getIcon(item)" />
                     {{ item.label }}
                   </MenubarCheckboxItem>
@@ -43,24 +44,16 @@
                       {{ item.label }}
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <MenubarItem
-                        v-for="(sub, sidx) in item.items"
-                        :key="menu.label + '-sub-' + sidx"
-                        @click="handleMenuEmit(sub)"
-                        class="flex items-center gap-2"
-                      >
+                      <MenubarItem v-for="(sub, sidx) in item.items" :key="menu.label + '-sub-' + sidx"
+                        @click="handleMenuEmit(sub)" class="flex items-center gap-2">
                         <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600" v-if="getIcon(sub)" />
                         {{ sub.label }}
                       </MenubarItem>
                     </MenubarSubContent>
                   </MenubarSub>
 
-                  <MenubarItem
-                    v-else
-                    class="flex items-center justify-between min-w-[250px]"
-                    :disabled="isDisabled(item)"
-                    @click="handleMenuEmit(item)"
-                  >
+                  <MenubarItem v-else class="flex items-center justify-between min-w-[250px]"
+                    :disabled="isDisabled(item)" @click="handleMenuEmit(item)">
                     <div class="flex items-center gap-2">
                       <component :is="getIcon(item)" class="w-4 h-4 text-gray-600" v-if="getIcon(item)" />
                       {{ item.label }}
@@ -71,19 +64,28 @@
                         <template v-if="isMac && getShortcut(item)?.mac">
                           <div class="flex items-center mr-1">
                             <template v-for="(mod, i) in getShortcut(item).mac" :key="i">
-                              <span v-if="mod === 'Command'" class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">
+                              <span v-if="mod === 'Command'"
+                                class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">
                                 <Command class="w-3 h-3 text-gray-600" />
                               </span>
-                              <span v-else class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">{{ mod }}</span>
+                              <span v-else
+                                class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">{{
+                                mod }}</span>
                             </template>
                           </div>
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
-                          <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{ getShortcut(item)?.key }}</span>
+                          <span
+                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
+                            getShortcut(item)?.key }}</span>
                         </template>
                         <template v-else>
-                          <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs font-medium mr-1">{{ getShortcut(item)?.pc || getShortcut(item)?.key || 'Ctrl' }}</span>
+                          <span
+                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs font-medium mr-1">{{
+                              getShortcut(item)?.pc || getShortcut(item)?.key || 'Ctrl' }}</span>
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
-                          <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{ getShortcut(item)?.key }}</span>
+                          <span
+                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
+                            getShortcut(item)?.key }}</span>
                         </template>
                       </div>
                     </MenubarShortcut>
@@ -142,7 +144,7 @@
       (e: 'select-all'): void
       (e: 'toggle-find'): void
       (e: 'toggle-sidebar'): void
-      (e: 'set-zoom', level: number): void
+      (e: 'set-zoom', level: number | 'fit'): void
       (e: 'insert-table'): void
       (e: 'insert-image'): void
       (e: 'insert-link'): void
@@ -178,7 +180,7 @@
   const bindings: Record<string, { value: any }> = {
     showToolbar: { value: showToolbar },
     showStatusBar: { value: showStatusBar },
-  // typewriterMode and focusMode removed
+    // typewriterMode and focusMode removed
   }
 
   // Generic emitter for menu items defined in the composable
@@ -188,6 +190,17 @@
     // preserve original behavior for documentation which opened a new window
     if (item.emit === 'show-documentation') {
       showDocumentation()
+      return
+    }
+    // Special handling for zoom menu: convert percent to decimal
+    if (item.emit === 'set-zoom' && item.payload !== undefined) {
+      if (item.payload === 'fit') {
+        emit('set-zoom', 'fit')
+      } else if (typeof item.payload === 'number') {
+        emit('set-zoom', item.payload)
+      } else {
+        emit('set-zoom', item.payload)
+      }
       return
     }
     if (item.payload !== undefined) emit(item.emit as any, item.payload)

@@ -6,33 +6,21 @@
         <MenuBar :documentTitle="documentTitle" :isDirty="isDirty" :user="user" @select-all="onSelectAll"
           @update-title="onUpdateTitle" @save-document="onSaveDocument" @new-document="onNewDocument"
           @open-document="onOpenDocument" @export-document="onExport" @import-document="onImport" @settings="onSettings"
-          @about="onAbout"
-          @undo="doUndo" @redo="doRedo"
-          @format-bold="toggleBold" @format-italic="toggleItalic" @format-underline="toggleUnderline"
-          @toggle-bullet-list="toggleBulletList" @toggle-ordered-list="toggleOrderedList"
-          @insert-link="onInsertLink" @insert-image="onInsertImage" @insert-table="onInsertTable"
-        />
+          @about="onAbout" @undo="doUndo" @redo="doRedo" @format-bold="toggleBold" @format-italic="toggleItalic"
+          @format-underline="toggleUnderline" @toggle-bullet-list="toggleBulletList"
+          @toggle-ordered-list="toggleOrderedList" @insert-link="onInsertLink" @insert-image="onInsertImage"
+          @insert-table="onInsertTable" @set-zoom="onSetZoom" />
       </div>
 
       <div ref="toolbarWrapper" :class="[menuVisible ? 'mt-2' : 'mt-0', 'pointer-events-auto']">
-        <EditorToolbar :isMenuVisible="menuVisible" :zoom="zoomPercent" @toggle-menubar="toggleMenu" @toggle-sidebar="toggleSidebar"
-          @toggle-find="toggleFind" @insert-link="onInsertLink" @insert-image="onInsertImage"
-          @insert-table="onInsertTable" @undo="doUndo" @redo="doRedo"
-          @format-bold="toggleBold"
-          @format-italic="toggleItalic"
-          @format-underline="toggleUnderline"
-          @format-strikethrough="toggleStrikethrough"
-          @set-font-family="setFontFamily"
-          @set-font-size="setFontSize"
-          @set-alignment="setAlignment"
-          @set-text-color="setTextColor"
-          @set-highlight-color="setHighlightColor"
-          @indent="indent"
-          @outdent="outdent"
-          @toggle-bullet-list="toggleBulletList"
-          @toggle-ordered-list="toggleOrderedList"
-          @set-zoom="onSetZoom"
-        />
+        <EditorToolbar :isMenuVisible="menuVisible" :zoom="zoomPercent" :fitMode="lastZoomWasFit"
+          @toggle-menubar="toggleMenu" @toggle-sidebar="toggleSidebar" @toggle-find="toggleFind"
+          @insert-link="onInsertLink" @insert-image="onInsertImage" @insert-table="onInsertTable" @undo="doUndo"
+          @redo="doRedo" @format-bold="toggleBold" @format-italic="toggleItalic" @format-underline="toggleUnderline"
+          @format-strikethrough="toggleStrikethrough" @set-font-family="setFontFamily" @set-font-size="setFontSize"
+          @set-alignment="setAlignment" @set-text-color="setTextColor" @set-highlight-color="setHighlightColor"
+          @indent="indent" @outdent="outdent" @toggle-bullet-list="toggleBulletList"
+          @toggle-ordered-list="toggleOrderedList" @set-zoom="onSetZoom" />
       </div>
     </div>
 
@@ -42,18 +30,12 @@
     <!-- Document editor canvas: contenteditable center pane -->
     <main class="flex-1 p-6 pb-24 flex items-start justify-center">
       <div class="w-full max-w-4xl">
-        <div class="editor-viewport overflow-auto">
-          <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 min-h-[60vh] document-page" :style="editorStyle">
+        <div ref="viewportEl" class="editor-viewport overflow-auto">
+          <div ref="pageEl" class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 min-h-[60vh] document-page"
+            :style="editorStyle">
             <div class="prose max-w-none">
-              <div
-                ref="editor"
-                class="editor-content outline-none min-h-[40vh] text-gray-800"
-                :contenteditable="true"
-                role="textbox"
-                aria-multiline="true"
-                @input="onEditorInput"
-                @keydown="onEditorKeydown"
-              ></div>
+              <div ref="editor" class="editor-content outline-none min-h-[40vh] text-gray-800" :contenteditable="true"
+                role="textbox" aria-multiline="true" @input="onEditorInput" @keydown="onEditorKeydown"></div>
               <!-- content is managed directly to avoid Vue re-rendering and resetting caret -->
             </div>
             <!-- hidden file input for image uploads -->
@@ -64,7 +46,7 @@
     </main>
 
     <StickyFooter :wordCount="wordCount" :pageCount="pageCount" :zoom="zoomPercent" :view="viewMode"
-      @set-zoom="onSetZoom" @set-view="onSetView" />
+      :fitMode="lastZoomWasFit" @set-zoom="onSetZoom" @set-view="onSetView" />
 
   </div>
   <div v-if="showProofModal" class="fixed inset-0 z-60 flex items-center justify-center bg-black/40">
@@ -103,6 +85,10 @@
   // view and zoom state
   const viewMode = ref<'list' | 'grid'>('list')
   const zoomPercent = ref<number>(100) // 100 == 1.0 scale
+  // refs to measure fit behavior
+  const viewportEl = ref<HTMLElement | null>(null)
+  const pageEl = ref<HTMLElement | null>(null)
+  const lastZoomWasFit = ref<boolean>(false)
 
   const wordCount = ref(0)
   const pageCount = ref(1)
@@ -344,8 +330,8 @@
   const editorStyle = computed(() => {
     const scale = (zoomPercent.value || 100) / 100
     return {
-  transform: `scale(${scale})`,
-  transformOrigin: 'top center'
+      transform: `scale(${scale})`,
+      transformOrigin: 'center center',
     }
   })
 
@@ -385,8 +371,8 @@
   // Undo / Redo
   function doUndo() {
     try {
-  editor.value?.focus()
-  document.execCommand('undo')
+      editor.value?.focus()
+      document.execCommand('undo')
       onEditorInput(new Event('input'))
     } catch (e) {
       console.warn('undo failed', e)
@@ -395,8 +381,8 @@
 
   function doRedo() {
     try {
-  editor.value?.focus()
-  document.execCommand('redo')
+      editor.value?.focus()
+      document.execCommand('redo')
       onEditorInput(new Event('input'))
     } catch (e) {
       try { document.execCommand('forward'); onEditorInput(new Event('input')) } catch (e2) { console.warn('redo failed', e2) }
@@ -451,9 +437,31 @@
     showProofModal.value = true
   }
 
-  function onSetZoom(level: number) {
-    // level is decimal (1.0 = 100%)
+  function onSetZoom(level: number | 'fit') {
+    // level may be decimal (1.0 = 100%) or the special 'fit' string
+    if (level === 'fit') {
+      // compute a scale such that the page fits inside the viewport (with some padding)
+      nextTick(() => {
+        const vp = viewportEl.value
+        const pg = pageEl.value
+        if (!vp || !pg) return
+        const vpRect = vp.getBoundingClientRect()
+        const pgRect = pg.getBoundingClientRect()
+        // available space inside viewport (subtract some padding)
+        const availWidth = vpRect.width - 40
+        const availHeight = vpRect.height - 40
+        const scaleW = availWidth / pgRect.width
+        const scaleH = availHeight / pgRect.height
+        const fitScale = Math.max(0.5, Math.min(3, Math.min(scaleW, scaleH)))
+        zoomPercent.value = Math.round(fitScale * 100)
+        lastZoomWasFit.value = true
+        console.log('fit -> scale', fitScale, '=>', zoomPercent.value)
+      })
+      return
+    }
+    // numeric level (decimal)
     zoomPercent.value = Math.round((level || 1) * 100)
+    lastZoomWasFit.value = false
     console.log('set-zoom ->', level, '=>', zoomPercent.value)
   }
 
@@ -473,28 +481,32 @@
     updateTopPadding()
     // update on window resize
     window.addEventListener('resize', updateTopPadding)
-  // set editor initial HTML content
-  setEditorHtml(pages.value[0] || '')
+    // set editor initial HTML content
+    setEditorHtml(pages.value[0] || '')
   })
 </script>
 
 <style scoped>
-/* Visual letter-sized page for the document canvas */
-.document-page {
-  width: 8.5in; /* physical letter width */
-  height: 11in; /* physical letter height */
-  margin: 0 auto; /* center within the viewport */
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  /* keep the internal padding/margins untouched */
-  background-clip: padding-box;
-}
 
-/* Keep the viewport centered and allow scrolling when scaled */
-.editor-viewport {
-  display: flex;
-  justify-content: center;
-  padding: 2rem 0; /* vertical space around the page */
-}
+  /* Visual letter-sized page for the document canvas */
+  .document-page {
+    width: 8.5in;
+    /* physical letter width */
+    height: 11in;
+    /* physical letter height */
+    margin: 0 auto;
+    /* center within the viewport */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    /* keep the internal padding/margins untouched */
+    background-clip: padding-box;
+  }
+
+  /* Keep the viewport centered and allow scrolling when scaled */
+  .editor-viewport {
+    display: flex;
+    justify-content: center;
+    padding: 2rem 0;
+    /* vertical space around the page */
+  }
 
 </style>
-

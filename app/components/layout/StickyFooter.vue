@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-x-0 bottom-2 z-40 pointer-events-none">
+  <div class="fixed inset-x-0 bottom-1 z-50 pointer-events-none">
     <div class="w-full mx-auto pointer-events-auto px-4">
       <div
         class="flex items-center justify-between bg-white border border-gray-200 rounded-lg shadow-sm h-12 px-3 md:h-10">
@@ -54,10 +54,17 @@
             <PopoverContent class="w-32 p-2">
               <div class="flex flex-col">
                 <button
+                  class="text-left px-2 py-1 rounded hover:bg-gray-100 font-medium"
+                  @click="selectZoom('fit')"
+                >
+                  Fit
+                </button>
+                <div class="border-t my-1" />
+                <button
                   v-for="opt in zoomOptions"
                   :key="opt"
                   class="text-left px-2 py-1 rounded hover:bg-gray-100"
-                  @click="zoomModel = opt"
+                  @click="selectZoom(opt)"
                 >
                   {{ opt }}%
                 </button>
@@ -77,29 +84,50 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, computed, watch } from 'vue'
   import { Minus, Plus, List, Grid } from 'lucide-vue-next'
   import { defineProps } from 'vue'
   import { Button } from '@/components/ui/button'
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   import { Input } from '@/components/ui/input'
-  import { computed } from 'vue'
+  // ...existing imports
 
   // props (accept current view and zoom for sync)
-  const props = defineProps<{ wordCount?: number; pageCount?: number; view?: 'list' | 'grid'; zoom?: number }>()
+  const props = defineProps<{ wordCount?: number; pageCount?: number; view?: 'list' | 'grid'; zoom?: number; fitMode?: boolean }>()
 
   // percent value (e.g. 100) — initialize from prop when provided
-  const emit = defineEmits<{ (e: 'set-zoom', level: number): void }>()
+  // allow emitting a special 'fit' payload in addition to numeric zoom levels
+  const emit = defineEmits<{ (e: 'set-zoom', level: number | 'fit'): void }>()
   const zoomPercent = ref<number>(props.zoom ?? 100)
   const viewMode = ref<'list' | 'grid'>(props.view ?? 'list')
+  // track whether 'Fit' is active (parent may toggle fitMode)
+  const isFit = ref<boolean>(!!props.fitMode)
+  // keep fit state in sync
+  watch(() => props.fitMode, (v) => {
+    isFit.value = !!v
+    if (isFit.value) {
+      // display 100% when fit is active
+      zoomPercent.value = 100
+    }
+  })
+  // also sync when parent updates numeric zoom
+  watch(() => props.zoom, (v) => {
+    if (typeof v === 'number') {
+      isFit.value = false
+      zoomPercent.value = Math.round(v)
+    }
+  })
 
   // Expose a computed model for the Input component so typed values are coerced and clamped
   const zoomModel = computed<string | number>({
-    get: () => zoomPercent.value,
+    get: () => (isFit.value ? 100 : zoomPercent.value),
     set: (v: string | number) => {
       const n = Number(v)
       if (Number.isNaN(n)) return
+      isFit.value = false
       zoomPercent.value = Math.min(200, Math.max(50, Math.round(n)))
+      // emit numeric zoom change as decimal (1.0 === 100%)
+      emit('set-zoom', zoomPercent.value / 100)
     },
   })
 
@@ -107,6 +135,16 @@
 
   const changeZoom = (delta: number) => {
     zoomPercent.value = Math.min(200, Math.max(50, zoomPercent.value + delta))
+    emit('set-zoom', zoomPercent.value / 100)
+  }
+
+  // Select a zoom option from the popover. Accept numeric percentages or the special 'fit'.
+  const selectZoom = (opt: number | 'fit') => {
+    if (opt === 'fit') {
+      emit('set-zoom', 'fit')
+      return
+    }
+    zoomPercent.value = Math.min(200, Math.max(50, Math.round(opt)))
     emit('set-zoom', zoomPercent.value / 100)
   }
 
