@@ -38,16 +38,9 @@
           <p class="text-sm text-gray-500 mt-1">Sign and verify document proofs using local keys — private keys never leave this device.</p>
         </div>
         <div class="flex flex-col items-end gap-2 md:ml-4">
-          <HoverCard>
-            <HoverCardTrigger>
-              <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('close')" aria-label="Close dialog">
-                <X class="w-4 h-4 text-gray-500" />
-              </Button>
-            </HoverCardTrigger>
-            <HoverCardContent>
-              <div class="text-sm text-gray-700">Close</div>
-            </HoverCardContent>
-          </HoverCard>
+          <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="closeDialog" aria-label="Close dialog">
+            <X class="w-5 h-5 text-gray-500" />
+          </Button>
         </div>
       </div>
 
@@ -108,27 +101,15 @@
 
     <!-- Compact toolbar for quick actions -->
     <div class="flex items-center gap-2 mt-3">
-      <div class="flex items-center gap-1">
-        <HoverCard>
-          <HoverCardTrigger>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="generateKeys" aria-label="Generate keys">
-              <Key class="w-4 h-4 text-gray-700" />
-            </Button>
-          </HoverCardTrigger>
-          <HoverCardContent>
-            <div class="text-sm text-gray-700">Generate new key pair (private key stays local)</div>
-          </HoverCardContent>
-        </HoverCard>
-        <HoverCard>
-          <HoverCardTrigger>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="pickProofFile" aria-label="Import proof">
-              <FileText class="w-4 h-4 text-gray-700" />
-            </Button>
-          </HoverCardTrigger>
-          <HoverCardContent>
-            <div class="text-sm text-gray-700">Import a proof JSON file</div>
-          </HoverCardContent>
-        </HoverCard>
+      <div class="flex items-center gap-2">
+        <Button variant="outline" size="sm" @click="generateKeys" class="px-3 py-2">
+          <Key class="w-4 h-4 mr-2" />
+          Generate Keys
+        </Button>
+        <Button variant="outline" size="sm" @click="pickProofFile" class="px-3 py-2">
+          <FileText class="w-4 h-4 mr-2" />
+          Import Proof
+        </Button>
       </div>
 
       <div class="ml-auto flex items-center gap-2">
@@ -157,6 +138,11 @@
     </div>
 
     <div v-if="errorMessage" class="text-sm text-red-600 mt-3">{{ errorMessage }}</div>
+    <div class="mt-6">
+      <Button variant="outline" size="lg" class="w-full py-4 text-sm flex items-center justify-center gap-2" @click="closeDialog">
+        Close
+      </Button>
+    </div>
   </div>
 </template>
 
@@ -318,6 +304,10 @@ function pickProofFile() {
     }
   }
   input.click()
+}
+
+function closeDialog() {
+  emit('close')
 }
 
 </script>
