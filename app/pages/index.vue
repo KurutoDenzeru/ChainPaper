@@ -15,7 +15,7 @@
       </div>
 
       <div ref="toolbarWrapper" :class="[menuVisible ? 'mt-2' : 'mt-0', 'pointer-events-auto']">
-        <EditorToolbar :isMenuVisible="menuVisible" @toggle-menubar="toggleMenu" @toggle-sidebar="toggleSidebar"
+        <EditorToolbar :isMenuVisible="menuVisible" :zoom="zoomPercent" @toggle-menubar="toggleMenu" @toggle-sidebar="toggleSidebar"
           @toggle-find="toggleFind" @insert-link="onInsertLink" @insert-image="onInsertImage"
           @insert-table="onInsertTable" @undo="doUndo" @redo="doRedo"
           @format-bold="toggleBold"
@@ -42,22 +42,22 @@
     <!-- Document editor canvas: contenteditable center pane -->
     <main class="flex-1 p-6 pb-24 flex items-start justify-center">
       <div class="w-full max-w-4xl">
-        <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 min-h-[60vh]">
-          <div class="prose max-w-none">
-              <div class="editor-viewport overflow-auto" :style="editorStyle">
-                <div
-                  ref="editor"
-                  class="editor-content outline-none min-h-[40vh] text-gray-800"
-                  :contenteditable="true"
-                  role="textbox"
-                  aria-multiline="true"
-                  @input="onEditorInput"
-                  @keydown="onEditorKeydown"
-                ></div>
-                <!-- content is managed directly to avoid Vue re-rendering and resetting caret -->
-              </div>
-              <!-- hidden file input for image uploads -->
-              <input ref="imageInput" type="file" accept="image/*" class="hidden" @change="onImageSelected" />
+        <div class="editor-viewport overflow-auto">
+          <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 min-h-[60vh] document-page" :style="editorStyle">
+            <div class="prose max-w-none">
+              <div
+                ref="editor"
+                class="editor-content outline-none min-h-[40vh] text-gray-800"
+                :contenteditable="true"
+                role="textbox"
+                aria-multiline="true"
+                @input="onEditorInput"
+                @keydown="onEditorKeydown"
+              ></div>
+              <!-- content is managed directly to avoid Vue re-rendering and resetting caret -->
+            </div>
+            <!-- hidden file input for image uploads -->
+            <input ref="imageInput" type="file" accept="image/*" class="hidden" @change="onImageSelected" />
           </div>
         </div>
       </div>
@@ -344,8 +344,8 @@
   const editorStyle = computed(() => {
     const scale = (zoomPercent.value || 100) / 100
     return {
-      transform: `scale(${scale})`,
-      transformOrigin: 'top left'
+  transform: `scale(${scale})`,
+  transformOrigin: 'top center'
     }
   })
 
@@ -477,4 +477,24 @@
   setEditorHtml(pages.value[0] || '')
   })
 </script>
+
+<style scoped>
+/* Visual letter-sized page for the document canvas */
+.document-page {
+  width: 8.5in; /* physical letter width */
+  height: 11in; /* physical letter height */
+  margin: 0 auto; /* center within the viewport */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  /* keep the internal padding/margins untouched */
+  background-clip: padding-box;
+}
+
+/* Keep the viewport centered and allow scrolling when scaled */
+.editor-viewport {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0; /* vertical space around the page */
+}
+
+</style>
 

@@ -31,7 +31,7 @@
             </Button>
           </div>
           <!-- Zoom controls -->
-          <Button type="button"
+          <Button type="button" @click="changeZoom(-25)"
             class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
             aria-label="Zoom out">
             <Minus class="w-4 h-4 text-gray-600" />
@@ -65,7 +65,7 @@
             </PopoverContent>
           </Popover>
 
-          <Button type="button"
+          <Button type="button" @click="changeZoom(25)"
             class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
             aria-label="Zoom in">
             <Plus class="w-4 h-4 text-gray-600" />
@@ -89,6 +89,7 @@
   const props = defineProps<{ wordCount?: number; pageCount?: number; view?: 'list' | 'grid'; zoom?: number }>()
 
   // percent value (e.g. 100) — initialize from prop when provided
+  const emit = defineEmits<{ (e: 'set-zoom', level: number): void }>()
   const zoomPercent = ref<number>(props.zoom ?? 100)
   const viewMode = ref<'list' | 'grid'>(props.view ?? 'list')
 
@@ -106,6 +107,7 @@
 
   const changeZoom = (delta: number) => {
     zoomPercent.value = Math.min(200, Math.max(50, zoomPercent.value + delta))
+    emit('set-zoom', zoomPercent.value / 100)
   }
 
   // Footer is now display-only; keep passed props for visual display

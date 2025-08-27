@@ -510,7 +510,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
+  import { ref, computed, watch } from 'vue'
   import {
     Bold, Italic, Underline, Strikethrough, Type, Highlighter,
     AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -546,8 +546,8 @@
   // emit helper for actions
   const emit = defineEmits()
 
-  // accept prop for whether the menubar is visible so we can flip the arrow
-  const props = defineProps<{ isMenuVisible?: boolean }>()
+  // accept props (menubar visibility and current zoom percent)
+  const props = defineProps<{ isMenuVisible?: boolean; zoom?: number }>()
   const menuVisible = computed(() => !!props.isMenuVisible)
 
   // Font options
@@ -587,23 +587,28 @@
   const canUndo = ref(true)
   const canRedo = ref(true)
 
-  // Zoom state (UI-only)
-  const zoomPercent = ref<number>(100)
+  // Zoom state (UI-only but synchronized via prop/emits)
+  const zoomPercent = ref<number>(props.zoom ?? 100)
+  // keep in sync if parent updates prop
+  watch(() => props.zoom, (v) => {
+    if (typeof v === 'number') zoomPercent.value = Math.round(v)
+  })
+
   const zoomModel = computed<string | number>({
     get: () => zoomPercent.value,
     set: (v: string | number) => {
       const n = Number(v)
       if (Number.isNaN(n)) return
-  zoomPercent.value = Math.min(200, Math.max(50, Math.round(n)))
-  emit && typeof emit === 'function' && emit('set-zoom', zoomPercent.value / 100)
+      zoomPercent.value = Math.min(200, Math.max(50, Math.round(n)))
+      emit('set-zoom', zoomPercent.value / 100)
     },
   })
 
   const zoomOptions = [50, 75, 100, 125, 150, 175, 200]
 
   const changeZoom = (delta: number) => {
-  zoomPercent.value = Math.min(200, Math.max(50, zoomPercent.value + delta))
-  emit && typeof emit === 'function' && emit('set-zoom', zoomPercent.value / 100)
+    zoomPercent.value = Math.min(200, Math.max(50, zoomPercent.value + delta))
+    emit('set-zoom', zoomPercent.value / 100)
   }
 
   // Actions
