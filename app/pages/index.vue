@@ -289,8 +289,80 @@
   function toggleItalic() { applyFormat('italic') }
   function toggleUnderline() { applyFormat('underline') }
   function toggleStrikethrough() { applyFormat('strikeThrough') }
-  function toggleBulletList() { applyFormat('insertUnorderedList') }
-  function toggleOrderedList() { applyFormat('insertOrderedList') }
+  
+  function toggleBulletList() {
+    const selection = window.getSelection()
+    const range = selection?.getRangeAt(0)
+    
+    if (!range) {
+      // No selection, create a new bullet list with an empty list item
+      const bulletHtml = '<ul style="margin-left: 20px; padding-left: 20px;"><li><br></li></ul>'
+      document.execCommand('insertHTML', false, bulletHtml)
+    } else {
+      // Check if we're already in a list
+      const container = range.commonAncestorContainer
+      const listElement = container.nodeType === Node.TEXT_NODE 
+        ? container.parentElement?.closest('ul, ol') 
+        : (container as Element)?.closest('ul, ol')
+      
+      if (listElement) {
+        // We're in a list, toggle it off
+        document.execCommand('insertUnorderedList')
+      } else {
+        // Convert selection to bullet list
+        const selectedText = selection?.toString() || ''
+        if (selectedText.trim()) {
+          // Split by lines and create list items
+          const lines = selectedText.split('\n').filter(line => line.trim())
+          const listItems = lines.map(line => `<li style="margin-bottom: 5px;">${line.trim()}</li>`).join('')
+          const bulletHtml = `<ul style="margin-left: 20px; padding-left: 20px;">${listItems}</ul>`
+          document.execCommand('insertHTML', false, bulletHtml)
+        } else {
+          // Create new bullet point (empty li for cursor)
+          const bulletHtml = '<ul style="margin-left: 20px; padding-left: 20px;"><li><br></li></ul>'
+          document.execCommand('insertHTML', false, bulletHtml)
+        }
+      }
+    }
+    onEditorInput(new Event('input'))
+  }
+  
+  function toggleOrderedList() {
+    const selection = window.getSelection()
+    const range = selection?.getRangeAt(0)
+    
+    if (!range) {
+      // No selection, create a new numbered list with an empty list item
+      const numberedHtml = '<ol style="margin-left: 20px; padding-left: 20px;"><li><br></li></ol>'
+      document.execCommand('insertHTML', false, numberedHtml)
+    } else {
+      // Check if we're already in a list
+      const container = range.commonAncestorContainer
+      const listElement = container.nodeType === Node.TEXT_NODE 
+        ? container.parentElement?.closest('ul, ol') 
+        : (container as Element)?.closest('ul, ol')
+      
+      if (listElement) {
+        // We're in a list, toggle it off
+        document.execCommand('insertOrderedList')
+      } else {
+        // Convert selection to numbered list
+        const selectedText = selection?.toString() || ''
+        if (selectedText.trim()) {
+          // Split by lines and create numbered list items (browser will handle numbering)
+          const lines = selectedText.split('\n').filter(line => line.trim())
+          const listItems = lines.map(line => `<li style="margin-bottom: 5px;">${line.trim()}</li>`).join('')
+          const numberedHtml = `<ol style="margin-left: 20px; padding-left: 20px;">${listItems}</ol>`
+          document.execCommand('insertHTML', false, numberedHtml)
+        } else {
+          // Create new numbered point (empty li for cursor)
+          const numberedHtml = '<ol style="margin-left: 20px; padding-left: 20px;"><li><br></li></ol>'
+          document.execCommand('insertHTML', false, numberedHtml)
+        }
+      }
+    }
+    onEditorInput(new Event('input'))
+  }
 
   function setFontFamily(f: string) {
     document.execCommand('fontName', false, f)
@@ -320,8 +392,80 @@
     onEditorInput(new Event('input'))
   }
 
-  function indent() { document.execCommand('indent'); onEditorInput(new Event('input')) }
-  function outdent() { document.execCommand('outdent'); onEditorInput(new Event('input')) }
+  function indent() { 
+    const selection = window.getSelection()
+    const range = selection?.getRangeAt(0)
+    if (range) {
+      const container = range.startContainer
+      const listItem = container.nodeType === Node.TEXT_NODE 
+        ? container.parentElement?.closest('li') 
+        : (container as Element)?.closest('li')
+      
+      if (listItem) {
+        // Indent list item by creating nested list
+        const currentList = listItem.closest('ul, ol')
+        if (currentList) {
+          const isOrderedList = currentList.tagName === 'OL'
+          const nestedList = document.createElement(isOrderedList ? 'ol' : 'ul')
+          nestedList.style.cssText = 'margin-left: 20px; padding-left: 20px;'
+          
+          const newListItem = document.createElement('li')
+          newListItem.style.cssText = 'margin-bottom: 5px;'
+          newListItem.innerHTML = '<br>'
+          
+          nestedList.appendChild(newListItem)
+          listItem.appendChild(nestedList)
+          
+          // Move cursor to nested item
+          const newRange = document.createRange()
+          newRange.setStart(newListItem, 1)
+          newRange.collapse(true)
+          selection?.removeAllRanges()
+          selection?.addRange(newRange)
+        }
+      } else {
+        document.execCommand('indent')
+      }
+    } else {
+      document.execCommand('indent')
+    }
+    onEditorInput(new Event('input'))
+  }
+  
+  function outdent() { 
+    const selection = window.getSelection()
+    const range = selection?.getRangeAt(0)
+    if (range) {
+      const container = range.startContainer
+      const listItem = container.nodeType === Node.TEXT_NODE 
+        ? container.parentElement?.closest('li') 
+        : (container as Element)?.closest('li')
+      
+      if (listItem) {
+        // Outdent list item
+        const parentList = listItem.closest('ul, ol')
+        const grandparentListItem = parentList?.closest('li')
+        
+        if (grandparentListItem) {
+          // Move this item to parent level
+          const grandparentList = grandparentListItem.closest('ul, ol')
+          if (grandparentList) {
+            grandparentList.insertBefore(listItem, grandparentListItem.nextSibling)
+            
+            // If the nested list is now empty, remove it
+            if (parentList && parentList.children.length === 0) {
+              parentList.remove()
+            }
+          }
+        }
+      } else {
+        document.execCommand('outdent')
+      }
+    } else {
+      document.execCommand('outdent')
+    }
+    onEditorInput(new Event('input'))
+  }
 
   // Editor element and basic editing handlers
   const editor = ref<HTMLElement | null>(null)
@@ -347,7 +491,63 @@
 
   function onEditorKeydown(e: Event) {
     const ev = e as KeyboardEvent
-    // simple handling: Ctrl/Cmd+B/I/U map to formatting
+    
+    // Handle Enter key in lists
+    if (ev.key === 'Enter') {
+      const selection = window.getSelection()
+      const range = selection?.getRangeAt(0)
+      if (range) {
+        const container = range.startContainer
+        const listItem = container.nodeType === Node.TEXT_NODE 
+          ? container.parentElement?.closest('li') 
+          : (container as Element)?.closest('li')
+        
+        if (listItem) {
+          const list = listItem.closest('ul, ol')
+          if (list) {
+            ev.preventDefault()
+
+            // If the list item is empty, exit the list and insert a paragraph
+            const listItemText = (listItem.textContent || '').trim()
+            if (listItemText === '') {
+              const newP = document.createElement('p')
+              newP.innerHTML = '<br>'
+              list.parentNode?.insertBefore(newP, list.nextSibling)
+
+              // Move cursor to new paragraph
+              const newRange = document.createRange()
+              newRange.setStart(newP, 0)
+              newRange.collapse(true)
+              selection?.removeAllRanges()
+              selection?.addRange(newRange)
+
+              // Remove empty list item
+              if (listItem.parentNode && listItem.parentNode.children.length === 1) {
+                list.remove()
+              } else {
+                listItem.remove()
+              }
+            } else {
+              // Create a new empty list item and place the cursor inside
+              const newListItem = document.createElement('li')
+              newListItem.innerHTML = '<br>'
+              listItem.parentNode?.insertBefore(newListItem, listItem.nextSibling)
+
+              const newRange = document.createRange()
+              newRange.setStart(newListItem, 0)
+              newRange.collapse(true)
+              selection?.removeAllRanges()
+              selection?.addRange(newRange)
+            }
+
+            onEditorInput(new Event('input'))
+            return
+          }
+        }
+      }
+    }
+    
+    // Handle formatting shortcuts
     const isMod = ev.metaKey || ev.ctrlKey
     if (!isMod) return
     const k = ev.key?.toLowerCase()
@@ -507,6 +707,28 @@
     justify-content: center;
     padding: 2rem 0;
     /* vertical space around the page */
+  }
+
+  /* List styling for better formatting */
+
+  :deep(ul), :deep(ol) {
+    margin: 10px 0;
+    padding-left: 32px; /* leave space for native markers */
+    list-style-position: outside;
+  }
+
+  /* Use native list markers to avoid adding duplicate bullets when pasted HTML
+     already contains inline bullet characters or markers. Keep simple spacing. */
+  :deep(ul li), :deep(ol li) {
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+
+
+  /* Nested list styling */
+  :deep(ul ul), :deep(ol ol), :deep(ul ol), :deep(ol ul) {
+    margin: 5px 0;
+    padding-left: 20px;
   }
 
 </style>
