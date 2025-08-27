@@ -162,8 +162,7 @@
       (e: 'toggle-ordered-list'): void
       (e: 'spell-check'): void
       (e: 'word-count'): void
-      (e: 'verify-authorship'): void
-      (e: 'generate-proof'): void
+  (e: 'verify-authorship'): void
       (e: 'show-shortcuts'): void
     }
   >()
@@ -380,7 +379,8 @@
   }
 
   function generateProof() {
-    emit('generate-proof')
+    // generate-proof removed; keep function stub for compatibility
+    // emit('generate-proof')
   }
 
   function showKeyboardShortcuts() {

@@ -3,13 +3,17 @@
     <!-- Fixed top area: Menubar + EditorToolbar (both floating) -->
     <div class="fixed inset-x-1 top-1 z-50 pointer-events-none">
       <div ref="menuWrapper" v-show="menuVisible" class="pointer-events-auto">
-        <MenuBar :documentTitle="documentTitle" :isDirty="isDirty" :user="user" @select-all="onSelectAll"
+      <MenuBar :documentTitle="documentTitle" :isDirty="isDirty" :user="user" @select-all="onSelectAll"
           @update-title="onUpdateTitle" @save-document="onSaveDocument" @new-document="onNewDocument"
           @open-document="onOpenDocument" @export-document="onExport" @import-document="onImport" @settings="onSettings"
           @about="onAbout" @undo="doUndo" @redo="doRedo" @format-bold="toggleBold" @format-italic="toggleItalic"
           @format-underline="toggleUnderline" @toggle-bullet-list="toggleBulletList"
           @toggle-ordered-list="toggleOrderedList" @insert-link="onInsertLink" @insert-image="onInsertImage"
-          @insert-table="onInsertTable" @set-zoom="onSetZoom" />
+          @insert-table="onInsertTable" @set-zoom="onSetZoom"
+          @verify-authorship="onVerifyAuthorship" />
+        <!-- listen for proof-related menu actions -->
+        <!-- these are emitted from MenuBar and handled here -->
+        <template v-if="false" />
       </div>
 
       <div ref="toolbarWrapper" :class="[menuVisible ? 'mt-2' : 'mt-0', 'pointer-events-auto']">
@@ -50,14 +54,9 @@
 
   </div>
   <div v-if="showProofModal" class="fixed inset-0 z-60 flex items-center justify-center bg-black/40">
-    <div class="bg-white rounded-md shadow-lg w-11/12 max-w-2xl p-4">
-      <div class="flex justify-between items-center mb-2">
-        <h3 class="text-lg font-medium">Document Proofs</h3>
-        <button class="text-sm text-gray-500" @click="showProofModal = false">Close</button>
-      </div>
       <AuthProofDialog />
-    </div>
   </div>
+
 </template>
 
 <script setup lang="ts">
@@ -626,11 +625,6 @@
 
   // Proof modal
   const showProofModal = ref(false)
-
-  async function onGenerateProof() {
-    // open modal which allows generating/inspecting proof
-    showProofModal.value = true
-  }
 
   async function onVerifyAuthorship() {
     // open modal to verify proof

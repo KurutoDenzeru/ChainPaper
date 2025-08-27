@@ -1,51 +1,169 @@
 <template>
-  <div class="p-4">
-    <div class="flex gap-2 mb-3">
-      <Button variant="outline" size="sm" @click="generateKeys">Generate Keypair</Button>
-      <Button variant="ghost" size="sm" @click="exportKeys" :disabled="!privateKey">Export Keys</Button>
-    </div>
-
-    <div class="mb-3">
-      <Label>Public Key (SPKI, base64)</Label>
-      <Textarea class="w-full" :value="publicKeyB64" readonly />
-    </div>
-
-    <div class="mb-3">
-      <Label>Private Key (PKCS8, base64)</Label>
-      <Textarea class="w-full" :value="privateKeyB64" readonly />
-    </div>
-
-    <div class="flex gap-2">
-      <Button @click="signExport" :disabled="!privateKey">Sign & Export JSON</Button>
-      <Button variant="secondary" @click="verifyCurrent" :disabled="!publicKeyB64 || !currentProof">Verify Proof</Button>
-    </div>
-
-    <div v-if="exported" class="mt-4 p-3 border rounded bg-gray-50">
-      <div class="text-sm font-medium">Exported JSON</div>
-      <pre class="text-xs mt-2 max-h-40 overflow-auto">{{ exported }}</pre>
-    </div>
-
-    <div v-if="currentProof" class="mt-4 p-3 border rounded bg-white">
-      <div class="flex justify-between items-center">
-        <div>
-          <div class="text-sm font-medium">Proof</div>
-          <div class="text-xs text-gray-600">Signature: {{ currentProof.signature.slice(0, 24) }}…</div>
+  <div class="bg-white rounded-lg shadow-sm p-4 max-w-full">
+    <!-- Header: icon + title + close -->
+    <div class="flex items-start gap-3 mb-3">
+      <div class="flex-shrink-0 mt-0.5">
+        <FileSignature class="w-6 h-6 text-indigo-600" />
+      </div>
+      <div class="flex-1">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-gray-900">Document Proofs</h3>
+          <div class="flex items-center gap-3">
+            <HoverCard>
+              <HoverCardTrigger>
+                <Badge :class="statusClass" :variant="verified === true ? 'default' : verified === false ? 'destructive' : 'outline'">{{ verifiedText }}</Badge>
+              </HoverCardTrigger>
+              <HoverCardContent>
+                <div class="text-xs text-gray-700">
+                  <div><strong>Verification:</strong> {{ verifiedText }}</div>
+                  <div class="mt-1">Proof hash: <code class="break-words">{{ currentProof?.hash ?? '—' }}</code></div>
+                  <div class="mt-1">Computed hash: <code class="break-words">{{ computedHash ?? '—' }}</code></div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+            <HoverCard>
+              <HoverCardTrigger>
+                <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('close')" aria-label="Close dialog">
+                  <X class="w-4 h-4 text-gray-600" />
+                </Button>
+              </HoverCardTrigger>
+              <HoverCardContent>
+                <div class="text-xs text-gray-700">Close</div>
+              </HoverCardContent>
+            </HoverCard>
+          </div>
         </div>
-        <div class="text-sm">Status: <span :class="verified ? 'text-green-600' : 'text-red-600'">{{ verified ? 'Valid' : 'Unknown' }}</span></div>
+        <p class="text-xs text-gray-500 mt-1">Sign and verify document proofs using local keys — private keys never leave this device.</p>
       </div>
     </div>
+
+    <!-- Key inputs: responsive and collapsible to reduce bulk -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <Label class="mb-0">Public Key (SPKI, base64)</Label>
+          <div class="flex items-center gap-2">
+            <HoverCard>
+              <HoverCardTrigger>
+                <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="pastePublicKey" aria-label="Paste public key">
+                  <Clipboard class="w-4 h-4 text-gray-600" />
+                </Button>
+              </HoverCardTrigger>
+              <HoverCardContent>
+                <div class="text-xs text-gray-700">Paste public key from clipboard</div>
+              </HoverCardContent>
+            </HoverCard>
+            <Button variant="outline" size="sm" class="h-8" @click="showPublicKey = !showPublicKey">
+              <span v-if="showPublicKey">Hide</span>
+              <span v-else>View</span>
+            </Button>
+          </div>
+        </div>
+        <div v-show="showPublicKey">
+          <Textarea v-model="publicKeyB64" placeholder="Paste or generate a public key" rows="4" class="w-full" />
+        </div>
+        <div v-show="!showPublicKey" class="text-xs text-gray-500">Public key hidden — click View to show.</div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <Label class="mb-0">Private Key (PKCS8, base64)</Label>
+          <div class="flex items-center gap-2">
+            <HoverCard>
+              <HoverCardTrigger>
+                <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="exportKeys" :disabled="!privateKey" aria-label="Export keys">
+                  <Download class="w-4 h-4 text-gray-600" />
+                </Button>
+              </HoverCardTrigger>
+              <HoverCardContent>
+                <div class="text-xs text-gray-700">Download public & private key files</div>
+              </HoverCardContent>
+            </HoverCard>
+            <Button variant="outline" size="sm" class="h-8" @click="showPrivateKey = !showPrivateKey">
+              <span v-if="showPrivateKey">Hide</span>
+              <span v-else>View</span>
+            </Button>
+          </div>
+        </div>
+        <div v-show="showPrivateKey">
+          <Textarea v-model="privateKeyB64" placeholder="(keeps local only)" rows="4" class="w-full" />
+        </div>
+        <div v-show="!showPrivateKey" class="text-xs text-gray-500">Private key hidden — keep this secret.</div>
+      </div>
+    </div>
+
+    <!-- Compact toolbar for quick actions -->
+    <div class="flex items-center gap-2 mt-3">
+      <div class="flex items-center gap-1">
+        <HoverCard>
+          <HoverCardTrigger>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="generateKeys" aria-label="Generate keys">
+              <Key class="w-4 h-4 text-gray-700" />
+            </Button>
+          </HoverCardTrigger>
+          <HoverCardContent>
+            <div class="text-xs text-gray-700">Generate new key pair (private key stays local)</div>
+          </HoverCardContent>
+        </HoverCard>
+        <HoverCard>
+          <HoverCardTrigger>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="pickProofFile" aria-label="Import proof">
+              <FileText class="w-4 h-4 text-gray-700" />
+            </Button>
+          </HoverCardTrigger>
+          <HoverCardContent>
+            <div class="text-xs text-gray-700">Import a proof JSON file</div>
+          </HoverCardContent>
+        </HoverCard>
+      </div>
+
+      <div class="ml-auto flex items-center gap-2">
+        <Button @click="signExport" :disabled="!privateKey" class="px-3">
+          <FileText class="w-4 h-4 mr-2" />
+          <span class="hidden sm:inline">Sign & Export</span>
+        </Button>
+        <Button variant="secondary" @click="verifyCurrent" :disabled="!publicKeyB64 || !currentProof" class="px-3">
+          <CheckCircle class="w-4 h-4 mr-2" />
+          <span class="hidden sm:inline">Verify Proof</span>
+        </Button>
+      </div>
+    </div>
+
+    <!-- Exported content + proof summary -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+      <div v-if="exported">
+        <div class="text-sm font-medium">Exported JSON</div>
+        <pre class="text-xs mt-2 max-h-36 overflow-auto bg-gray-50 p-2 rounded">{{ exported }}</pre>
+      </div>
+
+      <div v-if="currentProof">
+        <div class="text-sm font-medium">Proof</div>
+        <div class="text-xs break-words mt-1">Signature: <code class="text-xs">{{ currentProof.signature }}</code></div>
+        <div class="text-xs">Proof hash: <code>{{ currentProof.hash }}</code></div>
+        <div class="text-xs mt-2">Computed document hash: <code>{{ computedHash ?? '—' }}</code></div>
+      </div>
+    </div>
+
+    <div v-if="errorMessage" class="text-sm text-red-600 mt-3">{{ errorMessage }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { generateKeyPair, exportPublicKey, exportPrivateKey, importPrivateKey, importPublicKey } from '@/lib/crypto'
+import { Key, Download, Clipboard, FileText, CheckCircle, X, FileSignature } from 'lucide-vue-next'
+import { Badge } from '@/components/ui/badge'
+import HoverCard from '@/components/ui/hover-card/HoverCard.vue'
+import HoverCardTrigger from '@/components/ui/hover-card/HoverCardTrigger.vue'
+import HoverCardContent from '@/components/ui/hover-card/HoverCardContent.vue'
+import { generateKeyPair, exportPublicKey, exportPrivateKey } from '@/lib/crypto'
 import useDocument from '@/composables/useDocument'
 
-const { exportJSON, createProof, verifyProof } = useDocument()
+const emit = defineEmits(['close'] as const)
+
+const { createProof, verifyProof } = useDocument()
 
 const privateKey = ref<CryptoKey | null>(null)
 const publicKey = ref<CryptoKey | null>(null)
@@ -54,6 +172,19 @@ const privateKeyB64 = ref('')
 const exported = ref('')
 const currentProof = ref<any>(null)
 const verified = ref<boolean | null>(null)
+const computedHash = ref<string | null>(null)
+const errorMessage = ref<string | null>(null)
+
+const showPublicKey = ref(false)
+const showPrivateKey = ref(false)
+
+const verifiedText = computed(() => {
+  if (verified.value === true) return 'Valid'
+  if (verified.value === false) return 'Invalid'
+  return 'Not verified'
+})
+
+const statusClass = computed(() => (verified.value === true ? 'text-green-600' : verified.value === false ? 'text-red-600' : 'text-gray-600'))
 
 async function generateKeys() {
   const kp = await generateKeyPair()
@@ -61,10 +192,11 @@ async function generateKeys() {
   publicKey.value = kp.publicKey
   publicKeyB64.value = await exportPublicKey(kp.publicKey)
   privateKeyB64.value = await exportPrivateKey(kp.privateKey)
+  // show small preview after generation
+  showPublicKey.value = true
 }
 
 async function exportKeys() {
-  // trigger download of keys as files
   if (publicKeyB64.value) {
     const blob = new Blob([publicKeyB64.value], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
@@ -86,16 +218,91 @@ async function exportKeys() {
 }
 
 async function signExport() {
-  if (!privateKey.value) return
-  const { exportObj, proof } = await createProof(privateKey.value)
-  exported.value = JSON.stringify(exportObj, null, 2)
-  currentProof.value = proof
-  verified.value = true
+  errorMessage.value = null
+  if (!privateKey.value) {
+    errorMessage.value = 'No private key available to sign with.'
+    return
+  }
+  try {
+    const { proof, exportObj } = await createProof(privateKey.value)
+    exported.value = JSON.stringify(exportObj, null, 2)
+    currentProof.value = proof
+    // try local verification to compute hash; may fail if public key not present
+    try {
+      const res = await verifyProof(publicKeyB64.value || '', currentProof.value)
+      computedHash.value = res?.computedHash ?? null
+      verified.value = !!res?.valid
+      if (res?.error) errorMessage.value = res.error
+    } catch (e: any) {
+      errorMessage.value = String(e)
+      computedHash.value = null
+      verified.value = null
+    }
+  } catch (e: any) {
+    errorMessage.value = String(e)
+  }
 }
 
 async function verifyCurrent() {
-  if (!publicKeyB64.value || !currentProof.value) return
-  const res = await verifyProof(publicKeyB64.value, currentProof.value)
-  verified.value = !!res.valid
+  errorMessage.value = null
+  if (!publicKeyB64.value) {
+    errorMessage.value = 'Please provide a public key to verify with.'
+    return
+  }
+  if (!currentProof.value) {
+    errorMessage.value = 'No proof loaded to verify.'
+    return
+  }
+  try {
+    const res = await verifyProof(publicKeyB64.value, currentProof.value)
+    computedHash.value = res?.computedHash ?? null
+    verified.value = !!res?.valid
+    if (res?.error) errorMessage.value = res.error
+  } catch (e: any) {
+    errorMessage.value = String(e)
+    verified.value = null
+    computedHash.value = null
+  }
 }
+
+async function pastePublicKey() {
+  try {
+    const text = await navigator.clipboard.readText()
+    if (text) publicKeyB64.value = text.trim()
+  } catch (e) {
+    const t = prompt('Paste public key (base64)')
+    if (t) publicKeyB64.value = t.trim()
+  }
+}
+
+function pickProofFile() {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.json,application/json'
+  input.onchange = async (ev: any) => {
+    const f = ev.target.files?.[0]
+    if (!f) return
+    const txt = await f.text()
+    try {
+      const obj = JSON.parse(txt)
+      if (obj.proof) currentProof.value = obj.proof
+      else if (obj.signature && obj.hash) currentProof.value = obj
+      else alert('Selected file does not contain a proof object')
+    } catch (err) {
+      alert('Invalid JSON file')
+    }
+  }
+  input.click()
+}
+
 </script>
+
+<style scoped>
+.break-words code { word-break: break-all; }
+
+/* Responsive tweaks for dialog */
+@media (max-width: 640px) {
+  .max-w-full { padding: 0.75rem; }
+}
+
+</style>

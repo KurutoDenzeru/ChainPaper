@@ -121,7 +121,6 @@ export const menus = [
       { label: 'Word Count', icon: FileText, emit: 'word-count' },
       { type: 'separator' },
       { label: 'Verify Authorship', icon: ShieldCheck, emit: 'verify-authorship' },
-      { label: 'Generate Proof', icon: FileSignature, emit: 'generate-proof' },
       { type: 'separator' },
       { label: 'Preferences', icon: Settings, emit: 'settings', shortcut: { key: ',', mac: ['Command'], pc: 'Ctrl' } }
     ]

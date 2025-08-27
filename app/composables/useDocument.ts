@@ -50,12 +50,16 @@ export async function createProof(privateKey: CryptoKey) {
 }
 
 export async function verifyProof(publicKeyB64: string, proof: any) {
-  const { obj, str } = await exportJSON()
-  const imported = await importPublicKey(publicKeyB64)
-  const hashBytes = await digestSHA256(str)
-  const sigBytes = new Uint8Array(proof.signature.match(/.{1,2}/g).map((h: string) => parseInt(h, 16)))
-  const valid = await verifySignature(imported, hashBytes, sigBytes)
-  return { valid, computedHash: toHex(hashBytes), proofHash: proof.hash }
+  try {
+    const { obj, str } = await exportJSON()
+    const imported = await importPublicKey(publicKeyB64)
+    const hashBytes = await digestSHA256(str)
+    const sigBytes = new Uint8Array(proof.signature.match(/.{1,2}/g).map((h: string) => parseInt(h, 16)))
+    const valid = await verifySignature(imported, hashBytes, sigBytes)
+    return { valid, computedHash: toHex(hashBytes), proofHash: proof.hash }
+  } catch (err: any) {
+    return { valid: false, computedHash: null, proofHash: proof?.hash ?? null, error: err?.message || String(err) }
+  }
 }
 
 export function useDocument() {
