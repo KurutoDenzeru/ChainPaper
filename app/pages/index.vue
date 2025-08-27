@@ -44,7 +44,7 @@
       <div class="w-full max-w-4xl">
         <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 min-h-[60vh]">
           <div class="prose max-w-none">
-              <div class="editor-viewport overflow-auto">
+              <div class="editor-viewport overflow-auto" :style="editorStyle">
                 <div
                   ref="editor"
                   class="editor-content outline-none min-h-[40vh] text-gray-800"
@@ -53,9 +53,8 @@
                   aria-multiline="true"
                   @input="onEditorInput"
                   @keydown="onEditorKeydown"
-                  v-html="pages[0] || ''"
-                  :style="editorStyle"
                 ></div>
+                <!-- content is managed directly to avoid Vue re-rendering and resetting caret -->
               </div>
               <!-- hidden file input for image uploads -->
               <input ref="imageInput" type="file" accept="image/*" class="hidden" @change="onImageSelected" />
@@ -179,6 +178,12 @@
       computeCountsFromAllPages()
     })
     isDirty.value = false
+  }
+
+  function setEditorHtml(html = '') {
+    if (editor.value) {
+      editor.value.innerHTML = html || '<p><br></p>'
+    }
   }
 
   function onOpenDocument() {
@@ -380,7 +385,8 @@
   // Undo / Redo
   function doUndo() {
     try {
-      document.execCommand('undo')
+  editor.value?.focus()
+  document.execCommand('undo')
       onEditorInput(new Event('input'))
     } catch (e) {
       console.warn('undo failed', e)
@@ -389,7 +395,8 @@
 
   function doRedo() {
     try {
-      document.execCommand('redo')
+  editor.value?.focus()
+  document.execCommand('redo')
       onEditorInput(new Event('input'))
     } catch (e) {
       try { document.execCommand('forward'); onEditorInput(new Event('input')) } catch (e2) { console.warn('redo failed', e2) }
@@ -466,6 +473,8 @@
     updateTopPadding()
     // update on window resize
     window.addEventListener('resize', updateTopPadding)
+  // set editor initial HTML content
+  setEditorHtml(pages.value[0] || '')
   })
 </script>
 
