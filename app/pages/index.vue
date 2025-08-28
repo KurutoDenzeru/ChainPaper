@@ -310,37 +310,24 @@
 
     console.log('Generated table HTML:', tableHtml)
 
-    // Prefer DOM Range insertion so the table becomes its own block sibling
+    // Clear any existing selection and use a more reliable insertion method
     if (editor.value) {
       editor.value.focus()
       const sel = window.getSelection()
-      let range = sel && sel.rangeCount ? sel.getRangeAt(0) : null
+      sel?.removeAllRanges()
+
+      // Create a new range at the end of the editor content
+      const range = document.createRange()
+      range.selectNodeContents(editor.value)
+      range.collapse(false) // collapse to end
 
       try {
-        if (range) {
-          // If selection exists, try to insert after the nearest direct child block of the editor
-          // Find the node that is a direct child of editor (or editor itself)
-          let node: Node | null = range.startContainer
-          // climb up until the parent is the editor (so `node` is a direct child of editor)
-          while (node && node.parentNode && node.parentNode !== editor.value) {
-            node = node.parentNode
-          }
-
-          const fragment = range.createContextualFragment(tableHtml)
-
-          if (node && node !== editor.value && node.parentNode) {
-            // insert after this direct child so the table sits as a sibling block
-            if (node.nextSibling) node.parentNode.insertBefore(fragment, node.nextSibling)
-            else node.parentNode.appendChild(fragment)
-          } else {
-            // fallback: insert at the caret/range
-            range.collapse(true)
-            range.insertNode(fragment)
-          }
-        } else {
-          // no selection/unsupported: append to the end of the editor
-          editor.value.insertAdjacentHTML('beforeend', tableHtml)
-        }
+        // Insert the table at the end of the editor content
+        const fragment = range.createContextualFragment(tableHtml)
+        range.insertNode(fragment)
+        
+        // Clear the range after insertion
+        sel?.removeAllRanges()
       } catch (err) {
         // If anything fails, use execCommand as a last resort
         console.warn('table insertion via Range failed, falling back to execCommand', err)
