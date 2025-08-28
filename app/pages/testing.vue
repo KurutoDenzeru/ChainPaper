@@ -46,7 +46,15 @@
         </div>
       </div>
     </main>
-    <MarkdownFooter :wordCount="wordCount" :zoom="zoom" @set-zoom="setZoom" @word-count="showWordDialog=true" />
+    <MarkdownFooter 
+      :wordCount="wordCount" 
+      :characterCount="stats.charsWithSpaces"
+      :mode="mode"
+      :zoom="zoom" 
+      @set-zoom="setZoom" 
+      @word-count="showWordDialog=true"
+      @toggle-mode="toggleMode"
+    />
   <MarkdownWordCountDialog :open="showWordDialog" :stats="stats" @update:open="v=>showWordDialog=v" />
   </div>
 </template>
@@ -54,8 +62,8 @@
 import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import MarkdownMenuBar from '@/components/markdown/layout/MarkdownMenuBar.vue'
-import MarkdownToolbar from '@/components/markdown/editor/MarkdownToolbar.vue'
-import MarkdownFooter from '@/components/markdown/layout/MarkdownFooter.vue'
+import MarkdownToolbar from '@/components/markdown/editor/MarkdownEditorToolbar.vue'
+import MarkdownFooter from '@/components/markdown/layout/MarkdownStickyFooter.vue'
 import MarkdownWordCountDialog from '@/components/markdown/dialogs/MarkdownWordCountDialog.vue'
 // lazy load markdown-it to avoid SSR type resolution issues
 let MarkdownIt: any
@@ -271,6 +279,10 @@ const renderedHtml = computed(()=> {
   const md = new MarkdownIt({ html: true, linkify: true, breaks: true })
   try { return md.render(content.value) } catch { return '<pre class="text-red-600">Render error</pre>' }
 })
+
+function toggleMode() {
+  mode.value = mode.value === 'source' ? 'reader' : 'source'
+}
 
 onMounted(()=>{ textareaEl.value = document.querySelector('textarea') })
 
