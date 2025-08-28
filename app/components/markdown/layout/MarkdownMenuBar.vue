@@ -107,7 +107,13 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Edit3, Command } from 'lucide-vue-next'
+import { 
+  Edit3, Command, FileText, FolderOpen, Save, Download, Globe, FileDown,
+  Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
+  Strikethrough, Heading, List, ListOrdered, Quote, Link, Image, Table,
+  Code2, Calculator, Calendar, Wrench, BarChart3, Eye, Sidebar, ZoomIn,
+  SpellCheck, Hash, Shield, Keyboard, BookOpen
+} from 'lucide-vue-next'
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -174,41 +180,41 @@ const menus = ref([
   {
     label: 'File',
     items: [
-      { type: 'item', label: 'New Markdown', emit: 'new-document', icon: 'FileText', shortcut: { mac: ['Command'], key: 'N', pc: 'Ctrl' } },
-      { type: 'item', label: 'Open', emit: 'open-document', icon: 'FolderOpen', shortcut: { mac: ['Command'], key: 'O', pc: 'Ctrl' } },
+      { type: 'item', label: 'New Markdown', emit: 'new-document', icon: FileText, shortcut: { mac: ['Command'], key: 'N', pc: 'Ctrl' } },
+      { type: 'item', label: 'Open', emit: 'open-document', icon: FolderOpen, shortcut: { mac: ['Command'], key: 'O', pc: 'Ctrl' } },
       { type: 'separator' },
-      { type: 'item', label: 'Save', emit: 'save-document', icon: 'Save', shortcut: { mac: ['Command'], key: 'S', pc: 'Ctrl' } },
+      { type: 'item', label: 'Save', emit: 'save-document', icon: Save, shortcut: { mac: ['Command'], key: 'S', pc: 'Ctrl' } },
       { type: 'separator' },
-      { type: 'sub', label: 'Export', icon: 'Download', items: [
-        { type: 'item', label: 'Export as Markdown', emit: 'export-markdown', icon: 'FileText' },
-        { type: 'item', label: 'Export as HTML', emit: 'export-html', icon: 'Globe' },
-        { type: 'item', label: 'Export as PDF', emit: 'export-pdf', icon: 'FileDown' }
+      { type: 'sub', label: 'Export', icon: Download, items: [
+        { type: 'item', label: 'Export as Markdown', emit: 'export-markdown', icon: FileText },
+        { type: 'item', label: 'Export as HTML', emit: 'export-html', icon: Globe },
+        { type: 'item', label: 'Export as PDF', emit: 'export-pdf', icon: FileDown }
       ]}
     ]
   },
   {
     label: 'Edit',
     items: [
-      { type: 'item', label: 'Undo', emit: 'undo', icon: 'Undo2', shortcut: { mac: ['Command'], key: 'Z', pc: 'Ctrl' } },
-      { type: 'item', label: 'Redo', emit: 'redo', icon: 'Redo2', shortcut: { mac: ['Command', 'Shift'], key: 'Z', pc: 'Ctrl' } },
+      { type: 'item', label: 'Undo', emit: 'undo', icon: Undo2, shortcut: { mac: ['Command'], key: 'Z', pc: 'Ctrl' } },
+      { type: 'item', label: 'Redo', emit: 'redo', icon: Redo2, shortcut: { mac: ['Command', 'Shift'], key: 'Z', pc: 'Ctrl' } },
       { type: 'separator' },
-      { type: 'item', label: 'Cut', emit: 'cut', icon: 'Scissors', shortcut: { mac: ['Command'], key: 'X', pc: 'Ctrl' } },
-      { type: 'item', label: 'Copy', emit: 'copy', icon: 'Copy', shortcut: { mac: ['Command'], key: 'C', pc: 'Ctrl' } },
-      { type: 'item', label: 'Paste', emit: 'paste', icon: 'Clipboard', shortcut: { mac: ['Command'], key: 'V', pc: 'Ctrl' } },
+      { type: 'item', label: 'Cut', emit: 'cut', icon: Scissors, shortcut: { mac: ['Command'], key: 'X', pc: 'Ctrl' } },
+      { type: 'item', label: 'Copy', emit: 'copy', icon: Copy, shortcut: { mac: ['Command'], key: 'C', pc: 'Ctrl' } },
+      { type: 'item', label: 'Paste', emit: 'paste', icon: Clipboard, shortcut: { mac: ['Command'], key: 'V', pc: 'Ctrl' } },
       { type: 'separator' },
       { type: 'item', label: 'Select All', emit: 'select-all', shortcut: { mac: ['Command'], key: 'A', pc: 'Ctrl' } },
-      { type: 'item', label: 'Find', emit: 'toggle-find', icon: 'Search', shortcut: { mac: ['Command'], key: 'F', pc: 'Ctrl' } }
+      { type: 'item', label: 'Find', emit: 'toggle-find', icon: Search, shortcut: { mac: ['Command'], key: 'F', pc: 'Ctrl' } }
     ]
   },
   {
     label: 'Format',
     items: [
-      { type: 'item', label: 'Bold', emit: 'format-bold', icon: 'Bold', shortcut: { mac: ['Command'], key: 'B', pc: 'Ctrl' } },
-      { type: 'item', label: 'Italic', emit: 'format-italic', icon: 'Italic', shortcut: { mac: ['Command'], key: 'I', pc: 'Ctrl' } },
-      { type: 'item', label: 'Underline', emit: 'format-underline', icon: 'Underline', shortcut: { mac: ['Command'], key: 'U', pc: 'Ctrl' } },
-      { type: 'item', label: 'Strikethrough', emit: 'format-strikethrough', icon: 'Strikethrough', shortcut: { mac: ['Command', 'Shift'], key: 'X', pc: 'Ctrl' } },
+      { type: 'item', label: 'Bold', emit: 'format-bold', icon: Bold, shortcut: { mac: ['Command'], key: 'B', pc: 'Ctrl' } },
+      { type: 'item', label: 'Italic', emit: 'format-italic', icon: Italic, shortcut: { mac: ['Command'], key: 'I', pc: 'Ctrl' } },
+      { type: 'item', label: 'Underline', emit: 'format-underline', icon: Underline, shortcut: { mac: ['Command'], key: 'U', pc: 'Ctrl' } },
+      { type: 'item', label: 'Strikethrough', emit: 'format-strikethrough', icon: Strikethrough, shortcut: { mac: ['Command', 'Shift'], key: 'X', pc: 'Ctrl' } },
       { type: 'separator' },
-      { type: 'sub', label: 'Heading', icon: 'Heading', items: [
+      { type: 'sub', label: 'Heading', icon: Heading, items: [
         { type: 'item', label: 'Heading 1', emit: 'set-heading', payload: 1, shortcut: { mac: ['Command'], key: '1', pc: 'Ctrl' } },
         { type: 'item', label: 'Heading 2', emit: 'set-heading', payload: 2, shortcut: { mac: ['Command'], key: '2', pc: 'Ctrl' } },
         { type: 'item', label: 'Heading 3', emit: 'set-heading', payload: 3, shortcut: { mac: ['Command'], key: '3', pc: 'Ctrl' } },
@@ -217,33 +223,33 @@ const menus = ref([
         { type: 'item', label: 'Heading 6', emit: 'set-heading', payload: 6, shortcut: { mac: ['Command'], key: '6', pc: 'Ctrl' } }
       ]},
       { type: 'separator' },
-      { type: 'item', label: 'Bullet List', emit: 'toggle-bullet-list', icon: 'List' },
-      { type: 'item', label: 'Numbered List', emit: 'toggle-ordered-list', icon: 'ListOrdered' },
-      { type: 'item', label: 'Blockquote', emit: 'toggle-blockquote', icon: 'Quote' }
+      { type: 'item', label: 'Bullet List', emit: 'toggle-bullet-list', icon: List },
+      { type: 'item', label: 'Numbered List', emit: 'toggle-ordered-list', icon: ListOrdered },
+      { type: 'item', label: 'Blockquote', emit: 'toggle-blockquote', icon: Quote }
     ]
   },
   {
     label: 'Insert',
     items: [
-      { type: 'item', label: 'Link', emit: 'insert-link', icon: 'Link', shortcut: { mac: ['Command'], key: 'K', pc: 'Ctrl' } },
-      { type: 'item', label: 'Image', emit: 'insert-image', icon: 'Image' },
-      { type: 'item', label: 'Table', emit: 'insert-table', icon: 'Table' },
-      { type: 'item', label: 'Code Block', emit: 'insert-code-block', icon: 'Code2' },
+      { type: 'item', label: 'Link', emit: 'insert-link', icon: Link, shortcut: { mac: ['Command'], key: 'K', pc: 'Ctrl' } },
+      { type: 'item', label: 'Image', emit: 'insert-image', icon: Image },
+      { type: 'item', label: 'Table', emit: 'insert-table', icon: Table },
+      { type: 'item', label: 'Code Block', emit: 'insert-code-block', icon: Code2 },
       { type: 'separator' },
-      { type: 'item', label: 'Math Expression', emit: 'insert-math', icon: 'Calculator' },
-      { type: 'item', label: 'Date', emit: 'insert-date', icon: 'Calendar' }
+      { type: 'item', label: 'Math Expression', emit: 'insert-math', icon: Calculator },
+      { type: 'item', label: 'Date', emit: 'insert-date', icon: Calendar }
     ]
   },
   {
     label: 'View',
     items: [
-      { type: 'checkbox', label: 'Show Toolbar', bind: 'showToolbar', icon: 'Wrench' },
-      { type: 'checkbox', label: 'Show Status Bar', bind: 'showStatusBar', icon: 'BarChart3' },
-      { type: 'checkbox', label: 'Preview Mode', bind: 'showPreview', emit: 'toggle-preview', icon: 'Eye' },
+      { type: 'checkbox', label: 'Show Toolbar', bind: 'showToolbar', icon: Wrench },
+      { type: 'checkbox', label: 'Show Status Bar', bind: 'showStatusBar', icon: BarChart3 },
+      { type: 'checkbox', label: 'Preview Mode', bind: 'showPreview', emit: 'toggle-preview', icon: Eye },
       { type: 'separator' },
-      { type: 'item', label: 'Toggle Sidebar', emit: 'toggle-sidebar', icon: 'Sidebar', shortcut: { mac: ['Command'], key: '', pc: 'Ctrl' } },
+      { type: 'item', label: 'Toggle Sidebar', emit: 'toggle-sidebar', icon: Sidebar, shortcut: { mac: ['Command'], key: '\\', pc: 'Ctrl' } },
       { type: 'separator' },
-      { type: 'sub', label: 'Zoom', icon: 'ZoomIn', items: [
+      { type: 'sub', label: 'Zoom', icon: ZoomIn, items: [
         { type: 'item', label: 'Fit Page', emit: 'set-zoom', payload: 'fit' },
         { type: 'separator' },
         { type: 'item', label: '50%', emit: 'set-zoom', payload: 50 },
@@ -258,18 +264,18 @@ const menus = ref([
   {
     label: 'Tools',
     items: [
-      { type: 'item', label: 'Spell Check', emit: 'spell-check', icon: 'SpellCheck' },
-      { type: 'item', label: 'Word Count', emit: 'word-count', icon: 'Hash' },
+      { type: 'item', label: 'Spell Check', emit: 'spell-check', icon: SpellCheck },
+      { type: 'item', label: 'Word Count', emit: 'word-count', icon: Hash },
       { type: 'separator' },
-      { type: 'item', label: 'Verify Authorship', emit: 'verify-authorship', icon: 'Shield' }
+      { type: 'item', label: 'Verify Authorship', emit: 'verify-authorship', icon: Shield }
     ]
   },
   {
     label: 'Help',
     items: [
-      { type: 'item', label: 'Keyboard Shortcuts', emit: 'show-shortcuts', icon: 'Keyboard' },
+      { type: 'item', label: 'Keyboard Shortcuts', emit: 'show-shortcuts', icon: Keyboard },
       { type: 'separator' },
-      { type: 'item', label: 'Markdown Guide', emit: 'show-documentation', icon: 'BookOpen' }
+      { type: 'item', label: 'Markdown Guide', emit: 'show-documentation', icon: BookOpen }
     ]
   }
 ])
