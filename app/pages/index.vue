@@ -276,15 +276,24 @@
     onEditorInput(new Event('input'))
   }
 
-  function onInsertTable(rows: number = 2, cols: number = 2) {
-    console.log('Inserting table with rows:', rows, 'cols:', cols)
-    
+  function onInsertTable(rows: number = 2, cols: number = 2, header: boolean = false) {
+    console.log('Inserting table with rows:', rows, 'cols:', cols, 'header:', header)
+
     // Generate table HTML that matches Shadcn Vue table structure but with borders
     let tableHtml = `
       <div class="relative w-full overflow-auto border border-gray-300 rounded-md">
-        <table class="w-full caption-bottom text-sm border-collapse">
-          <tbody>`
-    
+        <table class="w-full caption-bottom text-sm border-collapse">`
+
+    if (header) {
+      tableHtml += `<thead><tr class="bg-gray-50">`
+      for (let c = 0; c < cols; c++) {
+        tableHtml += '<th class="p-3 align-middle border-r border-gray-200 last:border-r-0 text-left font-medium"><p><br></p></th>'
+      }
+      tableHtml += `</tr></thead>`
+    }
+
+    tableHtml += `<tbody>`
+
     for (let r = 0; r < rows; r++) {
       tableHtml += '<tr class="border-b border-gray-200 transition-colors hover:bg-gray-50">'
       for (let c = 0; c < cols; c++) {
@@ -292,20 +301,76 @@
       }
       tableHtml += '</tr>'
     }
-    
+
     tableHtml += `
           </tbody>
         </table>
       </div>
-      <p><br></p>` // Add spacing after table
-    
+      <p class="__after-table-caret"><br></p>` // Add spacing after table and marker class
+
     console.log('Generated table HTML:', tableHtml)
-    
-    // Make sure we have focus on the editor
+
+    // Prefer DOM Range insertion so the table becomes its own block sibling
     if (editor.value) {
       editor.value.focus()
+      const sel = window.getSelection()
+      let range = sel && sel.rangeCount ? sel.getRangeAt(0) : null
+
+      try {
+        if (range) {
+          // If selection exists, try to insert after the nearest direct child block of the editor
+          // Find the node that is a direct child of editor (or editor itself)
+          let node: Node | null = range.startContainer
+          // climb up until the parent is the editor (so `node` is a direct child of editor)
+          while (node && node.parentNode && node.parentNode !== editor.value) {
+            node = node.parentNode
+          }
+
+          const fragment = range.createContextualFragment(tableHtml)
+
+          if (node && node !== editor.value && node.parentNode) {
+            // insert after this direct child so the table sits as a sibling block
+            if (node.nextSibling) node.parentNode.insertBefore(fragment, node.nextSibling)
+            else node.parentNode.appendChild(fragment)
+          } else {
+            // fallback: insert at the caret/range
+            range.collapse(true)
+            range.insertNode(fragment)
+          }
+        } else {
+          // no selection/unsupported: append to the end of the editor
+          editor.value.insertAdjacentHTML('beforeend', tableHtml)
+        }
+      } catch (err) {
+        // If anything fails, use execCommand as a last resort
+        console.warn('table insertion via Range failed, falling back to execCommand', err)
+        document.execCommand('insertHTML', false, tableHtml)
+      }
+
+      onEditorInput(new Event('input'))
+
+      // Move caret into the paragraph after the table so the user can continue typing
+      nextTick(() => {
+        if (!editor.value) return
+        const after = editor.value.querySelector('p.__after-table-caret') as HTMLElement | null
+        if (after) {
+          const range = document.createRange()
+          // place inside the paragraph's first text node (or at start)
+          range.setStart(after, 0)
+          range.collapse(true)
+          const sel = window.getSelection()
+          sel?.removeAllRanges()
+          sel?.addRange(range)
+          editor.value.focus()
+        }
+        // cleanup marker class so next insertions aren't affected
+        const cleanup = editor.value.querySelectorAll('p.__after-table-caret')
+        cleanup.forEach((n) => n.classList.remove('__after-table-caret'))
+      })
+      return
     }
-    
+
+    // If we don't have an editor ref for some reason, fallback to execCommand
     document.execCommand('insertHTML', false, tableHtml)
     onEditorInput(new Event('input'))
   }

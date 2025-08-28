@@ -53,10 +53,20 @@
                   </MenubarSub>
 
                   <MenubarItem v-else class="flex items-center justify-between min-w-[250px]"
-                    :disabled="isDisabled(item)" @click="handleMenuEmit(item)">
+                    :disabled="isDisabled(item)">
                     <div class="flex items-center gap-2">
                       <component :is="getIcon(item)" class="w-4 h-4 text-gray-600" v-if="getIcon(item)" />
-                      {{ item.label }}
+
+                      <!-- For table item wrap the label with TableInserter so hovering the label opens the grid -->
+                      <template v-if="item.emit === 'insert-table'">
+                        <TableInserter @insertTable="(r, c, h) => emit('insert-table', r, c, h)">
+                          <button class="text-sm text-gray-900 hover:bg-gray-100 rounded">{{ item.label
+                            }}</button>
+                        </TableInserter>
+                      </template>
+                      <template v-else>
+                        <span @click="handleMenuEmit(item)">{{ item.label }}</span>
+                      </template>
                     </div>
 
                     <MenubarShortcut v-if="getShortcut(item)">
@@ -70,13 +80,13 @@
                               </span>
                               <span v-else
                                 class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">{{
-                                mod }}</span>
+                                  mod }}</span>
                             </template>
                           </div>
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
                           <span
                             class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
-                            getShortcut(item)?.key }}</span>
+                              getShortcut(item)?.key }}</span>
                         </template>
                         <template v-else>
                           <span
@@ -85,7 +95,7 @@
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
                           <span
                             class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
-                            getShortcut(item)?.key }}</span>
+                              getShortcut(item)?.key }}</span>
                         </template>
                       </div>
                     </MenubarShortcut>
@@ -117,6 +127,7 @@
     MenubarTrigger,
   } from '@/components/ui/menubar'
   import useMenuData from '@/composables/useMenuData'
+  import TableInserter from '@/components/editor/TableInserter.vue'
 
   const props = defineProps<{
     documentTitle: string
@@ -145,7 +156,7 @@
       (e: 'toggle-find'): void
       (e: 'toggle-sidebar'): void
       (e: 'set-zoom', level: number | 'fit'): void
-      (e: 'insert-table', rows?: number, cols?: number): void
+      (e: 'insert-table', rows?: number, cols?: number, header?: boolean): void
       (e: 'insert-image'): void
       (e: 'insert-link'): void
       (e: 'insert-code-block'): void
@@ -162,7 +173,7 @@
       (e: 'toggle-ordered-list'): void
       (e: 'spell-check'): void
       (e: 'word-count'): void
-  (e: 'verify-authorship'): void
+      (e: 'verify-authorship'): void
       (e: 'show-shortcuts'): void
     }
   >()
