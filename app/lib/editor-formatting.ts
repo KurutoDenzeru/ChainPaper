@@ -260,3 +260,168 @@ export function getCurrentLink(): HTMLAnchorElement | null {
   
   return null
 }
+
+/**
+ * Creates an inline <code> element styled as requested.
+ * Inline so it does NOT stretch full width; easier to exit.
+ */
+export function createCodeBlockElement(codeText: string = ''): HTMLElement {
+  const code = document.createElement('code')
+  // Provided classes + keep a hook class for future theming.
+  code.className = 'cp-inline-code px-1.5 py-0.5 text-sm font-mono font-medium rounded-md inline-block border border-muted bg-muted text-highlighted'
+  code.setAttribute('data-code-inline', 'true')
+  // Let the content be directly editable
+  code.contentEditable = 'true'
+  if (codeText) {
+    code.textContent = codeText
+  } else {
+    code.textContent = 'code'
+    // Select all later so user can overwrite immediately
+  }
+  return code
+}
+
+/**
+ * Inserts a code block at current selection, wrapping selected text when present.
+ * Returns the created <pre> element or null on failure.
+ */
+export function insertCodeBlock(): HTMLElement | null {
+  const sel = window.getSelection()
+  if (!sel || sel.rangeCount === 0) return null
+  const range = sel.getRangeAt(0)
+  const selectedText = sel.toString()
+
+  // If already inside an inline code element we don't nest; instead select it.
+  const ancestor = range.startContainer.nodeType === Node.ELEMENT_NODE
+    ? range.startContainer as HTMLElement
+    : (range.startContainer.parentElement as HTMLElement | null)
+  const existingCode = ancestor?.closest('code[data-code-inline="true"]') as HTMLElement | null
+  if (existingCode) {
+    // Determine if selection fully covers code element
+    const fullText = existingCode.textContent || ''
+    const selText = sel.toString()
+    const startInCode = existingCode.contains(range.startContainer)
+    const endInCode = existingCode.contains(range.endContainer)
+
+    // Case: selection collapsed inside code -> unwrap whole element (toggle off)
+    if (range.collapsed) {
+      const txt = document.createTextNode(fullText)
+      const parent = existingCode.parentNode
+      if (parent) {
+        parent.replaceChild(txt, existingCode)
+        const r = document.createRange(); r.setStart(txt, fullText.length); r.collapse(true)
+        sel.removeAllRanges(); sel.addRange(r)
+      }
+      return null
+    }
+
+    // If selection spans outside the code element (mixed content) we treat action as insertion of new code around selection, not toggle
+    if (!startInCode || !endInCode) {
+      // fall through to normal insertion pathway below (do not early-return)
+    } else {
+      // Selection entirely within one code element.
+      // If it covers full text => unwrap whole element
+      if (selText === fullText) {
+        const txt = document.createTextNode(fullText)
+        const parent = existingCode.parentNode
+        if (parent) {
+          parent.replaceChild(txt, existingCode)
+          const r = document.createRange(); r.setStart(txt, 0); r.setEnd(txt, txt.length)
+          sel.removeAllRanges(); sel.addRange(r)
+        }
+        return null
+      }
+
+      // Partial selection inside code: unwrap only selected part (segregation)
+      // Simplify: only handle when selection within a single text node child
+      if (range.startContainer === range.endContainer && range.startContainer.nodeType === Node.TEXT_NODE) {
+        const textNode = range.startContainer as Text
+        const text = textNode.data
+        const before = text.slice(0, range.startOffset)
+        const middle = text.slice(range.startOffset, range.endOffset)
+        const after = text.slice(range.endOffset)
+        const frag = document.createDocumentFragment()
+        if (before) {
+          const beforeCode = createCodeBlockElement(before)
+          beforeCode.contentEditable = 'false'
+          frag.appendChild(beforeCode)
+          frag.appendChild(document.createTextNode(' '))
+        }
+        // middle becomes plain text (unwrapped)
+        const middleTextNode = document.createTextNode(middle)
+        frag.appendChild(middleTextNode)
+        if (after) {
+          frag.appendChild(document.createTextNode(' '))
+          const afterCode = createCodeBlockElement(after)
+          afterCode.contentEditable = 'false'
+          frag.appendChild(afterCode)
+        }
+        const parent = existingCode.parentNode
+        if (parent) {
+          parent.replaceChild(frag, existingCode)
+          const newRange = document.createRange()
+            newRange.setStart(middleTextNode, 0)
+            newRange.setEnd(middleTextNode, middleTextNode.length)
+          sel.removeAllRanges(); sel.addRange(newRange)
+        }
+        return null
+      }
+      // If complex (multiple nodes) fallback to full unwrap to avoid broken markup
+      const plain = document.createTextNode(fullText)
+      const parent = existingCode.parentNode
+      if (parent) {
+        parent.replaceChild(plain, existingCode)
+        const r = document.createRange(); r.setStart(plain, 0); r.setEnd(plain, plain.length)
+        sel.removeAllRanges(); sel.addRange(r)
+      }
+      return null
+    }
+  }
+
+  const codeEl = createCodeBlockElement(selectedText.trim())
+  try {
+    // Replace selection contents with code element (wrap behaviour)
+    range.deleteContents()
+    range.insertNode(codeEl)
+
+    // After insertion: select contents so typing overwrites placeholder
+    const newRange = document.createRange()
+    newRange.selectNodeContents(codeEl)
+    sel.removeAllRanges()
+    sel.addRange(newRange)
+
+    // Key handler to allow exiting the inline code on Enter
+    const exitHandler = (ev: KeyboardEvent) => {
+      if (ev.key === 'Enter' && !ev.shiftKey) {
+        ev.preventDefault()
+        const space = document.createTextNode(' ')
+        if (codeEl.parentNode) {
+          codeEl.parentNode.insertBefore(space, codeEl.nextSibling)
+          const afterRange = document.createRange()
+          afterRange.setStartAfter(space)
+          afterRange.collapse(true)
+          sel.removeAllRanges(); sel.addRange(afterRange)
+        }
+      } else if (ev.key === 'Enter' && ev.shiftKey) {
+        // Allow newline inside code (insert \n visually as <br>)
+        ev.preventDefault()
+        const br = document.createElement('br')
+        const r = window.getSelection()?.getRangeAt(0)
+        if (r) {
+          r.deleteContents()
+          r.insertNode(br)
+          // move caret after br
+          const after = document.createRange()
+          after.setStartAfter(br)
+          after.collapse(true)
+          const s = window.getSelection(); if (s) { s.removeAllRanges(); s.addRange(after) }
+        }
+      }
+    }
+    codeEl.addEventListener('keydown', exitHandler)
+    return codeEl
+  } catch (e) {
+    console.warn('insertCodeBlock failed', e)
+    return null
+  }
+}

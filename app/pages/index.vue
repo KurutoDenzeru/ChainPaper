@@ -9,7 +9,7 @@
           @about="onAbout" @undo="doUndo" @redo="doRedo" @format-bold="toggleBold" @format-italic="toggleItalic"
           @format-underline="toggleUnderline" @toggle-bullet-list="toggleBulletList"
           @toggle-ordered-list="toggleOrderedList" @insert-link="onInsertLink" @insert-image="onInsertImage"
-          @insert-table="onInsertTable" @set-zoom="onSetZoom" @verify-authorship="onVerifyAuthorship" @word-count="onShowWordCount" />
+          @insert-table="onInsertTable" @insert-code-block="onInsertCodeBlock" @set-zoom="onSetZoom" @verify-authorship="onVerifyAuthorship" @word-count="onShowWordCount" />
         <!-- listen for proof-related menu actions -->
         <!-- these are emitted from MenuBar and handled here -->
         <template v-if="false" />
@@ -23,7 +23,7 @@
           @format-strikethrough="toggleStrikethrough" @set-font-family="setFontFamily" @set-font-size="setFontSize"
           @set-alignment="setAlignment" @set-text-color="setTextColor" @set-highlight-color="setHighlightColor"
           @indent="indent" @outdent="outdent" @toggle-bullet-list="toggleBulletList"
-          @toggle-ordered-list="toggleOrderedList" @set-zoom="onSetZoom" />
+          @toggle-ordered-list="toggleOrderedList" @insert-code-block="onInsertCodeBlock" @set-zoom="onSetZoom" />
       </div>
     </div>
 
@@ -73,7 +73,7 @@
   import AuthProofDialog from '@/components/editor/AuthProofDialog.vue'
   import StickyFooter from '@/components/layout/StickyFooter.vue'
   import useDocument, { exportJSON, createProof, verifyProof } from '@/composables/useDocument'
-  import { promptAndInsertLink, setupLinkClickHandling } from '@/lib/editor-formatting'
+  import { promptAndInsertLink, setupLinkClickHandling, insertCodeBlock } from '@/lib/editor-formatting'
   import LinkInsertDialog from '@/components/editor/LinkInsertDialog.vue'
   import WordCountDialog from '@/components/editor/WordCountDialog.vue'
 
@@ -573,6 +573,15 @@
     onEditorInput(new Event('input'))
   }
 
+  function onInsertCodeBlock() {
+    // focus editor and insert code block using utility
+    if (!editor.value) return
+    editor.value.focus()
+    const inserted = insertCodeBlock()
+  // inserted may be null when toggling off - still update
+  onEditorInput(new Event('input'))
+  }
+
   function toggleBold() { applyFormat('bold') }
   function toggleItalic() { applyFormat('italic') }
   function toggleUnderline() { applyFormat('underline') }
@@ -851,18 +860,31 @@
     if (!isMod) return
     const k = ev.key?.toLowerCase()
     if (k === 'b') {
-      ev.preventDefault()
-      document.execCommand('bold')
-      return
+      ev.preventDefault(); document.execCommand('bold'); return
     }
     if (k === 'i') {
-      ev.preventDefault()
-      document.execCommand('italic')
-      return
+      ev.preventDefault(); document.execCommand('italic'); return
     }
     if (k === 'u') {
+      ev.preventDefault(); document.execCommand('underline'); return
+    }
+    // Cmd+Shift+C -> insert inline code block (like Slack)
+    if (k === 'c' && ev.shiftKey) {
       ev.preventDefault()
-      document.execCommand('underline')
+      // Avoid nesting: if already inside an inline code element, just select it
+      const sel = window.getSelection()
+      if (sel && sel.rangeCount) {
+        const r = sel.getRangeAt(0)
+        const ancestor = r.startContainer.nodeType === Node.ELEMENT_NODE ? r.startContainer as HTMLElement : r.startContainer.parentElement as HTMLElement | null
+        const existing = ancestor?.closest('code[data-code-inline="true"]') as HTMLElement | null
+        if (existing) {
+          const nr = document.createRange(); nr.selectNodeContents(existing); sel.removeAllRanges(); sel.addRange(nr)
+        } else {
+          insertCodeBlock(); onEditorInput(new Event('input'))
+        }
+      } else {
+        insertCodeBlock(); onEditorInput(new Event('input'))
+      }
       return
     }
   }

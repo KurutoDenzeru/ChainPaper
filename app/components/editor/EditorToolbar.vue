@@ -161,6 +161,13 @@
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
       <!-- Alignment: consolidated into a single popover button -->
+      <!-- Code Block Insertion -->
+      <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="insertCodeBlock">
+        <Code2 class="w-4 h-4" />
+      </Button>
+      <div class="h-6 w-px bg-gray-300 mx-1"></div>
+
+      <!-- Alignment: consolidated into a single popover button -->
       <Popover>
         <PopoverTrigger as-child>
           <Button variant="ghost" size="sm" class="h-8 p-0 px-2 flex items-center gap-1">
@@ -518,11 +525,11 @@
 <script setup lang="ts">
   import { ref, computed, watch } from 'vue'
   import {
-    Bold, Italic, Underline, Strikethrough, Type, Highlighter,
+  Bold, Italic, Underline, Strikethrough, Type, Highlighter,
     AlignLeft, AlignCenter, AlignRight, AlignJustify,
-    List, ListOrdered, Indent, Link, ImageIcon as Image, Table,
+  List, ListOrdered, Indent, Link, ImageIcon as Image, Table,
     Undo2, Redo2, MoreHorizontal, Minus, FileText, Hash, Sidebar, Search,
-    Plus, ArrowUp, ArrowDown
+  Plus, ArrowUp, ArrowDown, Code2
   } from 'lucide-vue-next'
   import { Button } from '@/components/ui/button'
   import {
@@ -752,6 +759,10 @@
 
   function insertSymbol() {
     emit('insert-symbol')
+  }
+
+  function insertCodeBlock() {
+    emit('insert-code-block')
   }
 
   // expose emits for template listeners (toggle-sidebar/toggle-find are emitted from template with $emit)

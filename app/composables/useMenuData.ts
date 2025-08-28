@@ -84,8 +84,6 @@ export const menus = [
       { label: 'Image', icon: ImageIcon, emit: 'insert-image' },
       { label: 'Link', icon: Link, emit: 'insert-link' },
       { type: 'separator' },
-      { label: 'Code Block', icon: Code2, emit: 'insert-code-block' },
-      { type: 'separator' },
       { label: 'Page Break', icon: FileText, emit: 'insert-page-break' }
     ]
   },
@@ -96,6 +94,7 @@ export const menus = [
       { label: 'Italic', icon: Italic, emit: 'format-italic', shortcut: { key: 'I', mac: ['Command'], pc: 'Ctrl' } },
       { label: 'Underline', icon: Underline, emit: 'format-underline', shortcut: { key: 'U', mac: ['Command'], pc: 'Ctrl' } },
       { type: 'separator' },
+      { label: 'Inline Code', icon: Code2, emit: 'insert-code-block', shortcut: { key: 'C', mac: ['Command', 'Shift'], pc: 'Ctrl+Shift' } },
       {
         type: 'sub',
         label: 'Paragraph',
