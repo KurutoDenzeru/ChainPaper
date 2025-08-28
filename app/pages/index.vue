@@ -38,7 +38,8 @@
             :style="editorStyle">
             <div class="prose max-w-none">
               <div ref="editor" class="editor-content outline-none min-h-[40vh] text-gray-800" :contenteditable="true"
-                role="textbox" aria-multiline="true" @input="onEditorInput" @keydown="onEditorKeydown"></div>
+                role="textbox" aria-multiline="true" @input="onEditorInput" @keydown="onEditorKeydown"
+                @paste="onEditorPaste"></div>
               <!-- content is managed directly to avoid Vue re-rendering and resetting caret -->
             </div>
             <!-- hidden file input for image uploads -->
@@ -56,6 +57,10 @@
     <AuthProofDialog @close="showProofModal = false" />
   </div>
 
+  <!-- Link Insert Dialog -->
+  <LinkInsertDialog :open="showLinkDialog" :selected-text="selectedTextForLink" @update:open="showLinkDialog = $event"
+    @insert="onLinkInserted" />
+
 </template>
 
 <script setup lang="ts">
@@ -65,6 +70,8 @@
   import AuthProofDialog from '@/components/editor/AuthProofDialog.vue'
   import StickyFooter from '@/components/layout/StickyFooter.vue'
   import useDocument, { exportJSON, createProof, verifyProof } from '@/composables/useDocument'
+  import { promptAndInsertLink, setupLinkClickHandling } from '@/lib/editor-formatting'
+  import LinkInsertDialog from '@/components/editor/LinkInsertDialog.vue'
 
   // Page state
   const documentTitle = ref('Untitled Document')
@@ -73,6 +80,11 @@
   // toolbar state mirrors to keep buttons highlighted
   const toolbarState = ref({ isBold: false, isItalic: false, isUnderline: false, isStrikethrough: false, isBulletList: false, isOrderedList: false })
   const user = ref({ name: 'Demo User', email: undefined, avatar: undefined })
+
+  // Link dialog state
+  const showLinkDialog = ref(false)
+  const selectedTextForLink = ref('')
+  const savedRange = ref<Range | null>(null)
   // pagination and content state
   const pageContents = ref<string[]>([''])
   // refs to the page DOM elements so we can measure overflow and focus next page
@@ -170,6 +182,32 @@
     }
   }
 
+  // Focus the editor and place caret at end
+  function focusEditor(placeAtEnd = true) {
+    const el = editor.value
+    if (!el) return
+    // Focus the contenteditable element
+    el.focus()
+    try {
+      const sel = window.getSelection()
+      if (!sel) return
+      const range = document.createRange()
+      if (placeAtEnd) {
+        range.selectNodeContents(el)
+        range.collapse(false)
+      } else {
+        range.selectNodeContents(el)
+        range.collapse(true)
+      }
+      sel.removeAllRanges()
+      sel.addRange(range)
+      // remember last focused page index
+      lastFocusedPage.value = 0
+    } catch (e) {
+      // ignore selection errors on some environments
+    }
+  }
+
   function onOpenDocument() {
     console.log('open-document fired')
   }
@@ -239,20 +277,163 @@
   }
 
   function onInsertLink() {
-    // If a selection exists, prompt for URL and wrap selection in anchor; otherwise insert placeholder link
-    const sel = window.getSelection()
-    const selectedText = sel?.toString()
-    const url = prompt('Enter URL')
-    if (!url) return
-    if (selectedText && selectedText.length > 0) {
-      // wrap the selected text
-      document.execCommand('createLink', false, url)
+    // Save current selection/range so we can restore it after the dialog
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      try {
+        savedRange.value = selection.getRangeAt(0).cloneRange()
+      } catch (e) {
+        savedRange.value = null
+      }
+      selectedTextForLink.value = selection.toString()
     } else {
-      // insert an <a> element with the URL as text
-      const html = `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
-      document.execCommand('insertHTML', false, html)
+      savedRange.value = null
+      selectedTextForLink.value = ''
     }
-    onEditorInput(new Event('input'))
+
+    // Open dialog
+    showLinkDialog.value = true
+  }
+
+  function onLinkInserted(success: boolean, message?: string, options?: any) {
+    if (!success && message) {
+      console.error('Failed to insert link:', message)
+      return
+    }
+
+    if (!options) return
+
+    // Restore saved range (selection) before inserting
+    const selection = window.getSelection()
+    if (savedRange.value && selection) {
+      selection.removeAllRanges()
+      selection.addRange(savedRange.value)
+    }
+
+    if (!editor.value) return
+
+    try {
+      const sel = window.getSelection()
+      if (sel && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0)
+
+        // If there was selected text originally, delete it
+        if (selectedTextForLink.value) {
+          range.deleteContents()
+        }
+
+        // Create link element
+        const linkElement = document.createElement('a')
+        linkElement.href = options.url
+        linkElement.target = options.target || '_blank'
+        linkElement.rel = options.rel || 'noopener noreferrer'
+        linkElement.textContent = options.text || options.url
+
+        // Insert link node
+        range.insertNode(linkElement)
+
+        // Move caret after link
+        range.setStartAfter(linkElement)
+        range.setEndAfter(linkElement)
+        sel.removeAllRanges()
+        sel.addRange(range)
+
+        // Notify editor of input
+        onEditorInput(new Event('input'))
+        console.log('Link inserted successfully')
+      } else {
+        // Fallback: insert HTML at cursor
+        const html = `<a href="${options.url}" target="${options.target || '_blank'}" rel="${options.rel || 'noopener noreferrer'}">${options.text || options.url}</a>`
+        document.execCommand('insertHTML', false, html)
+        onEditorInput(new Event('input'))
+      }
+    } catch (e) {
+      console.error('Error inserting link:', e)
+    } finally {
+      // Clear saved range
+      savedRange.value = null
+      selectedTextForLink.value = ''
+    }
+  }
+
+  // Auto-detect URLs in pasted content and convert them to links
+  function processAutoLinkDetection() {
+    if (!editor.value) return
+
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+
+    // Look for URLs in the current selection or recently inserted text
+    const range = selection.getRangeAt(0)
+    const container = range.commonAncestorContainer
+
+    // Get the text content to search for URLs
+    let textNode: Node | null = null
+    let textContent = ''
+
+    if (container.nodeType === Node.TEXT_NODE) {
+      textNode = container
+      textContent = container.textContent || ''
+    } else if (container.nodeType === Node.ELEMENT_NODE) {
+      // Find the last text node in the container
+      const walker = document.createTreeWalker(
+        container,
+        NodeFilter.SHOW_TEXT,
+        null
+      )
+      let node
+      while (node = walker.nextNode()) {
+        textNode = node
+        textContent = node.textContent || ''
+      }
+    }
+
+    if (!textNode || !textContent) return
+
+    // URL regex pattern - matches common URL patterns
+    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.([a-zA-Z]{2,}|[a-zA-Z]{2,}\.[a-zA-Z]{2,})([\/\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]*)?)/g
+
+    let match
+    let lastIndex = 0
+    const replacements: { start: number, end: number, url: string }[] = []
+
+    while ((match = urlRegex.exec(textContent)) !== null) {
+      let url = match[0]
+      // Add protocol if missing
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url
+      }
+
+      replacements.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        url: url
+      })
+    }
+
+    // Apply replacements in reverse order to maintain positions
+    if (replacements.length > 0) {
+      const parentElement = textNode.parentElement
+      if (parentElement) {
+        let content = textContent
+
+        for (let i = replacements.length - 1; i >= 0; i--) {
+          const replacement = replacements[i]
+          if (!replacement) continue
+
+          const { start, end, url } = replacement
+          const originalText = content.substring(start, end)
+          const linkHtml = `<a href="${url}" target="_blank" rel="noopener noreferrer">${originalText}</a>`
+          content = content.substring(0, start) + linkHtml + content.substring(end)
+        }
+
+        // Replace the parent element's innerHTML
+        parentElement.innerHTML = content
+
+        // Trigger input event to update editor state
+        onEditorInput(new Event('input'))
+      }
+    }
   }
 
   function onInsertImage() {
@@ -315,20 +496,20 @@
     if (editor.value) {
       editor.value.focus()
       const sel = window.getSelection()
-      
+
       if (sel && sel.rangeCount > 0) {
         const range = sel.getRangeAt(0)
-        
+
         try {
           // Clear the selection first
           range.deleteContents()
-          
+
           // Create the table fragment
           const fragment = range.createContextualFragment(tableHtml)
-          
+
           // Insert the fragment at the current cursor position
           range.insertNode(fragment)
-          
+
           // Clear selection after insertion
           sel.removeAllRanges()
         } catch (err) {
@@ -549,6 +730,11 @@
     onEditorInput(new Event('input'))
   }
 
+  function onEditorPaste(e: Event) {
+    // Let the paste happen, then process for auto-link detection
+    setTimeout(processAutoLinkDetection, 50)
+  }
+
   // Editor element and basic editing handlers
   const editor = ref<HTMLElement | null>(null)
   const imageInput = ref<HTMLInputElement | null>(null)
@@ -573,6 +759,12 @@
 
   function onEditorKeydown(e: Event) {
     const ev = e as KeyboardEvent
+
+    // Handle paste with Ctrl+V
+    if (ev.ctrlKey && ev.key === 'v') {
+      // Let the paste happen first, then process it
+      setTimeout(processAutoLinkDetection, 10)
+    }
 
     // Handle Enter key in lists
     if (ev.key === 'Enter') {
@@ -739,6 +931,8 @@
   }
 
   // initialise counts on mount
+  let linkClickCleanup: (() => void) | null = null
+
   onMounted(async () => {
     await nextTick()
     // initialize with empty pages; placeholder text shown via CSS when empty
@@ -750,6 +944,22 @@
     window.addEventListener('resize', updateTopPadding)
     // set editor initial HTML content
     setEditorHtml(pages.value[0] || '')
+
+  // Ensure the editor receives initial focus and caret is ready for typing
+  await nextTick()
+  focusEditor()
+
+    // Setup link click handling for Ctrl+Click to open links
+    if (editor.value) {
+      linkClickCleanup = setupLinkClickHandling(editor.value)
+    }
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', updateTopPadding)
+    if (linkClickCleanup) {
+      linkClickCleanup()
+    }
   })
 </script>
 
@@ -821,6 +1031,52 @@
 
   :deep(ul ul ul) {
     list-style-type: square;
+  }
+
+  /* Link styling for clickable appearance */
+  :deep(a) {
+    color: #2563eb;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    position: relative;
+  }
+
+  :deep(a:hover) {
+    color: #1d4ed8;
+    text-decoration: underline;
+  }
+
+  :deep(a:visited) {
+    color: #7c3aed;
+  }
+
+  /* Show hint on hover that Ctrl+Click opens the link */
+  :deep(a:hover::after) {
+    content: 'Ctrl+Click to open';
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+  }
+
+  /* Mac users see Cmd+Click instead */
+  @media (pointer: fine) {
+    :deep(a:hover::after) {
+      content: '⌘+Click to open' attr(data-platform);
+    }
+  }
+
+  /* Make links functional in contenteditable */
+  :deep(a[href]) {
+    pointer-events: auto;
   }
 
 </style>

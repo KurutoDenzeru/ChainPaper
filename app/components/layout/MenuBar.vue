@@ -53,7 +53,7 @@
                   </MenubarSub>
 
                   <MenubarItem v-else class="flex items-center justify-between min-w-[250px]"
-                    :disabled="isDisabled(item)">
+                    :disabled="isDisabled(item)" @click="handleMenuEmit(item)">
                     <div class="flex items-center gap-2">
                       <component :is="getIcon(item)" class="w-4 h-4 text-gray-600" v-if="getIcon(item)" />
 
@@ -61,11 +61,11 @@
                       <template v-if="item.emit === 'insert-table'">
                         <TableInserter @insertTable="(r, c, h) => emit('insert-table', r, c, h)">
                           <button class="text-sm text-gray-900 hover:bg-gray-100 rounded">{{ item.label
-                            }}</button>
+                          }}</button>
                         </TableInserter>
                       </template>
                       <template v-else>
-                        <span @click="handleMenuEmit(item)">{{ item.label }}</span>
+                        <span>{{ item.label }}</span>
                       </template>
                     </div>
 
