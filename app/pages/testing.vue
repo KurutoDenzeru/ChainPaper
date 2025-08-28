@@ -12,12 +12,12 @@
           :mode="mode"
           @undo="onUndo"
           @redo="onRedo"
-          @format-bold="applyAround('**')"
-          @format-italic="applyAround('*')"
-          @format-underline="applyAround('__')"
-          @format-strikethrough="applyAround('~~')"
-          @toggle-bullet-list="toggleList('- ')"
-          @toggle-ordered-list="toggleList('1. ')"
+          @format-bold="applyBold"
+          @format-italic="applyItalic"
+          @format-underline="applyUnderline"
+          @format-strikethrough="applyStrike"
+          @toggle-bullet-list="applyBulletList"
+          @toggle-ordered-list="applyOrderedList"
           @insert-link="insertLink"
           @insert-image="insertImage"
           @insert-code-block="insertCodeBlockBlock"
@@ -32,10 +32,10 @@
       </div>
     </div>
     <div :style="{ height: topPad + 'px' }" aria-hidden="true" />
-    <main class="flex-1 p-6 pb-24 flex items-start justify-center">
-      <div class="w-full flex justify-center">
+    <main class="flex-1 p-6 pb-24 flex items-center justify-center">
+      <div class="w-full flex justify-center items-center">
         <!-- viewport with scroll/pinch handling -->
-        <div ref="pageViewport" class="overflow-auto w-full flex justify-center" style="max-width: 100%;">
+        <div ref="pageViewport" class="overflow-auto w-full flex justify-center items-center min-h-[60vh]" >
           <!-- inner page that is scaled via transform; size = Letter 8.5in x 11in -->
           <div ref="pageInner" :style="pageInnerStyle" class="bg-white border border-gray-200 rounded-lg shadow-sm m-6">
             <div class="w-full h-full">
@@ -86,7 +86,7 @@ const pageInner = ref<HTMLElement | null>(null)
 const pageInnerStyle = computed(() => ({
   width: PAGE_WIDTH_PX + 'px',
   height: PAGE_HEIGHT_PX + 'px',
-  transformOrigin: 'top left',
+  transformOrigin: 'center center',
   transform: `scale(${zoom.value/100})`,
 }))
 
@@ -102,6 +102,10 @@ function onWheel(e: WheelEvent){
 onMounted(()=>{
   // attach listener to viewport
   if (pageViewport.value) pageViewport.value.addEventListener('wheel', onWheel, { passive: false })
+  // ensure textareaEl ref is available
+  nextTick(() => {
+    textareaEl.value = document.querySelector('textarea')
+  })
 })
 
 onUnmounted(()=>{
@@ -128,6 +132,11 @@ function setZoom(z: number | 'fit'){
 }
 
 // --- Formatting helpers ---
+function getActiveTextarea(): HTMLTextAreaElement | null {
+  // Get the current textarea element
+  return textareaEl.value || document.querySelector('textarea') as HTMLTextAreaElement | null
+}
+
 function getSelection(el: HTMLTextAreaElement){ return { start: el.selectionStart, end: el.selectionEnd, value: el.value } }
 function replaceRange(el: HTMLTextAreaElement, start: number, end: number, insert: string){
   const before = el.value.slice(0,start)
@@ -140,7 +149,8 @@ function replaceRange(el: HTMLTextAreaElement, start: number, end: number, inser
 
 function applyAround(token: string){
   return () => {
-    const ta = textareaEl.value
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea()
     if(!ta) return
     const { start, end, value } = getSelection(ta)
     const selected = value.slice(start,end)
@@ -148,9 +158,18 @@ function applyAround(token: string){
   }
 }
 
+// Individual formatting functions
+function applyBold(){ applyAround('**')() }
+function applyItalic(){ applyAround('*')() }
+function applyUnderline(){ applyAround('__')() }
+function applyStrike(){ applyAround('~~')() }
+function applyBulletList(){ toggleList('- ')() }
+function applyOrderedList(){ toggleList('1. ')() }
+
 function toggleList(prefix: string){
   return () => {
-    const ta = textareaEl.value
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea()
     if(!ta) return
     const { start, end, value } = getSelection(ta)
     // expand to full lines
@@ -166,7 +185,8 @@ function toggleList(prefix: string){
 }
 
 function setHeading(level:number){
-  const ta = textareaEl.value; if(!ta) return
+  if (mode.value !== 'source') return // only work in source mode
+  const ta = getActiveTextarea(); if(!ta) return
   const { start, end, value } = getSelection(ta)
   const lineStart = value.lastIndexOf('\n', start -1) + 1
   const lineEnd = value.indexOf('\n', end)
@@ -178,31 +198,36 @@ function setHeading(level:number){
 
 function setAlignmentComment(alignment: string){
   // No native markdown alignment; insert an HTML comment marker
-  const ta = textareaEl.value; if(!ta) return
+  if (mode.value !== 'source') return // only work in source mode
+  const ta = getActiveTextarea(); if(!ta) return
   const marker = `<!-- align:${alignment} -->\n`
   const { start, end } = getSelection(ta)
   replaceRange(ta, start, end, marker)
 }
 
 function insertLink(){
-  const ta = textareaEl.value; if(!ta) return
+  if (mode.value !== 'source') return // only work in source mode
+  const ta = getActiveTextarea(); if(!ta) return
   const { start, end, value } = getSelection(ta)
   const selected = value.slice(start,end) || 'text'
   replaceRange(ta, start, end, `[${selected}](https://example.com)`)
 }
 function insertImage(){
-  const ta = textareaEl.value; if(!ta) return
+  if (mode.value !== 'source') return // only work in source mode
+  const ta = getActiveTextarea(); if(!ta) return
   const { start, end } = getSelection(ta)
   replaceRange(ta, start, end, `![alt text](https://placehold.co/400x200)`)
 }
 function insertCodeBlockBlock(){
-  const ta = textareaEl.value; if(!ta) return
+  if (mode.value !== 'source') return // only work in source mode
+  const ta = getActiveTextarea(); if(!ta) return
   const { start, end } = getSelection(ta)
   const snippet = "```ts\n// code\n```\n"
   replaceRange(ta, start, end, snippet)
 }
 function insertTable(rows:number=2, cols:number=2, header:boolean=true){
-  const ta = textareaEl.value; if(!ta) return
+  if (mode.value !== 'source') return // only work in source mode
+  const ta = getActiveTextarea(); if(!ta) return
   const headerRow = '|' + Array(cols).fill(' Header ').join('|') + '|\n'
   const sepRow = '|' + Array(cols).fill(' --- ').join('|') + '|\n'
   const body = Array(rows).fill('|' + Array(cols).fill(' Cell ').join('|') + '|\n').join('')
@@ -213,7 +238,8 @@ function insertTable(rows:number=2, cols:number=2, header:boolean=true){
 
 // Inline color via HTML span (markdown fallback) & highlight background
 function surroundWithHtml(tagOpen: string, tagClose: string){
-  const ta = textareaEl.value; if(!ta) return
+  if (mode.value !== 'source') return // only work in source mode
+  const ta = getActiveTextarea(); if(!ta) return
   const { start, end, value } = getSelection(ta)
   const selected = value.slice(start,end) || 'text'
   replaceRange(ta, start, end, tagOpen + selected + tagClose)
