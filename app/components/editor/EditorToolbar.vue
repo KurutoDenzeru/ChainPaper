@@ -58,6 +58,7 @@
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="paragraph">Normal</SelectItem>
+          <SelectItem value="subtitle">Subtitle</SelectItem>
           <SelectItem value="heading1">Heading 1</SelectItem>
           <SelectItem value="heading2">Heading 2</SelectItem>
           <SelectItem value="heading3">Heading 3</SelectItem>
@@ -373,6 +374,7 @@
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="paragraph">Normal</SelectItem>
+                        <SelectItem value="subtitle">Subtitle</SelectItem>
                   <SelectItem value="heading1">Heading 1</SelectItem>
                   <SelectItem value="heading2">Heading 2</SelectItem>
                   <SelectItem value="heading3">Heading 3</SelectItem>
@@ -694,6 +696,8 @@
     selectedHeading.value = heading
     if (heading === 'paragraph') {
       emit('set-paragraph')
+    } else if (heading === 'subtitle') {
+      emit('set-subtitle')
     } else if (typeof heading === 'string') {
       const level = parseInt(heading.replace('heading', ''))
       emit('set-heading', level)

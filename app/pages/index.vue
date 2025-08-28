@@ -23,7 +23,8 @@
           @format-strikethrough="toggleStrikethrough" @set-font-family="setFontFamily" @set-font-size="setFontSize"
           @set-alignment="setAlignment" @set-text-color="setTextColor" @set-highlight-color="setHighlightColor"
           @indent="indent" @outdent="outdent" @toggle-bullet-list="toggleBulletList"
-          @toggle-ordered-list="toggleOrderedList" @insert-code-block="onInsertCodeBlock" @set-zoom="onSetZoom" />
+          @toggle-ordered-list="toggleOrderedList" @insert-code-block="onInsertCodeBlock" @set-zoom="onSetZoom"
+          @set-paragraph="onSetParagraph" @set-heading="onSetHeading" @set-subtitle="onSetSubtitle" />
       </div>
     </div>
 
@@ -74,6 +75,7 @@
   import StickyFooter from '@/components/layout/StickyFooter.vue'
   import useDocument, { exportJSON, createProof, verifyProof } from '@/composables/useDocument'
   import { promptAndInsertLink, setupLinkClickHandling, insertCodeBlock } from '@/lib/editor-formatting'
+  import { applyHeading } from '@/lib/heading-format'
   import LinkInsertDialog from '@/components/editor/LinkInsertDialog.vue'
   import WordCountDialog from '@/components/editor/WordCountDialog.vue'
 
@@ -689,6 +691,21 @@
     onEditorInput(new Event('input'))
   }
 
+  // Heading / paragraph / subtitle handlers (refactored)
+  function onSetParagraph() {
+    applyHeading('paragraph', editor.value)
+    onEditorInput(new Event('input'))
+  }
+  function onSetHeading(level: number) {
+    const lvl = Math.min(6, Math.max(1, level)) as 1|2|3|4|5|6
+    applyHeading(lvl, editor.value)
+    onEditorInput(new Event('input'))
+  }
+  function onSetSubtitle() {
+    applyHeading('subtitle', editor.value)
+    onEditorInput(new Event('input'))
+  }
+
   function indent() {
     const selection = window.getSelection()
     const range = selection?.getRangeAt(0)
@@ -1000,6 +1017,22 @@
     if (editor.value) {
       linkClickCleanup = setupLinkClickHandling(editor.value)
     }
+
+    // Guard against unwanted aria-hidden on root (accessibility fix)
+    const root = document.querySelector('.min-h-screen.bg-gray-50.flex.flex-col') as HTMLElement | null
+    if (root) {
+      const obs = new MutationObserver((muts) => {
+        muts.forEach(m => {
+          if (m.type === 'attributes' && m.attributeName === 'aria-hidden') {
+            if (root.getAttribute('aria-hidden') === 'true') {
+              root.removeAttribute('aria-hidden')
+              root.removeAttribute('data-aria-hidden')
+            }
+          }
+        })
+      })
+      obs.observe(root, { attributes: true })
+    }
   })
 
   onUnmounted(() => {
@@ -1087,6 +1120,17 @@
     cursor: pointer;
     transition: color 0.2s ease;
     position: relative;
+  }
+
+  /* Subtitle style (between H2 and body text) */
+  :deep(.subtitle) {
+    font-size: 1.25rem; /* ~20px */
+    font-weight: 500;
+    color: #374151;
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    font-family: inherit;
   }
 
   :deep(a:hover) {

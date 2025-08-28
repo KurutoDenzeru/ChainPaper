@@ -125,7 +125,6 @@ export const menus = [
   {
     label: 'Help',
     items: [
-      { label: 'Keyboard Shortcuts', icon: Keyboard, emit: 'show-shortcuts' },
       { label: 'Documentation', icon: BookOpen, emit: 'show-documentation' },
       { type: 'separator' },
       { label: 'About ChainPaper', icon: Info, emit: 'about' }
