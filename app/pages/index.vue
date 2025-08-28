@@ -280,8 +280,9 @@
     console.log('Inserting table with rows:', rows, 'cols:', cols, 'header:', header)
 
     // Generate table HTML that matches Shadcn Vue table structure but with borders
-    let tableHtml = `
-      <div class="relative w-full overflow-auto border border-gray-300 rounded-md">
+    // Wrap the entire table structure in a div with proper spacing
+    let tableHtml = `<p class="__before-table-caret"><br></p>
+      <div class="relative w-full overflow-auto border border-gray-300 rounded-md my-4">
         <table class="w-full caption-bottom text-sm border-collapse">`
 
     if (header) {
@@ -310,28 +311,33 @@
 
     console.log('Generated table HTML:', tableHtml)
 
-    // Clear any existing selection and use a more reliable insertion method
+    // Better insertion strategy that respects current cursor position
     if (editor.value) {
       editor.value.focus()
       const sel = window.getSelection()
-      sel?.removeAllRanges()
-
-      // Create a new range at the end of the editor content
-      const range = document.createRange()
-      range.selectNodeContents(editor.value)
-      range.collapse(false) // collapse to end
-
-      try {
-        // Insert the table at the end of the editor content
-        const fragment = range.createContextualFragment(tableHtml)
-        range.insertNode(fragment)
+      
+      if (sel && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0)
         
-        // Clear the range after insertion
-        sel?.removeAllRanges()
-      } catch (err) {
-        // If anything fails, use execCommand as a last resort
-        console.warn('table insertion via Range failed, falling back to execCommand', err)
-        document.execCommand('insertHTML', false, tableHtml)
+        try {
+          // Clear the selection first
+          range.deleteContents()
+          
+          // Create the table fragment
+          const fragment = range.createContextualFragment(tableHtml)
+          
+          // Insert the fragment at the current cursor position
+          range.insertNode(fragment)
+          
+          // Clear selection after insertion
+          sel.removeAllRanges()
+        } catch (err) {
+          console.warn('table insertion via Range failed, falling back to execCommand', err)
+          document.execCommand('insertHTML', false, tableHtml)
+        }
+      } else {
+        // No selection - append to end
+        editor.value.insertAdjacentHTML('beforeend', tableHtml)
       }
 
       onEditorInput(new Event('input'))
@@ -342,7 +348,6 @@
         const after = editor.value.querySelector('p.__after-table-caret') as HTMLElement | null
         if (after) {
           const range = document.createRange()
-          // place inside the paragraph's first text node (or at start)
           range.setStart(after, 0)
           range.collapse(true)
           const sel = window.getSelection()
@@ -350,9 +355,9 @@
           sel?.addRange(range)
           editor.value.focus()
         }
-        // cleanup marker class so next insertions aren't affected
-        const cleanup = editor.value.querySelectorAll('p.__after-table-caret')
-        cleanup.forEach((n) => n.classList.remove('__after-table-caret'))
+        // cleanup marker classes so next insertions aren't affected
+        const cleanup = editor.value.querySelectorAll('p.__after-table-caret, p.__before-table-caret')
+        cleanup.forEach((n) => n.classList.remove('__after-table-caret', '__before-table-caret'))
       })
       return
     }
@@ -373,7 +378,7 @@
 
     if (!range) {
       // No selection, create a new bullet list with an empty list item
-      const bulletHtml = '<ul style="margin-left: 20px; padding-left: 20px;"><li><br></li></ul>'
+      const bulletHtml = '<ul><li><br></li></ul>'
       document.execCommand('insertHTML', false, bulletHtml)
     } else {
       // Check if we're already in a list
@@ -391,12 +396,12 @@
         if (selectedText.trim()) {
           // Split by lines and create list items
           const lines = selectedText.split('\n').filter(line => line.trim())
-          const listItems = lines.map(line => `<li style="margin-bottom: 5px;">${line.trim()}</li>`).join('')
-          const bulletHtml = `<ul style="margin-left: 20px; padding-left: 20px;">${listItems}</ul>`
+          const listItems = lines.map(line => `<li>${line.trim()}</li>`).join('')
+          const bulletHtml = `<ul>${listItems}</ul>`
           document.execCommand('insertHTML', false, bulletHtml)
         } else {
           // Create new bullet point (empty li for cursor)
-          const bulletHtml = '<ul style="margin-left: 20px; padding-left: 20px;"><li><br></li></ul>'
+          const bulletHtml = '<ul><li><br></li></ul>'
           document.execCommand('insertHTML', false, bulletHtml)
         }
       }
@@ -410,7 +415,7 @@
 
     if (!range) {
       // No selection, create a new numbered list with an empty list item
-      const numberedHtml = '<ol style="margin-left: 20px; padding-left: 20px;"><li><br></li></ol>'
+      const numberedHtml = '<ol><li><br></li></ol>'
       document.execCommand('insertHTML', false, numberedHtml)
     } else {
       // Check if we're already in a list
@@ -428,12 +433,12 @@
         if (selectedText.trim()) {
           // Split by lines and create numbered list items (browser will handle numbering)
           const lines = selectedText.split('\n').filter(line => line.trim())
-          const listItems = lines.map(line => `<li style="margin-bottom: 5px;">${line.trim()}</li>`).join('')
-          const numberedHtml = `<ol style="margin-left: 20px; padding-left: 20px;">${listItems}</ol>`
+          const listItems = lines.map(line => `<li>${line.trim()}</li>`).join('')
+          const numberedHtml = `<ol>${listItems}</ol>`
           document.execCommand('insertHTML', false, numberedHtml)
         } else {
           // Create new numbered point (empty li for cursor)
-          const numberedHtml = '<ol style="margin-left: 20px; padding-left: 20px;"><li><br></li></ol>'
+          const numberedHtml = '<ol><li><br></li></ol>'
           document.execCommand('insertHTML', false, numberedHtml)
         }
       }
@@ -781,12 +786,22 @@
     list-style-position: outside;
   }
 
+  /* Ensure bullets and numbers are visible */
+  :deep(ul) {
+    list-style-type: disc;
+  }
+
+  :deep(ol) {
+    list-style-type: decimal;
+  }
+
   /* Use native list markers to avoid adding duplicate bullets when pasted HTML
      already contains inline bullet characters or markers. Keep simple spacing. */
   :deep(ul li),
   :deep(ol li) {
     margin-bottom: 6px;
     line-height: 1.5;
+    list-style: inherit;
   }
 
 
@@ -797,6 +812,15 @@
   :deep(ol ul) {
     margin: 5px 0;
     padding-left: 20px;
+  }
+
+  /* Nested list marker variations */
+  :deep(ul ul) {
+    list-style-type: circle;
+  }
+
+  :deep(ul ul ul) {
+    list-style-type: square;
   }
 
 </style>
