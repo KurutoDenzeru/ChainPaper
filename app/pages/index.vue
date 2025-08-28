@@ -9,7 +9,7 @@
           @about="onAbout" @undo="doUndo" @redo="doRedo" @format-bold="toggleBold" @format-italic="toggleItalic"
           @format-underline="toggleUnderline" @toggle-bullet-list="toggleBulletList"
           @toggle-ordered-list="toggleOrderedList" @insert-link="onInsertLink" @insert-image="onInsertImage"
-          @insert-table="onInsertTable" @set-zoom="onSetZoom" @verify-authorship="onVerifyAuthorship" />
+          @insert-table="onInsertTable" @set-zoom="onSetZoom" @verify-authorship="onVerifyAuthorship" @word-count="onShowWordCount" />
         <!-- listen for proof-related menu actions -->
         <!-- these are emitted from MenuBar and handled here -->
         <template v-if="false" />
@@ -50,7 +50,7 @@
     </main>
 
     <StickyFooter :wordCount="wordCount" :pageCount="pageCount" :zoom="zoomPercent" :view="viewMode"
-      :fitMode="lastZoomWasFit" @set-zoom="onSetZoom" @set-view="onSetView" />
+      :fitMode="lastZoomWasFit" @set-zoom="onSetZoom" @set-view="onSetView" @word-count="onShowWordCount" />
 
   </div>
   <div v-if="showProofModal" class="fixed inset-0 z-60 flex items-center justify-center bg-black/40">
@@ -60,6 +60,9 @@
   <!-- Link Insert Dialog -->
   <LinkInsertDialog :open="showLinkDialog" :selected-text="selectedTextForLink" @update:open="showLinkDialog = $event"
     @insert="onLinkInserted" />
+
+  <!-- Word Count Dialog -->
+  <WordCountDialog :open="showWordCountDialog" :stats="wordStats" @update:open="showWordCountDialog = $event" />
 
 </template>
 
@@ -72,6 +75,7 @@
   import useDocument, { exportJSON, createProof, verifyProof } from '@/composables/useDocument'
   import { promptAndInsertLink, setupLinkClickHandling } from '@/lib/editor-formatting'
   import LinkInsertDialog from '@/components/editor/LinkInsertDialog.vue'
+  import WordCountDialog from '@/components/editor/WordCountDialog.vue'
 
   // Page state
   const documentTitle = ref('Untitled Document')
@@ -85,6 +89,8 @@
   const showLinkDialog = ref(false)
   const selectedTextForLink = ref('')
   const savedRange = ref<Range | null>(null)
+  const showWordCountDialog = ref(false)
+  const wordStats = ref<Record<string, any>>({})
   // pagination and content state
   const pageContents = ref<string[]>([''])
   // refs to the page DOM elements so we can measure overflow and focus next page
@@ -176,6 +182,20 @@
     isDirty.value = false
   }
 
+  // compute simple document stats from the editor text
+  function computeWordStats() {
+    const text = editor.value ? editor.value.innerText || '' : pageContents.value.join('\n')
+    const charsWithSpaces = text.length
+    const charsNoSpaces = text.replace(/\s+/g, '').length
+    const words = (text.trim().match(/\S+/g) || []).length
+    const sentences = (text.match(/[.!?]+/g) || []).length
+    const paragraphs = (text.trim().split(/\n{2,}|\n/).filter(Boolean) || []).length
+    const readingMinutes = Math.max(1, Math.round(words / 200))
+    const pages = Math.max(1, Math.ceil(words / WORDS_PER_PAGE))
+    const avgWordsPerParagraph = paragraphs ? Math.round(words / paragraphs) : words
+    wordStats.value = { charsWithSpaces, charsNoSpaces, words, sentences, paragraphs, readingMinutes, pages, avgWordsPerParagraph }
+  }
+
   function setEditorHtml(html = '') {
     if (editor.value) {
       editor.value.innerHTML = html || '<p><br></p>'
@@ -234,6 +254,11 @@
 
   function onSettings() {
     console.log('open settings')
+  }
+
+  function onShowWordCount() {
+    computeWordStats()
+    showWordCountDialog.value = true
   }
 
   function onAbout() {

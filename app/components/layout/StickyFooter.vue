@@ -10,7 +10,7 @@
             <span class="text-gray-800">{{ pageCount }} of {{ pageCount }}</span>
           </div>
           <div class="hidden sm:flex items-center gap-2">•</div>
-          <div class="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer" @click="$emit('word-count')">
             <span class="font-medium">Word Count</span>
             <span class="text-gray-800">{{ wordCount }}</span>
           </div>
@@ -86,7 +86,6 @@
 <script setup lang="ts">
   import { ref, computed, watch } from 'vue'
   import { Minus, Plus, List, Grid } from 'lucide-vue-next'
-  import { defineProps } from 'vue'
   import { Button } from '@/components/ui/button'
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   import { Input } from '@/components/ui/input'
@@ -97,7 +96,8 @@
 
   // percent value (e.g. 100) — initialize from prop when provided
   // allow emitting a special 'fit' payload in addition to numeric zoom levels
-  const emit = defineEmits<{ (e: 'set-zoom', level: number | 'fit'): void }>()
+  // include a no-payload "word-count" event so template $emit('word-count') typechecks
+  const emit = defineEmits<{ (e: 'set-zoom', level: number | 'fit'): void; (e: 'word-count'): void }>()
   const zoomPercent = ref<number>(props.zoom ?? 100)
   const viewMode = ref<'list' | 'grid'>(props.view ?? 'list')
   // track whether 'Fit' is active (parent may toggle fitMode)

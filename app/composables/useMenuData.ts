@@ -85,9 +85,7 @@ export const menus = [
       { label: 'Link', icon: Link, emit: 'insert-link' },
       { type: 'separator' },
       { label: 'Code Block', icon: Code2, emit: 'insert-code-block' },
-      { label: 'Math Formula', icon: Calculator, emit: 'insert-math' },
       { type: 'separator' },
-      { label: 'Date & Time', icon: Calendar, emit: 'insert-date' },
       { label: 'Page Break', icon: FileText, emit: 'insert-page-break' }
     ]
   },
