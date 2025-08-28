@@ -18,6 +18,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-vue-next": "^0.542.0",
+    "markdown-it": "^14.1.0",
     "nuxt": "^4.0.3",
     "nuxt-vitalizer": "^1.0.0",
     "pinia": "^3.0.3",
@@ -29,5 +30,8 @@
     "typescript": "^5.9.2",
     "vue": "^3.5.20",
     "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2"
   }
 }
