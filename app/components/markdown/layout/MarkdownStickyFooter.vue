@@ -1,10 +1,23 @@
 <template>
   <div class="fixed inset-x-0 bottom-1 z-50 pointer-events-none">
     <div class="w-full mx-auto pointer-events-auto px-4">
-      <div class="flex items-center justify-between bg-white border border-gray-200 rounded-lg shadow-sm h-12 px-3 md:h-10">
-        <!-- Left: Word Count / Character Count -->
+      <div
+        class="flex items-center justify-between bg-white border border-gray-200 rounded-lg shadow-sm h-12 px-4 md:h-10">
+        <!-- Left: Mode toggle + Word Count / Character Count -->
         <div class="flex items-center gap-4 text-xs text-gray-600">
-          <div class="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer" @click="$emit('word-count')">
+          <!-- Mode label + toggle (far left) -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-medium">Mode:</span>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="toggleMode"
+              :title="mode === 'source' ? 'Switch to Reader' : 'Switch to Source'">
+              <BookOpen v-if="mode === 'source'" class="w-4 h-4" />
+              <Edit v-else class="w-4 h-4" />
+            </Button>
+            <div class="h-6 w-px bg-gray-300 mx-1"></div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer"
+            @click="$emit('word-count')">
             <span class="font-medium">Words</span>
             <span class="text-gray-800">{{ wordCount || 0 }}</span>
           </div>
@@ -14,10 +27,7 @@
             <span class="text-gray-800">{{ characterCount || 0 }}</span>
           </div>
           <div class="hidden md:flex items-center gap-2">•</div>
-          <div class="hidden md:flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
-            <span class="font-medium">Mode</span>
-            <span class="text-gray-800">{{ mode || 'Source' }}</span>
-          </div>
+          <!-- duplicate mode display removed; use far-left control -->
         </div>
 
         <!-- Middle: spacer -->
@@ -25,16 +35,8 @@
 
         <!-- Right: Mode toggle and Zoom controls -->
         <div class="flex items-center gap-2">
-          <!-- Mode toggle (hidden on mobile) -->
-          <div class="hidden sm:flex items-center gap-2">
-            <Button variant="ghost" size="sm" @click="toggleMode" :class="mode === 'source' ? 'bg-blue-50 text-blue-600' : 'bg-transparent'" aria-label="Source mode">
-              <FileText class="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="sm" @click="toggleMode" :class="mode === 'reader' ? 'bg-blue-50 text-blue-600' : 'bg-transparent'" aria-label="Reader mode">
-              <Eye class="w-4 h-4" />
-            </Button>
-          </div>
-          
+          <!-- right-side duplicate mode toggles removed; use far-left control -->
+
           <!-- Zoom controls -->
           <Button type="button" @click="changeZoom(-25)"
             class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
@@ -45,31 +47,18 @@
           <Popover>
             <PopoverTrigger as-child>
               <div>
-                <Input
-                  type="number"
-                  class="w-16 text-center text-sm rounded-md border border-gray-200 px-2 py-1"
-                  v-model="zoomModel"
-                  min="50"
-                  max="200"
-                  placeholder="100"
-                />
+                <Input type="number" class="w-16 text-center text-sm rounded-md border border-gray-200 px-2 py-1"
+                  v-model="zoomModel" min="50" max="200" placeholder="100" />
               </div>
             </PopoverTrigger>
             <PopoverContent class="w-32 p-2">
               <div class="flex flex-col">
-                <button
-                  class="text-left px-2 py-1 rounded hover:bg-gray-100 font-medium"
-                  @click="selectZoom('fit')"
-                >
+                <button class="text-left px-2 py-1 rounded hover:bg-gray-100 font-medium" @click="selectZoom('fit')">
                   Fit
                 </button>
                 <div class="border-t my-1" />
-                <button
-                  v-for="opt in zoomOptions"
-                  :key="opt"
-                  class="text-left px-2 py-1 rounded hover:bg-gray-100"
-                  @click="selectZoom(opt)"
-                >
+                <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-gray-100"
+                  @click="selectZoom(opt)">
                   {{ opt }}%
                 </button>
               </div>
@@ -88,82 +77,83 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { Minus, Plus, FileText, Eye } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
-import { Input } from '@/components/ui/input'
+  import { ref, computed, watch } from 'vue'
+  import { Minus, Plus, BookOpen, Edit } from 'lucide-vue-next'
+  import { Button } from '@/components/ui/button'
+  import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
+  import { Input } from '@/components/ui/input'
 
-// props for markdown editor specific data
-const props = defineProps<{ 
-  wordCount?: number
-  characterCount?: number
-  mode?: 'source' | 'reader'
-  zoom?: number
-  fitMode?: boolean
-}>()
+  // props for markdown editor specific data
+  const props = defineProps<{
+    wordCount?: number
+    characterCount?: number
+    mode?: 'source' | 'reader'
+    zoom?: number
+    fitMode?: boolean
+  }>()
 
-// emit events for markdown editor
-const emit = defineEmits<{ 
-  (e: 'set-zoom', level: number | 'fit'): void
-  (e: 'word-count'): void
-  (e: 'toggle-mode'): void
-}>()
+  // emit events for markdown editor
+  const emit = defineEmits<{
+    (e: 'set-zoom', level: number | 'fit'): void
+    (e: 'word-count'): void
+    (e: 'toggle-mode'): void
+  }>()
 
-const zoomPercent = ref<number>(props.zoom ?? 100)
-const isFit = ref<boolean>(!!props.fitMode)
+  const zoomPercent = ref<number>(props.zoom ?? 100)
+  const isFit = ref<boolean>(!!props.fitMode)
 
-// keep fit state in sync
-watch(() => props.fitMode, (v) => {
-  isFit.value = !!v
-})
+  // keep fit state in sync
+  watch(() => props.fitMode, (v) => {
+    isFit.value = !!v
+  })
 
-// sync when parent updates numeric zoom
-watch(() => props.zoom, (v) => {
-  if (typeof v === 'number') {
+  // sync when parent updates numeric zoom
+  watch(() => props.zoom, (v) => {
+    if (typeof v === 'number') {
+      isFit.value = false
+      zoomPercent.value = Math.round(v)
+    }
+  })
+
+  // Computed model for the Input component
+  const zoomModel = computed<string | number>({
+    get: () => (isFit.value ? 100 : zoomPercent.value),
+    set: (v: string | number) => {
+      const n = Number(v)
+      if (Number.isNaN(n)) return
+      isFit.value = false
+      zoomPercent.value = Math.min(200, Math.max(50, Math.round(n)))
+      emit('set-zoom', zoomPercent.value)
+    },
+  })
+
+  const zoomOptions = [50, 75, 100, 125, 150, 175, 200]
+
+  const changeZoom = (delta: number) => {
+    zoomPercent.value = Math.min(200, Math.max(50, zoomPercent.value + delta))
     isFit.value = false
-    zoomPercent.value = Math.round(v)
-  }
-})
-
-// Computed model for the Input component
-const zoomModel = computed<string | number>({
-  get: () => (isFit.value ? 100 : zoomPercent.value),
-  set: (v: string | number) => {
-    const n = Number(v)
-    if (Number.isNaN(n)) return
-    isFit.value = false
-    zoomPercent.value = Math.min(200, Math.max(50, Math.round(n)))
     emit('set-zoom', zoomPercent.value)
-  },
-})
-
-const zoomOptions = [50, 75, 100, 125, 150, 175, 200]
-
-const changeZoom = (delta: number) => {
-  zoomPercent.value = Math.min(200, Math.max(50, zoomPercent.value + delta))
-  isFit.value = false
-  emit('set-zoom', zoomPercent.value)
-}
-
-const selectZoom = (opt: number | 'fit') => {
-  if (opt === 'fit') {
-    emit('set-zoom', 'fit')
-    return
   }
-  zoomPercent.value = Math.min(200, Math.max(50, Math.round(opt)))
-  isFit.value = false
-  emit('set-zoom', zoomPercent.value)
-}
 
-const toggleMode = () => {
-  emit('toggle-mode')
-}
+  const selectZoom = (opt: number | 'fit') => {
+    if (opt === 'fit') {
+      emit('set-zoom', 'fit')
+      return
+    }
+    zoomPercent.value = Math.min(200, Math.max(50, Math.round(opt)))
+    isFit.value = false
+    emit('set-zoom', zoomPercent.value)
+  }
+
+  const toggleMode = () => {
+    emit('toggle-mode')
+  }
 </script>
 
 <style scoped>
-/* keep footer visually small on mobile */
-.max-w-4xl {
-  max-width: 64rem;
-}
+
+  /* keep footer visually small on mobile */
+  .max-w-4xl {
+    max-width: 64rem;
+  }
 </style>
