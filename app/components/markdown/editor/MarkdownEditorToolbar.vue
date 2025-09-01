@@ -33,21 +33,48 @@
     <div class="hidden lg:flex gap-1 flex-1 items-center">
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
-      <!-- Headings -->
-      <Select v-model="heading" @update:modelValue="onHeadingChange">
-        <SelectTrigger class="w-28 h-8">
-          <SelectValue placeholder="Paragraph" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="p">Paragraph</SelectItem>
-          <SelectItem value="h1">Heading 1</SelectItem>
-          <SelectItem value="h2">Heading 2</SelectItem>
-          <SelectItem value="h3">Heading 3</SelectItem>
-          <SelectItem value="h4">Heading 4</SelectItem>
-          <SelectItem value="h5">Heading 5</SelectItem>
-          <SelectItem value="h6">Heading 6</SelectItem>
-        </SelectContent>
-      </Select>
+      <!-- Headings (popover dropdown) -->
+      <Popover>
+        <PopoverTrigger as-child>
+          <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
+            <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600" />
+            <ChevronDown class="w-3 h-3 text-gray-500" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent class="w-40 p-2">
+          <div class="flex flex-col">
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('p')">
+              <FileText class="w-4 h-4" />
+              Paragraph
+            </button>
+            <div class="border-t my-1" />
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h1')">
+              <Heading1 class="w-4 h-4" />
+              Heading 1
+            </button>
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h2')">
+              <Heading2 class="w-4 h-4" />
+              Heading 2
+            </button>
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h3')">
+              <Heading3 class="w-4 h-4" />
+              Heading 3
+            </button>
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h4')">
+              <Heading4 class="w-4 h-4" />
+              Heading 4
+            </button>
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h5')">
+              <Heading5 class="w-4 h-4" />
+              Heading 5
+            </button>
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h6')">
+              <Heading6 class="w-4 h-4" />
+              Heading 6
+            </button>
+          </div>
+        </PopoverContent>
+      </Popover>
 
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
@@ -141,11 +168,12 @@
 
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
-      <!-- Alignment -->
+      <!-- Alignment (popover with chevron inside trigger) -->
       <Popover>
         <PopoverTrigger as-child>
-          <Button variant="ghost" size="sm" class="h-8 w-8 p-0">
+          <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
             <component :is="alignmentIcon" class="w-4 h-4" />
+            <ChevronDown class="w-3 h-3 text-gray-500" />
           </Button>
         </PopoverTrigger>
         <PopoverContent class="w-36 p-2">
@@ -203,21 +231,48 @@
     <div class="hidden md:flex lg:hidden gap-1 flex-1 items-center">
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
-      <!-- Headings (smaller) -->
-      <Select v-model="heading" @update:modelValue="onHeadingChange">
-        <SelectTrigger class="w-20 h-8">
-          <SelectValue placeholder="P" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="p">P</SelectItem>
-          <SelectItem value="h1">H1</SelectItem>
-          <SelectItem value="h2">H2</SelectItem>
-          <SelectItem value="h3">H3</SelectItem>
-          <SelectItem value="h4">H4</SelectItem>
-          <SelectItem value="h5">H5</SelectItem>
-          <SelectItem value="h6">H6</SelectItem>
-        </SelectContent>
-      </Select>
+      <!-- Headings (smaller popover) -->
+      <Popover>
+        <PopoverTrigger as-child>
+          <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
+            <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600" />
+            <ChevronDown class="w-3 h-3 text-gray-500" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent class="w-36 p-2">
+          <div class="flex flex-col">
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('p')">
+              <FileText class="w-4 h-4" />
+              P
+            </button>
+            <div class="border-t my-1" />
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h1')">
+              <Heading1 class="w-4 h-4" />
+              H1
+            </button>
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h2')">
+              <Heading2 class="w-4 h-4" />
+              H2
+            </button>
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h3')">
+              <Heading3 class="w-4 h-4" />
+              H3
+            </button>
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h4')">
+              <Heading4 class="w-4 h-4" />
+              H4
+            </button>
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h5')">
+              <Heading5 class="w-4 h-4" />
+              H5
+            </button>
+            <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="setHeading('h6')">
+              <Heading6 class="w-4 h-4" />
+              H6
+            </button>
+          </div>
+        </PopoverContent>
+      </Popover>
 
       <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
@@ -286,20 +341,39 @@
             <!-- Paragraph Styles -->
             <div class="space-y-1">
               <div class="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">Style</div>
-              <Select v-model="heading" @update:modelValue="onHeadingChange">
-                <SelectTrigger class="w-full h-8">
-                  <SelectValue placeholder="Paragraph" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="p">Paragraph</SelectItem>
-                  <SelectItem value="h1">Heading 1</SelectItem>
-                  <SelectItem value="h2">Heading 2</SelectItem>
-                  <SelectItem value="h3">Heading 3</SelectItem>
-                  <SelectItem value="h4">Heading 4</SelectItem>
-                  <SelectItem value="h5">Heading 5</SelectItem>
-                  <SelectItem value="h6">Heading 6</SelectItem>
-                </SelectContent>
-              </Select>
+              <div>
+                <div class="flex flex-col">
+                  <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="$emit('set-heading', 0)">
+                    <FileText class="w-4 h-4" />
+                    Paragraph
+                  </button>
+                  <div class="border-t my-1"></div>
+                  <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="$emit('set-heading', 1)">
+                    <Heading1 class="w-4 h-4" />
+                    Heading 1
+                  </button>
+                  <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="$emit('set-heading', 2)">
+                    <Heading2 class="w-4 h-4" />
+                    Heading 2
+                  </button>
+                  <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="$emit('set-heading', 3)">
+                    <Heading3 class="w-4 h-4" />
+                    Heading 3
+                  </button>
+                  <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="$emit('set-heading', 4)">
+                    <Heading4 class="w-4 h-4" />
+                    Heading 4
+                  </button>
+                  <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="$emit('set-heading', 5)">
+                    <Heading5 class="w-4 h-4" />
+                    Heading 5
+                  </button>
+                  <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100" @click="$emit('set-heading', 6)">
+                    <Heading6 class="w-4 h-4" />
+                    Heading 6
+                  </button>
+                </div>
+              </div>
               <div class="border-t border-gray-200 my-2"></div>
             </div>
 
@@ -351,9 +425,8 @@
   import { Button } from '@/components/ui/button'
   import { Input } from '@/components/ui/input'
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
-  import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
   import TableInserter from '@/components/editor/TableInserter.vue'
-  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit } from 'lucide-vue-next'
+  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText } from 'lucide-vue-next'
 
   interface ActiveState { bold: boolean; italic: boolean; underline: boolean; strike: boolean; bullet: boolean; ordered: boolean }
   const props = defineProps<{
@@ -385,6 +458,31 @@
     heading.value = val
     if (val === 'p') emit('set-heading', 0)
     else emit('set-heading', Number(val.replace('h', '')))
+  }
+
+  const headingLabel = computed(() => {
+    const v = heading.value
+    if (!v || v === 'p') return 'Paragraph'
+    return v.toUpperCase().replace('H', 'Heading ')
+  })
+
+  const currentHeadingIcon = computed(() => {
+    const v = heading.value
+    switch (v) {
+      case 'h1': return Heading1
+      case 'h2': return Heading2
+      case 'h3': return Heading3
+      case 'h4': return Heading4
+      case 'h5': return Heading5
+      case 'h6': return Heading6
+      default: return FileText // For paragraph
+    }
+  })
+
+  function setHeading(v: string) {
+    heading.value = v
+    if (v === 'p') emit('set-heading', 0)
+    else emit('set-heading', Number(String(v).replace('h', '')))
   }
 
   function setAlign(a: string) { emit('set-alignment', a) }
