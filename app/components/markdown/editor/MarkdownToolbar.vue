@@ -107,8 +107,7 @@
 
     <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
-    <!-- Insert link / image / table / code -->
-    <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="emit('insert-link')"><Link class="w-4 h-4" /></Button>
+  <!-- Insert image / table / code (link moved into Format menu) -->
     <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="emit('insert-image')"><ImageIcon class="w-4 h-4" /></Button>
     <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="emit('insert-code-block')"><Code2 class="w-4 h-4" /></Button>
     <TableInserter @insert-table="(r,c,h)=>emit('insert-table',r,c,h)">

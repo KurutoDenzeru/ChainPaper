@@ -1,1173 +1,367 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col">
-    <!-- Fixed top area: Menubar + EditorToolbar (both floating) -->
     <div class="fixed inset-x-1 top-1 z-50 pointer-events-none">
-      <div ref="menuWrapper" v-show="menuVisible" class="pointer-events-auto">
-        <MenuBar :documentTitle="documentTitle" :isDirty="isDirty" :user="user" @select-all="onSelectAll"
-          @update-title="onUpdateTitle" @save-document="onSaveDocument" @new-document="onNewDocument"
-          @open-document="onOpenDocument" @export-document="onExport" @import-document="onImport" @settings="onSettings"
-          @about="onAbout" @undo="doUndo" @redo="doRedo" @format-bold="toggleBold" @format-italic="toggleItalic"
-          @format-underline="toggleUnderline" @toggle-bullet-list="toggleBulletList"
-          @toggle-ordered-list="toggleOrderedList" @insert-link="onInsertLink" @insert-image="onInsertImage"
-          @insert-table="onInsertTable" @insert-code-block="onInsertCodeBlock" @set-zoom="onSetZoom" @verify-authorship="onVerifyAuthorship" @word-count="onShowWordCount" />
-        <!-- listen for proof-related menu actions -->
-        <!-- these are emitted from MenuBar and handled here -->
-        <template v-if="false" />
+      <div class="pointer-events-auto">
+        <MarkdownMenuBar @word-count="showWordDialog = true" @insert-link="insertLink" />
       </div>
-
-      <div ref="toolbarWrapper" :class="[menuVisible ? 'mt-2' : 'mt-0', 'pointer-events-auto']">
-        <EditorToolbar :isMenuVisible="menuVisible" :zoom="zoomPercent" :fitMode="lastZoomWasFit"
-          @toggle-menubar="toggleMenu" @toggle-sidebar="toggleSidebar" @toggle-find="toggleFind"
-          @insert-link="onInsertLink" @insert-image="onInsertImage" @insert-table="onInsertTable" @undo="doUndo"
-          @redo="doRedo" @format-bold="toggleBold" @format-italic="toggleItalic" @format-underline="toggleUnderline"
-          @format-strikethrough="toggleStrikethrough" @set-font-family="setFontFamily" @set-font-size="setFontSize"
-          @set-alignment="setAlignment" @set-text-color="setTextColor" @set-highlight-color="setHighlightColor"
-          @indent="indent" @outdent="outdent" @toggle-bullet-list="toggleBulletList"
-          @toggle-ordered-list="toggleOrderedList" @insert-code-block="onInsertCodeBlock" @set-zoom="onSetZoom"
-          @set-paragraph="onSetParagraph" @set-heading="onSetHeading" @set-subtitle="onSetSubtitle" />
+      <div class="mt-2 pointer-events-auto">
+        <MarkdownToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
+          @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
+          @format-strikethrough="applyStrike" @toggle-bullet-list="applyBulletList"
+          @toggle-ordered-list="applyOrderedList" @insert-link="insertLink" @insert-image="insertImage"
+          @insert-code-block="insertCodeBlockBlock" @insert-table="insertTable" @set-heading="setHeading"
+          @set-alignment="setAlignmentComment" @set-zoom="setZoom" @set-text-color="applyColor"
+          @set-highlight="applyHighlight" @update:mode="v => mode = v" />
       </div>
     </div>
-
-    <!-- spacer to keep main content below fixed top controls -->
-    <div aria-hidden="true" :style="{ height: topPadding + 'px' }"></div>
-
-    <!-- Document editor canvas: contenteditable center pane -->
-    <main class="flex-1 p-6 pb-24 flex items-start justify-center">
-      <div class="w-full max-w-4xl">
-        <div ref="viewportEl" class="editor-viewport overflow-auto">
-          <div ref="pageEl" class="bg-white border border-gray-200 rounded-lg shadow-sm p-6 min-h-[60vh] document-page"
-            :style="editorStyle">
-            <div class="prose max-w-none">
-              <div ref="editor" class="editor-content outline-none min-h-[40vh] text-gray-800" :contenteditable="true"
-                role="textbox" aria-multiline="true" @input="onEditorInput" @keydown="onEditorKeydown"
-                @paste="onEditorPaste"></div>
-              <!-- content is managed directly to avoid Vue re-rendering and resetting caret -->
+    <div :style="{ height: topPad + 'px' }" aria-hidden="true" />
+    <main class="flex-1 p-6 pb-24 flex items-center justify-center">
+      <div class="w-full flex justify-center items-center">
+        <!-- viewport with scroll/pinch handling -->
+        <div ref="pageViewport" class="overflow-auto w-full flex justify-center items-center min-h-[60vh]">
+          <!-- inner page that is scaled via transform; size = Letter 8.5in x 11in -->
+          <div ref="pageInner" :style="pageInnerStyle" class="bg-white border border-gray-200 rounded-lg shadow-sm m-6">
+            <div class="w-full h-full">
+              <textarea v-if="mode === 'source'" ref="textareaEl" v-model="content"
+                class="w-full h-full outline-none resize-none font-mono text-sm p-6" placeholder="Write Markdown..."
+                @input="recount" />
+              <div v-else class="prose prose-gray max-w-none overflow-auto h-full p-6 prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg prose-h6:text-base" v-html="renderedHtml" />
             </div>
-            <!-- hidden file input for image uploads -->
-            <input ref="imageInput" type="file" accept="image/*" class="hidden" @change="onImageSelected" />
           </div>
         </div>
       </div>
     </main>
-
-    <StickyFooter :wordCount="wordCount" :pageCount="pageCount" :zoom="zoomPercent" :view="viewMode"
-      :fitMode="lastZoomWasFit" @set-zoom="onSetZoom" @set-view="onSetView" @word-count="onShowWordCount" />
-
+    <MarkdownFooter :wordCount="wordCount" :characterCount="stats.charsWithSpaces" :mode="mode" :zoom="zoom"
+      @set-zoom="setZoom" @word-count="showWordDialog = true" @toggle-mode="toggleMode" />
+    <MarkdownWordCountDialog :open="showWordDialog" :stats="stats" @update:open="v => showWordDialog = v" />
+  <LinkInsertDialog :open="linkDialogOpen" :selectedText="linkDialogSelectedText" @update:open="v => linkDialogOpen = v" @insert="handleLinkInsert" />
   </div>
-  <div v-if="showProofModal" class="fixed inset-0 z-60 flex items-center justify-center bg-black/40">
-    <AuthProofDialog @close="showProofModal = false" />
-  </div>
-
-  <!-- Link Insert Dialog -->
-  <LinkInsertDialog :open="showLinkDialog" :selected-text="selectedTextForLink" @update:open="showLinkDialog = $event"
-    @insert="onLinkInserted" />
-
-  <!-- Word Count Dialog -->
-  <WordCountDialog :open="showWordCountDialog" :stats="wordStats" @update:open="showWordCountDialog = $event" />
-
 </template>
-
 <script setup lang="ts">
-  import { ref, nextTick, onMounted, onUnmounted, computed, type ComponentPublicInstance } from 'vue'
-  import MenuBar from '@/components/layout/MenuBar.vue'
-  import EditorToolbar from '@/components/editor/EditorToolbar.vue'
-  import AuthProofDialog from '@/components/editor/AuthProofDialog.vue'
-  import StickyFooter from '@/components/layout/StickyFooter.vue'
-  import useDocument, { exportJSON, createProof, verifyProof } from '@/composables/useDocument'
-  import { promptAndInsertLink, setupLinkClickHandling, insertCodeBlock } from '@/lib/editor-formatting'
-  import { applyHeading } from '@/lib/heading-format'
+  import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import MarkdownMenuBar from '@/components/markdown/layout/MarkdownMenuBar.vue'
+  import MarkdownToolbar from '@/components/markdown/editor/MarkdownEditorToolbar.vue'
+  import MarkdownFooter from '@/components/markdown/layout/MarkdownStickyFooter.vue'
+  import MarkdownWordCountDialog from '@/components/markdown/dialogs/MarkdownWordCountDialog.vue'
   import LinkInsertDialog from '@/components/editor/LinkInsertDialog.vue'
-  import WordCountDialog from '@/components/editor/WordCountDialog.vue'
+  import { insertLink as domInsertLink } from '@/lib/editor-formatting'
+  // lazy load markdown-it to avoid SSR type resolution issues
+  let MarkdownIt: any
+  if (typeof window !== 'undefined') {
+    // @ts-ignore - shim declared, but resolver may still complain during dev
+    import('markdown-it').then(m => { MarkdownIt = (m as any).default || m })
+  }
+  import { useMarkdownDocStore } from '@/stores/markdownDoc'
+  import WordCountDialog from '@/components/markdown/editor/MarkdownWordCountDialog.vue'
 
-  // Page state
-  const documentTitle = ref('Untitled Document')
-  const isDirty = ref(false)
-  const { title, pages, isDirty: docDirty } = useDocument()
-  // toolbar state mirrors to keep buttons highlighted
-  const toolbarState = ref({ isBold: false, isItalic: false, isUnderline: false, isStrikethrough: false, isBulletList: false, isOrderedList: false })
-  const user = ref({ name: 'Demo User', email: undefined, avatar: undefined })
-
-  // Link dialog state
-  const showLinkDialog = ref(false)
-  const selectedTextForLink = ref('')
-  const savedRange = ref<Range | null>(null)
-  const showWordCountDialog = ref(false)
-  const wordStats = ref<Record<string, any>>({})
-  // pagination and content state
-  const pageContents = ref<string[]>([''])
-  // refs to the page DOM elements so we can measure overflow and focus next page
-  const pageEls = ref<Array<HTMLElement | null>>([])
-  // index of the last focused page element
-  const lastFocusedPage = ref<number | null>(null)
-
-  // view and zoom state
-  const viewMode = ref<'list' | 'grid'>('list')
-  const zoomPercent = ref<number>(100) // 100 == 1.0 scale
-  // refs to measure fit behavior
-  const viewportEl = ref<HTMLElement | null>(null)
-  const pageEl = ref<HTMLElement | null>(null)
-  const lastZoomWasFit = ref<boolean>(false)
+  const store = useMarkdownDocStore()
+  const { content, canUndo, canRedo } = storeToRefs(store)
 
   const wordCount = ref(0)
-  const pageCount = ref(1)
+  const zoom = ref(100)
+  const topPad = ref(140)
+  const showWordDialog = ref(false)
+  const mode = ref<'source' | 'reader'>('source')
 
-  const WORDS_PER_PAGE = 300
+  // page dimensions (Letter) at 96 DPI: 8.5in * 96 = 816px, 11in * 96 = 1056px
+  const DPI = 96
+  const PAGE_WIDTH_PX = Math.round(8.5 * DPI)
+  const PAGE_HEIGHT_PX = Math.round(11 * DPI)
 
-  function computeCountsFromAllPages() {
-    const allText = pageContents.value.join('\n')
-    const words = allText.trim().match(/\S+/g)
-    const wc = words ? words.length : 0
-    wordCount.value = wc
-    pageCount.value = Math.max(1, Math.ceil(wc / WORDS_PER_PAGE))
+  const pageViewport = ref<HTMLElement | null>(null)
+  const pageInner = ref<HTMLElement | null>(null)
+
+  const pageInnerStyle = computed(() => ({
+    width: PAGE_WIDTH_PX + 'px',
+    height: PAGE_HEIGHT_PX + 'px',
+    transformOrigin: 'center center',
+    transform: `scale(${zoom.value / 100})`,
+  }))
+
+  // wheel + ctrl/command zoom
+  function onWheel(e: WheelEvent) {
+    if (!(e.ctrlKey || e.metaKey)) return
+    e.preventDefault()
+    const delta = e.deltaY < 0 ? 10 : -10
+    const next = Math.min(200, Math.max(50, zoom.value + delta))
+    zoom.value = next
   }
 
-  function distributeTextToPages(fullText: string) {
-    const words = fullText.trim().split(/\s+/).filter(Boolean)
-    const pages: string[] = []
-    for (let i = 0; i < words.length; i += WORDS_PER_PAGE) {
-      pages.push(words.slice(i, i + WORDS_PER_PAGE).join(' '))
-    }
-    if (pages.length === 0) pages.push('')
-    pageContents.value = pages
-  }
-
-  function onSelectAll() {
-    // select contents of the last focused page, or the first page if none
-    const idx = lastFocusedPage.value ?? 0
-    const node = pageEls.value[idx]
-    if (node) {
-      const range = document.createRange()
-      const sel = window.getSelection()
-      range.selectNodeContents(node)
-      sel?.removeAllRanges()
-      sel?.addRange(range)
-      node.focus()
-    }
-  }
-
-  function formatPageHtml(content: string) {
-    // basic HTML-escapes for safety, preserve simple line breaks
-    const escaped = content
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\n/g, '<br/>')
-    return escaped || '<p><br></p>'
-  }
-
-  // no single-page navigation — pages are scrollable like a document
-
-  // Handlers for menubar events
-  function onUpdateTitle(newTitle: string) {
-    documentTitle.value = newTitle
-    title.value = newTitle
-    isDirty.value = true
-    docDirty.value = true
-  }
-
-  function onSaveDocument() {
-    // simple save simulation
-    console.log('save-document fired — implement persistence')
-    isDirty.value = false
-  }
-
-  function onNewDocument() {
-    documentTitle.value = 'Untitled Document'
-    // Reset page contents and clear any existing page DOM content (we manage pages via pageContents/pageEls)
-    pageContents.value = ['']
-    nextTick(() => {
-      pageEls.value.forEach((el) => {
-        if (el) el.innerText = ''
-      })
-      computeCountsFromAllPages()
-    })
-    isDirty.value = false
-  }
-
-  // compute simple document stats from the editor text
-  function computeWordStats() {
-    const text = editor.value ? editor.value.innerText || '' : pageContents.value.join('\n')
-    const charsWithSpaces = text.length
-    const charsNoSpaces = text.replace(/\s+/g, '').length
-    const words = (text.trim().match(/\S+/g) || []).length
-    const sentences = (text.match(/[.!?]+/g) || []).length
-    const paragraphs = (text.trim().split(/\n{2,}|\n/).filter(Boolean) || []).length
-    const readingMinutes = Math.max(1, Math.round(words / 200))
-    const pages = Math.max(1, Math.ceil(words / WORDS_PER_PAGE))
-    const avgWordsPerParagraph = paragraphs ? Math.round(words / paragraphs) : words
-    wordStats.value = { charsWithSpaces, charsNoSpaces, words, sentences, paragraphs, readingMinutes, pages, avgWordsPerParagraph }
-  }
-
-  function setEditorHtml(html = '') {
-    if (editor.value) {
-      editor.value.innerHTML = html || '<p><br></p>'
-    }
-  }
-
-  // Focus the editor and place caret at end
-  function focusEditor(placeAtEnd = true) {
-    const el = editor.value
-    if (!el) return
-    // Focus the contenteditable element
-    el.focus()
-    try {
-      const sel = window.getSelection()
-      if (!sel) return
-      const range = document.createRange()
-      if (placeAtEnd) {
-        range.selectNodeContents(el)
-        range.collapse(false)
-      } else {
-        range.selectNodeContents(el)
-        range.collapse(true)
-      }
-      sel.removeAllRanges()
-      sel.addRange(range)
-      // remember last focused page index
-      lastFocusedPage.value = 0
-    } catch (e) {
-      // ignore selection errors on some environments
-    }
-  }
-
-  function onOpenDocument() {
-    console.log('open-document fired')
-  }
-
-  function onExport(format: string) {
-    // support 'json' export for now
-    console.log('export-document', format)
-    if (format === 'json') {
-      exportJSON().then(({ obj, str }) => {
-        const blob = new Blob([str], { type: 'application/json' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = (documentTitle.value || 'document') + '.chainpaper.json'
-        a.click()
-        URL.revokeObjectURL(url)
-      })
-    }
-  }
-
-  function onImport() {
-    console.log('import-document')
-  }
-
-  function onSettings() {
-    console.log('open settings')
-  }
-
-  function onShowWordCount() {
-    computeWordStats()
-    showWordCountDialog.value = true
-  }
-
-  function onAbout() {
-    console.log('open about')
-  }
-
-  // Handlers for toolbar events
-  const sidebarVisible = ref(false)
-  const findVisible = ref(false)
-
-  // Menubar visible and measuring refs for sticky top area
-  const menuVisible = ref(true)
-  const menuWrapper = ref<HTMLElement | null>(null)
-  const toolbarWrapper = ref<HTMLElement | null>(null)
-  const topPadding = ref<number>(0)
-
-  const updateTopPadding = async () => {
-    await nextTick()
-    const m = menuWrapper.value
-    const t = toolbarWrapper.value
-    const mh = m && m.offsetHeight ? m.offsetHeight : 0
-    const th = t && t.offsetHeight ? t.offsetHeight : 0
-    // add a small gap so content isn't flush
-    topPadding.value = mh + th + 16
-  }
-
-  function toggleMenu() {
-    menuVisible.value = !menuVisible.value
-    // recompute padding after DOM updates
-    updateTopPadding()
-  }
-
-  function toggleSidebar() {
-    sidebarVisible.value = !sidebarVisible.value
-    console.log('toggle-sidebar ->', sidebarVisible.value)
-  }
-
-  function toggleFind() {
-    findVisible.value = !findVisible.value
-    console.log('toggle-find ->', findVisible.value)
-  }
-
-  function onInsertLink() {
-    // Save current selection/range so we can restore it after the dialog
-    const selection = window.getSelection()
-    if (selection && selection.rangeCount > 0) {
-      try {
-        savedRange.value = selection.getRangeAt(0).cloneRange()
-      } catch (e) {
-        savedRange.value = null
-      }
-      selectedTextForLink.value = selection.toString()
-    } else {
-      savedRange.value = null
-      selectedTextForLink.value = ''
-    }
-
-    // Open dialog
-    showLinkDialog.value = true
-  }
-
-  function onLinkInserted(success: boolean, message?: string, options?: any) {
-    if (!success && message) {
-      console.error('Failed to insert link:', message)
-      return
-    }
-
-    if (!options) return
-
-    // Restore saved range (selection) before inserting
-    const selection = window.getSelection()
-    if (savedRange.value && selection) {
-      selection.removeAllRanges()
-      selection.addRange(savedRange.value)
-    }
-
-    if (!editor.value) return
-
-    try {
-      const sel = window.getSelection()
-      if (sel && sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0)
-
-        // If there was selected text originally, delete it
-        if (selectedTextForLink.value) {
-          range.deleteContents()
-        }
-
-        // Create link element
-        const linkElement = document.createElement('a')
-        linkElement.href = options.url
-        linkElement.target = options.target || '_blank'
-        linkElement.rel = options.rel || 'noopener noreferrer'
-        linkElement.textContent = options.text || options.url
-
-        // Insert link node
-        range.insertNode(linkElement)
-
-        // Move caret after link
-        range.setStartAfter(linkElement)
-        range.setEndAfter(linkElement)
-        sel.removeAllRanges()
-        sel.addRange(range)
-
-        // Notify editor of input
-        onEditorInput(new Event('input'))
-        console.log('Link inserted successfully')
-      } else {
-        // Fallback: insert HTML at cursor
-        const html = `<a href="${options.url}" target="${options.target || '_blank'}" rel="${options.rel || 'noopener noreferrer'}">${options.text || options.url}</a>`
-        document.execCommand('insertHTML', false, html)
-        onEditorInput(new Event('input'))
-      }
-    } catch (e) {
-      console.error('Error inserting link:', e)
-    } finally {
-      // Clear saved range
-      savedRange.value = null
-      selectedTextForLink.value = ''
-    }
-  }
-
-  // Auto-detect URLs in pasted content and convert them to links
-  function processAutoLinkDetection() {
-    if (!editor.value) return
-
-    const selection = window.getSelection()
-    if (!selection || selection.rangeCount === 0) return
-
-    // Look for URLs in the current selection or recently inserted text
-    const range = selection.getRangeAt(0)
-    const container = range.commonAncestorContainer
-
-    // Get the text content to search for URLs
-    let textNode: Node | null = null
-    let textContent = ''
-
-    if (container.nodeType === Node.TEXT_NODE) {
-      textNode = container
-      textContent = container.textContent || ''
-    } else if (container.nodeType === Node.ELEMENT_NODE) {
-      // Find the last text node in the container
-      const walker = document.createTreeWalker(
-        container,
-        NodeFilter.SHOW_TEXT,
-        null
-      )
-      let node
-      while (node = walker.nextNode()) {
-        textNode = node
-        textContent = node.textContent || ''
-      }
-    }
-
-    if (!textNode || !textContent) return
-
-    // URL regex pattern - matches common URL patterns
-    const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.([a-zA-Z]{2,}|[a-zA-Z]{2,}\.[a-zA-Z]{2,})([\/\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]*)?)/g
-
-    let match
-    let lastIndex = 0
-    const replacements: { start: number, end: number, url: string }[] = []
-
-    while ((match = urlRegex.exec(textContent)) !== null) {
-      let url = match[0]
-      // Add protocol if missing
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url
-      }
-
-      replacements.push({
-        start: match.index,
-        end: match.index + match[0].length,
-        url: url
-      })
-    }
-
-    // Apply replacements in reverse order to maintain positions
-    if (replacements.length > 0) {
-      const parentElement = textNode.parentElement
-      if (parentElement) {
-        let content = textContent
-
-        for (let i = replacements.length - 1; i >= 0; i--) {
-          const replacement = replacements[i]
-          if (!replacement) continue
-
-          const { start, end, url } = replacement
-          const originalText = content.substring(start, end)
-          const linkHtml = `<a href="${url}" target="_blank" rel="noopener noreferrer">${originalText}</a>`
-          content = content.substring(0, start) + linkHtml + content.substring(end)
-        }
-
-        // Replace the parent element's innerHTML
-        parentElement.innerHTML = content
-
-        // Trigger input event to update editor state
-        onEditorInput(new Event('input'))
-      }
-    }
-  }
-
-  function onInsertImage() {
-    // trigger hidden file input to allow file upload
-    imageInput.value?.click()
-  }
-
-  async function onImageSelected(e: Event) {
-    const input = e.target as HTMLInputElement
-    if (!input.files || input.files.length === 0) return
-    const file = input.files[0]
-    if (!file) return
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(String(reader.result))
-      reader.onerror = () => reject(new Error('file read error'))
-      reader.readAsDataURL(file as Blob)
-    })
-    document.execCommand('insertImage', false, dataUrl)
-    input.value = ''
-    onEditorInput(new Event('input'))
-  }
-
-  function onInsertTable(rows: number = 2, cols: number = 2, header: boolean = false) {
-    console.log('Inserting table with rows:', rows, 'cols:', cols, 'header:', header)
-
-    // Generate table HTML that matches Shadcn Vue table structure but with borders
-    // Wrap the entire table structure in a div with proper spacing
-    let tableHtml = `<p class="__before-table-caret"><br></p>
-      <div class="relative w-full overflow-auto border border-gray-300 rounded-md my-4">
-        <table class="w-full caption-bottom text-sm border-collapse">`
-
-    if (header) {
-      tableHtml += `<thead><tr class="bg-gray-50">`
-      for (let c = 0; c < cols; c++) {
-        tableHtml += '<th class="p-3 align-middle border-r border-gray-200 last:border-r-0 text-left font-medium"><p><br></p></th>'
-      }
-      tableHtml += `</tr></thead>`
-    }
-
-    tableHtml += `<tbody>`
-
-    for (let r = 0; r < rows; r++) {
-      tableHtml += '<tr class="border-b border-gray-200 transition-colors hover:bg-gray-50">'
-      for (let c = 0; c < cols; c++) {
-        tableHtml += '<td class="p-3 align-middle border-r border-gray-200 last:border-r-0"><p><br></p></td>'
-      }
-      tableHtml += '</tr>'
-    }
-
-    tableHtml += `
-          </tbody>
-        </table>
-      </div>
-      <p class="__after-table-caret"><br></p>` // Add spacing after table and marker class
-
-    console.log('Generated table HTML:', tableHtml)
-
-    // Better insertion strategy that respects current cursor position
-    if (editor.value) {
-      editor.value.focus()
-      const sel = window.getSelection()
-
-      if (sel && sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0)
-
-        try {
-          // Clear the selection first
-          range.deleteContents()
-
-          // Create the table fragment
-          const fragment = range.createContextualFragment(tableHtml)
-
-          // Insert the fragment at the current cursor position
-          range.insertNode(fragment)
-
-          // Clear selection after insertion
-          sel.removeAllRanges()
-        } catch (err) {
-          console.warn('table insertion via Range failed, falling back to execCommand', err)
-          document.execCommand('insertHTML', false, tableHtml)
-        }
-      } else {
-        // No selection - append to end
-        editor.value.insertAdjacentHTML('beforeend', tableHtml)
-      }
-
-      onEditorInput(new Event('input'))
-
-      // Move caret into the paragraph after the table so the user can continue typing
-      nextTick(() => {
-        if (!editor.value) return
-        const after = editor.value.querySelector('p.__after-table-caret') as HTMLElement | null
-        if (after) {
-          const range = document.createRange()
-          range.setStart(after, 0)
-          range.collapse(true)
-          const sel = window.getSelection()
-          sel?.removeAllRanges()
-          sel?.addRange(range)
-          editor.value.focus()
-        }
-        // cleanup marker classes so next insertions aren't affected
-        const cleanup = editor.value.querySelectorAll('p.__after-table-caret, p.__before-table-caret')
-        cleanup.forEach((n) => n.classList.remove('__after-table-caret', '__before-table-caret'))
-      })
-      return
-    }
-
-    // If we don't have an editor ref for some reason, fallback to execCommand
-    document.execCommand('insertHTML', false, tableHtml)
-    onEditorInput(new Event('input'))
-  }
-
-  function onInsertCodeBlock() {
-    // focus editor and insert code block using utility
-    if (!editor.value) return
-    editor.value.focus()
-    const inserted = insertCodeBlock()
-  // inserted may be null when toggling off - still update
-  onEditorInput(new Event('input'))
-  }
-
-  function toggleBold() { applyFormat('bold') }
-  function toggleItalic() { applyFormat('italic') }
-  function toggleUnderline() { applyFormat('underline') }
-  function toggleStrikethrough() { applyFormat('strikeThrough') }
-
-  function toggleBulletList() {
-    const selection = window.getSelection()
-    const range = selection?.getRangeAt(0)
-
-    if (!range) {
-      // No selection, create a new bullet list with an empty list item
-      const bulletHtml = '<ul><li><br></li></ul>'
-      document.execCommand('insertHTML', false, bulletHtml)
-    } else {
-      // Check if we're already in a list
-      const container = range.commonAncestorContainer
-      const listElement = container.nodeType === Node.TEXT_NODE
-        ? container.parentElement?.closest('ul, ol')
-        : (container as Element)?.closest('ul, ol')
-
-      if (listElement) {
-        // We're in a list, toggle it off
-        document.execCommand('insertUnorderedList')
-      } else {
-        // Convert selection to bullet list
-        const selectedText = selection?.toString() || ''
-        if (selectedText.trim()) {
-          // Split by lines and create list items
-          const lines = selectedText.split('\n').filter(line => line.trim())
-          const listItems = lines.map(line => `<li>${line.trim()}</li>`).join('')
-          const bulletHtml = `<ul>${listItems}</ul>`
-          document.execCommand('insertHTML', false, bulletHtml)
-        } else {
-          // Create new bullet point (empty li for cursor)
-          const bulletHtml = '<ul><li><br></li></ul>'
-          document.execCommand('insertHTML', false, bulletHtml)
-        }
-      }
-    }
-    onEditorInput(new Event('input'))
-  }
-
-  function toggleOrderedList() {
-    const selection = window.getSelection()
-    const range = selection?.getRangeAt(0)
-
-    if (!range) {
-      // No selection, create a new numbered list with an empty list item
-      const numberedHtml = '<ol><li><br></li></ol>'
-      document.execCommand('insertHTML', false, numberedHtml)
-    } else {
-      // Check if we're already in a list
-      const container = range.commonAncestorContainer
-      const listElement = container.nodeType === Node.TEXT_NODE
-        ? container.parentElement?.closest('ul, ol')
-        : (container as Element)?.closest('ul, ol')
-
-      if (listElement) {
-        // We're in a list, toggle it off
-        document.execCommand('insertOrderedList')
-      } else {
-        // Convert selection to numbered list
-        const selectedText = selection?.toString() || ''
-        if (selectedText.trim()) {
-          // Split by lines and create numbered list items (browser will handle numbering)
-          const lines = selectedText.split('\n').filter(line => line.trim())
-          const listItems = lines.map(line => `<li>${line.trim()}</li>`).join('')
-          const numberedHtml = `<ol>${listItems}</ol>`
-          document.execCommand('insertHTML', false, numberedHtml)
-        } else {
-          // Create new numbered point (empty li for cursor)
-          const numberedHtml = '<ol><li><br></li></ol>'
-          document.execCommand('insertHTML', false, numberedHtml)
-        }
-      }
-    }
-    onEditorInput(new Event('input'))
-  }
-
-  function setFontFamily(f: string) {
-    document.execCommand('fontName', false, f)
-    onEditorInput(new Event('input'))
-  }
-
-  function setFontSize(size: number | string) {
-    // execCommand fontSize expects 1-7 for legacy; instead wrap selected text in span
-    const sz = typeof size === 'string' ? size : String(size)
-    document.execCommand('insertHTML', false, `<span style="font-size:${sz}px">${window.getSelection()?.toString() || ''}</span>`)
-    onEditorInput(new Event('input'))
-  }
-
-  function setTextColor(color: string) {
-    document.execCommand('foreColor', false, color)
-    onEditorInput(new Event('input'))
-  }
-
-  function setHighlightColor(color: string) {
-    document.execCommand('backColor', false, color)
-    onEditorInput(new Event('input'))
-  }
-
-  function setAlignment(align: 'left' | 'center' | 'right' | 'justify') {
-    const cmd = align === 'left' ? 'justifyLeft' : align === 'center' ? 'justifyCenter' : align === 'right' ? 'justifyRight' : 'justifyFull'
-    document.execCommand(cmd)
-    onEditorInput(new Event('input'))
-  }
-
-  // Heading / paragraph / subtitle handlers (refactored)
-  function onSetParagraph() {
-    applyHeading('paragraph', editor.value)
-    onEditorInput(new Event('input'))
-  }
-  function onSetHeading(level: number) {
-    const lvl = Math.min(6, Math.max(1, level)) as 1|2|3|4|5|6
-    applyHeading(lvl, editor.value)
-    onEditorInput(new Event('input'))
-  }
-  function onSetSubtitle() {
-    applyHeading('subtitle', editor.value)
-    onEditorInput(new Event('input'))
-  }
-
-  function indent() {
-    const selection = window.getSelection()
-    const range = selection?.getRangeAt(0)
-    if (range) {
-      const container = range.startContainer
-      const listItem = container.nodeType === Node.TEXT_NODE
-        ? container.parentElement?.closest('li')
-        : (container as Element)?.closest('li')
-
-      if (listItem) {
-        // Indent list item by creating nested list
-        const currentList = listItem.closest('ul, ol')
-        if (currentList) {
-          const isOrderedList = currentList.tagName === 'OL'
-          const nestedList = document.createElement(isOrderedList ? 'ol' : 'ul')
-          nestedList.style.cssText = 'margin-left: 20px; padding-left: 20px;'
-
-          const newListItem = document.createElement('li')
-          newListItem.style.cssText = 'margin-bottom: 5px;'
-          newListItem.innerHTML = '<br>'
-
-          nestedList.appendChild(newListItem)
-          listItem.appendChild(nestedList)
-
-          // Move cursor to nested item
-          const newRange = document.createRange()
-          newRange.setStart(newListItem, 1)
-          newRange.collapse(true)
-          selection?.removeAllRanges()
-          selection?.addRange(newRange)
-        }
-      } else {
-        document.execCommand('indent')
-      }
-    } else {
-      document.execCommand('indent')
-    }
-    onEditorInput(new Event('input'))
-  }
-
-  function outdent() {
-    const selection = window.getSelection()
-    const range = selection?.getRangeAt(0)
-    if (range) {
-      const container = range.startContainer
-      const listItem = container.nodeType === Node.TEXT_NODE
-        ? container.parentElement?.closest('li')
-        : (container as Element)?.closest('li')
-
-      if (listItem) {
-        // Outdent list item
-        const parentList = listItem.closest('ul, ol')
-        const grandparentListItem = parentList?.closest('li')
-
-        if (grandparentListItem) {
-          // Move this item to parent level
-          const grandparentList = grandparentListItem.closest('ul, ol')
-          if (grandparentList) {
-            grandparentList.insertBefore(listItem, grandparentListItem.nextSibling)
-
-            // If the nested list is now empty, remove it
-            if (parentList && parentList.children.length === 0) {
-              parentList.remove()
-            }
-          }
-        }
-      } else {
-        document.execCommand('outdent')
-      }
-    } else {
-      document.execCommand('outdent')
-    }
-    onEditorInput(new Event('input'))
-  }
-
-  function onEditorPaste(e: Event) {
-    // Let the paste happen, then process for auto-link detection
-    setTimeout(processAutoLinkDetection, 50)
-  }
-
-  // Editor element and basic editing handlers
-  const editor = ref<HTMLElement | null>(null)
-  const imageInput = ref<HTMLInputElement | null>(null)
-
-  const editorStyle = computed(() => {
-    const scale = (zoomPercent.value || 100) / 100
-    return {
-      transform: `scale(${scale})`,
-      transformOrigin: 'center center',
-    }
-  })
-
-  function onEditorInput(e: Event) {
-    const html = editor.value?.innerHTML || ''
-    // update the first page content for now
-    pages.value[0] = html
-    pageContents.value = [html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()]
-    computeCountsFromAllPages()
-    isDirty.value = true
-    docDirty.value = true
-  }
-
-  function onEditorKeydown(e: Event) {
-    const ev = e as KeyboardEvent
-
-    // Handle paste with Ctrl+V
-    if (ev.ctrlKey && ev.key === 'v') {
-      // Let the paste happen first, then process it
-      setTimeout(processAutoLinkDetection, 10)
-    }
-
-    // Handle Enter key in lists
-    if (ev.key === 'Enter') {
-      const selection = window.getSelection()
-      const range = selection?.getRangeAt(0)
-      if (range) {
-        const container = range.startContainer
-        const listItem = container.nodeType === Node.TEXT_NODE
-          ? container.parentElement?.closest('li')
-          : (container as Element)?.closest('li')
-
-        if (listItem) {
-          const list = listItem.closest('ul, ol')
-          if (list) {
-            ev.preventDefault()
-
-            // If the list item is empty, exit the list and insert a paragraph
-            const listItemText = (listItem.textContent || '').trim()
-            if (listItemText === '') {
-              const newP = document.createElement('p')
-              newP.innerHTML = '<br>'
-              list.parentNode?.insertBefore(newP, list.nextSibling)
-
-              // Move cursor to new paragraph
-              const newRange = document.createRange()
-              newRange.setStart(newP, 0)
-              newRange.collapse(true)
-              selection?.removeAllRanges()
-              selection?.addRange(newRange)
-
-              // Remove empty list item
-              if (listItem.parentNode && listItem.parentNode.children.length === 1) {
-                list.remove()
-              } else {
-                listItem.remove()
-              }
-            } else {
-              // Create a new empty list item and place the cursor inside
-              const newListItem = document.createElement('li')
-              newListItem.innerHTML = '<br>'
-              listItem.parentNode?.insertBefore(newListItem, listItem.nextSibling)
-
-              const newRange = document.createRange()
-              newRange.setStart(newListItem, 0)
-              newRange.collapse(true)
-              selection?.removeAllRanges()
-              selection?.addRange(newRange)
-            }
-
-            onEditorInput(new Event('input'))
-            return
-          }
-        }
-      }
-    }
-
-    // Handle formatting shortcuts
-    const isMod = ev.metaKey || ev.ctrlKey
-    if (!isMod) return
-    const k = ev.key?.toLowerCase()
-    if (k === 'b') {
-      ev.preventDefault(); document.execCommand('bold'); return
-    }
-    if (k === 'i') {
-      ev.preventDefault(); document.execCommand('italic'); return
-    }
-    if (k === 'u') {
-      ev.preventDefault(); document.execCommand('underline'); return
-    }
-    // Cmd+Shift+C -> insert inline code block (like Slack)
-    if (k === 'c' && ev.shiftKey) {
-      ev.preventDefault()
-      // Avoid nesting: if already inside an inline code element, just select it
-      const sel = window.getSelection()
-      if (sel && sel.rangeCount) {
-        const r = sel.getRangeAt(0)
-        const ancestor = r.startContainer.nodeType === Node.ELEMENT_NODE ? r.startContainer as HTMLElement : r.startContainer.parentElement as HTMLElement | null
-        const existing = ancestor?.closest('code[data-code-inline="true"]') as HTMLElement | null
-        if (existing) {
-          const nr = document.createRange(); nr.selectNodeContents(existing); sel.removeAllRanges(); sel.addRange(nr)
-        } else {
-          insertCodeBlock(); onEditorInput(new Event('input'))
-        }
-      } else {
-        insertCodeBlock(); onEditorInput(new Event('input'))
-      }
-      return
-    }
-  }
-
-  // Undo / Redo
-  function doUndo() {
-    try {
-      editor.value?.focus()
-      document.execCommand('undo')
-      onEditorInput(new Event('input'))
-    } catch (e) {
-      console.warn('undo failed', e)
-    }
-  }
-
-  function doRedo() {
-    try {
-      editor.value?.focus()
-      document.execCommand('redo')
-      onEditorInput(new Event('input'))
-    } catch (e) {
-      try { document.execCommand('forward'); onEditorInput(new Event('input')) } catch (e2) { console.warn('redo failed', e2) }
-    }
-  }
-
-  // update toolbar active states based on current selection
-  function updateToolbarState() {
-    toolbarState.value.isBold = document.queryCommandState('bold')
-    toolbarState.value.isItalic = document.queryCommandState('italic')
-    toolbarState.value.isUnderline = document.queryCommandState('underline')
-    toolbarState.value.isStrikethrough = document.queryCommandState('strikeThrough')
-    toolbarState.value.isBulletList = document.queryCommandState('insertUnorderedList')
-    toolbarState.value.isOrderedList = document.queryCommandState('insertOrderedList')
-  }
-
-  // listen to selection changes to update toolbar
   onMounted(() => {
-    document.addEventListener('selectionchange', updateToolbarState)
-  })
-
-  // Wire format events from toolbar/menubar to execCommand
-  function applyFormat(command: string, value?: string) {
-    try {
-      document.execCommand(command, false, value)
-      onEditorInput(new InputEvent('input'))
-    } catch (e) {
-      console.warn('format not supported', command, e)
-    }
-  }
-
-  // Proof modal
-  const showProofModal = ref(false)
-
-  async function onVerifyAuthorship() {
-    // open modal to verify proof
-    showProofModal.value = true
-  }
-
-  function onSetZoom(level: number | 'fit') {
-    // level may be decimal (1.0 = 100%) or the special 'fit' string
-    if (level === 'fit') {
-      // compute a scale such that the page fits inside the viewport (with some padding)
-      nextTick(() => {
-        const vp = viewportEl.value
-        const pg = pageEl.value
-        if (!vp || !pg) return
-        const vpRect = vp.getBoundingClientRect()
-        const pgRect = pg.getBoundingClientRect()
-        // available space inside viewport (subtract some padding)
-        const availWidth = vpRect.width - 40
-        const availHeight = vpRect.height - 40
-        const scaleW = availWidth / pgRect.width
-        const scaleH = availHeight / pgRect.height
-        const fitScale = Math.max(0.5, Math.min(3, Math.min(scaleW, scaleH)))
-        zoomPercent.value = Math.round(fitScale * 100)
-        lastZoomWasFit.value = true
-        console.log('fit -> scale', fitScale, '=>', zoomPercent.value)
-      })
-      return
-    }
-    // numeric level (decimal)
-    zoomPercent.value = Math.round((level || 1) * 100)
-    lastZoomWasFit.value = false
-    console.log('set-zoom ->', level, '=>', zoomPercent.value)
-  }
-
-  function onSetView(v: 'list' | 'grid') {
-    viewMode.value = v
-    // when switching to grid and zoom is small, pages will naturally wrap via CSS
-    console.log('set-view ->', v)
-  }
-
-  // initialise counts on mount
-  let linkClickCleanup: (() => void) | null = null
-
-  onMounted(async () => {
-    await nextTick()
-    // initialize with empty pages; placeholder text shown via CSS when empty
-    distributeTextToPages('')
-    computeCountsFromAllPages()
-    // compute top padding for fixed menubar + toolbar
-    updateTopPadding()
-    // update on window resize
-    window.addEventListener('resize', updateTopPadding)
-    // set editor initial HTML content
-    setEditorHtml(pages.value[0] || '')
-
-  // Ensure the editor receives initial focus and caret is ready for typing
-  await nextTick()
-  focusEditor()
-
-    // Setup link click handling for Ctrl+Click to open links
-    if (editor.value) {
-      linkClickCleanup = setupLinkClickHandling(editor.value)
-    }
-
-    // Guard against unwanted aria-hidden on root (accessibility fix)
-    const root = document.querySelector('.min-h-screen.bg-gray-50.flex.flex-col') as HTMLElement | null
-    if (root) {
-      const obs = new MutationObserver((muts) => {
-        muts.forEach(m => {
-          if (m.type === 'attributes' && m.attributeName === 'aria-hidden') {
-            if (root.getAttribute('aria-hidden') === 'true') {
-              root.removeAttribute('aria-hidden')
-              root.removeAttribute('data-aria-hidden')
-            }
-          }
-        })
-      })
-      obs.observe(root, { attributes: true })
-    }
+    // attach listener to viewport
+    if (pageViewport.value) pageViewport.value.addEventListener('wheel', onWheel, { passive: false })
+    // ensure textareaEl ref is available
+    nextTick(() => {
+      textareaEl.value = document.querySelector('textarea')
+    })
   })
 
   onUnmounted(() => {
-    window.removeEventListener('resize', updateTopPadding)
-    if (linkClickCleanup) {
-      linkClickCleanup()
+    if (pageViewport.value) pageViewport.value.removeEventListener('wheel', onWheel)
+  })
+
+  function recount() {
+    const words = content.value.trim().match(/\S+/g)
+    wordCount.value = words ? words.length : 0
+  }
+
+  watch(content, recount, { immediate: true })
+
+  function setZoom(z: number | 'fit') {
+    if (z === 'fit') {
+      // optional: compute fit based on container width later; for now treat as 100%
+      zoom.value = 100
+      return
+    }
+    // Toolbar/footer now emit percent integers (e.g. 125)
+    if (typeof z === 'number') {
+      zoom.value = Math.min(200, Math.max(50, Math.round(z)))
+    }
+  }
+
+  // --- Formatting helpers ---
+  function getActiveTextarea(): HTMLTextAreaElement | null {
+    // Get the current textarea element
+    return textareaEl.value || document.querySelector('textarea') as HTMLTextAreaElement | null
+  }
+
+  function getSelection(el: HTMLTextAreaElement) { return { start: el.selectionStart, end: el.selectionEnd, value: el.value } }
+  function replaceRange(el: HTMLTextAreaElement, start: number, end: number, insert: string) {
+    const before = el.value.slice(0, start)
+    const after = el.value.slice(end)
+    const next = before + insert + after
+    store.setContent(next)
+    nextTick(() => { el.focus(); el.selectionStart = el.selectionEnd = start + insert.length })
+    recount()
+  }
+
+  function applyAround(token: string) {
+    return () => {
+      if (mode.value !== 'source') return // only work in source mode
+      const ta = getActiveTextarea()
+      if (!ta) return
+      const { start, end, value } = getSelection(ta)
+      const selected = value.slice(start, end)
+      replaceRange(ta, start, end, token + selected + token)
+    }
+  }
+
+  // Individual formatting functions
+  function applyBold() { applyAround('**')() }
+  function applyItalic() { applyAround('*')() }
+  function applyUnderline() { 
+    // Use HTML tags for underline since markdown doesn't support it natively
+    surroundWithHtml('<u>', '</u>')
+  }
+  function applyStrike() { applyAround('~~')() }
+  function applyBulletList() { toggleList('- ')() }
+  function applyOrderedList() { toggleList('1. ')() }
+
+  function toggleList(prefix: string) {
+    return () => {
+      if (mode.value !== 'source') return // only work in source mode
+      const ta = getActiveTextarea()
+      if (!ta) return
+      const { start, end, value } = getSelection(ta)
+      // expand to full lines
+      const lineStart = value.lastIndexOf('\n', start - 1) + 1
+      const lineEnd = value.indexOf('\n', end)
+      const actualEnd = lineEnd === -1 ? value.length : lineEnd
+      const segment = value.slice(lineStart, actualEnd)
+      const lines = segment.split(/\n/)
+      const allHave = lines.every(l => l.startsWith(prefix))
+      const updated = lines.map(l => allHave ? l.replace(/^\Q"+prefix+"\E/, '').replace(new RegExp('^' + prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), '') : (l.startsWith(prefix) ? l : prefix + l)).join('\n')
+      replaceRange(ta, lineStart, actualEnd, updated)
+    }
+  }
+
+  function setHeading(level: number) {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea(); if (!ta) return
+    const { start, end, value } = getSelection(ta)
+    const lineStart = value.lastIndexOf('\n', start - 1) + 1
+    const lineEnd = value.indexOf('\n', end)
+    const actualEnd = lineEnd === -1 ? value.length : lineEnd
+    const line = value.slice(lineStart, actualEnd).replace(/^#{1,6}\s+/, '')
+    const prefix = level > 0 ? '#'.repeat(level) + ' ' : ''
+    replaceRange(ta, lineStart, actualEnd, prefix + line)
+  }
+
+  function setAlignmentComment(alignment: string) {
+    // No native markdown alignment; insert an HTML comment marker
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea(); if (!ta) return
+    const marker = `<!-- align:${alignment} -->\n`
+    const { start, end } = getSelection(ta)
+    replaceRange(ta, start, end, marker)
+  }
+
+  // selection used for pre-filling link text in dialog
+  const linkDialogSelectedText = ref('')
+
+  function insertLink() {
+    // Capture selected text from textarea (source) or window selection (reader)
+    let selected = ''
+    if (mode.value === 'source') {
+      const ta = getActiveTextarea()
+      if (ta) {
+        const { start, end, value } = getSelection(ta)
+        selected = value.slice(start, end)
+      }
+    } else {
+      const s = window.getSelection()
+      selected = s ? s.toString() : ''
+    }
+    linkDialogSelectedText.value = selected || ''
+    // open dialog
+    linkDialogOpen.value = true
+  }
+  function insertImage() {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea(); if (!ta) return
+    const { start, end } = getSelection(ta)
+    replaceRange(ta, start, end, `![alt text](https://placehold.co/400x200)`)
+  }
+  function insertCodeBlockBlock() {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea(); if (!ta) return
+    const { start, end } = getSelection(ta)
+    const snippet = "```ts\n// code\n```\n"
+    replaceRange(ta, start, end, snippet)
+  }
+  function insertTable(rows: number = 2, cols: number = 2, header: boolean = true) {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea(); if (!ta) return
+    const headerRow = '|' + Array(cols).fill(' Header ').join('|') + '|\n'
+    const sepRow = '|' + Array(cols).fill(' --- ').join('|') + '|\n'
+    const body = Array(rows).fill('|' + Array(cols).fill(' Cell ').join('|') + '|\n').join('')
+    const table = (header ? headerRow + sepRow : '') + body + '\n'
+    const { start, end } = getSelection(ta)
+    replaceRange(ta, start, end, table)
+  }
+
+  // Inline color via HTML span (markdown fallback) & highlight background
+  function surroundWithHtml(tagOpen: string, tagClose: string) {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea(); if (!ta) return
+    const { start, end, value } = getSelection(ta)
+    const selected = value.slice(start, end) || 'text'
+    replaceRange(ta, start, end, tagOpen + selected + tagClose)
+  }
+  function applyColor(color: string) { surroundWithHtml(`<span style=\"color:${color}\">`, '</span>') }
+  function applyHighlight(color: string) { surroundWithHtml(`<span style=\"background:${color}\">`, '</span>') }
+
+  function onUndo() { store.undo(); recount() }
+  function onRedo() { store.redo(); recount() }
+
+  const textareaEl = ref<HTMLTextAreaElement | null>(null)
+
+  const stats = computed(() => ({
+    charsWithSpaces: content.value.length,
+    charsNoSpaces: content.value.replace(/\s+/g, '').length,
+    words: wordCount.value,
+    sentences: (content.value.match(/[.!?]+/g) || []).length,
+    paragraphs: content.value.split(/\n{2,}|\n/).filter(Boolean).length,
+    readingMinutes: Math.max(1, Math.round(wordCount.value / 200)),
+    pages: 1,
+    lines: content.value.split(/\n/).length,
+    avgWordsPerParagraph: (() => { const p = content.value.split(/\n{2,}|\n/).filter(Boolean); return p.length ? Math.round(wordCount.value / p.length) : wordCount.value })()
+  }))
+
+  // markdown renderer
+  const renderedHtml = computed(() => {
+    if (mode.value !== 'reader') return ''
+    if (!MarkdownIt) return '<p class="text-gray-400 text-sm">Loading renderer...</p>'
+    
+    // Configure markdown-it with proper options
+    const md = new MarkdownIt({ 
+      html: true, 
+      linkify: true, 
+      breaks: true,
+      typographer: true
+    })
+
+    // Render convention: treat strong markup created with double-underscore (__text__) as underline
+    // Leave double-asterisk (**) as bold. We override the strong_open/strong_close renderer
+    // to emit <u>...</u> when the token.markup is '__'.
+    const defaultStrongOpen = md.renderer.rules.strong_open || function(tokens: any, idx: any, options: any, env: any, self: any) { return self.renderToken(tokens, idx, options) }
+    const defaultStrongClose = md.renderer.rules.strong_close || function(tokens: any, idx: any, options: any, env: any, self: any) { return self.renderToken(tokens, idx, options) }
+
+    md.renderer.rules.strong_open = function(tokens: any, idx: any, options: any, env: any, self: any) {
+      const tok = tokens[idx]
+      if (tok && tok.markup === '__') return '<u>'
+      return defaultStrongOpen(tokens, idx, options, env, self)
+    }
+    md.renderer.rules.strong_close = function(tokens: any, idx: any, options: any, env: any, self: any) {
+      const tok = tokens[idx]
+      if (tok && tok.markup === '__') return '</u>'
+      return defaultStrongClose(tokens, idx, options, env, self)
+    }
+
+    try {
+      return md.render(content.value)
+    } catch {
+      return '<pre class="text-red-600">Render error</pre>'
     }
   })
+
+  function toggleMode() {
+    mode.value = mode.value === 'source' ? 'reader' : 'source'
+  }
+
+  onMounted(() => { textareaEl.value = document.querySelector('textarea') })
+
+  // Link dialog state
+  const linkDialogOpen = ref(false)
+
+  // Handler when dialog emits insert: options is LinkInsertOptions from dialog
+  function handleLinkInsert(_: any, __: any, options: any) {
+    if (!options || !options.url) return
+    // If in source mode, wrap selection in markdown link
+    if (mode.value === 'source') {
+      const ta = getActiveTextarea(); if (!ta) return
+      const { start, end, value } = getSelection(ta)
+      const selected = value.slice(start, end) || options.text || options.url
+      const md = `[${selected}](${options.url})`
+      replaceRange(ta, start, end, md)
+      return
+    }
+    // In reader mode, insert actual anchor into content DOM using helper
+    try {
+      domInsertLink({ url: options.url, text: options.text || undefined, target: options.target || '_blank', rel: options.rel || 'noopener noreferrer' })
+    } catch (e) {
+      console.warn('dom insert link failed', e)
+    }
+  }
+
 </script>
 
 <style scoped>
-
-  /* Visual letter-sized page for the document canvas */
-  .document-page {
-    width: 8.5in;
-    /* physical letter width */
-    height: 11in;
-    /* physical letter height */
-    margin: 0 auto;
-    /* center within the viewport */
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    /* keep the internal padding/margins untouched */
-    background-clip: padding-box;
-  }
-
-  /* Keep the viewport centered and allow scrolling when scaled */
-  .editor-viewport {
-    display: flex;
-    justify-content: center;
-    padding: 2rem 0;
-    /* vertical space around the page */
-  }
-
-  /* List styling for better formatting */
-
-  :deep(ul),
-  :deep(ol) {
-    margin: 10px 0;
-    padding-left: 32px;
-    /* leave space for native markers */
-    list-style-position: outside;
-  }
-
-  /* Ensure bullets and numbers are visible */
-  :deep(ul) {
-    list-style-type: disc;
-  }
-
-  :deep(ol) {
-    list-style-type: decimal;
-  }
-
-  /* Use native list markers to avoid adding duplicate bullets when pasted HTML
-     already contains inline bullet characters or markers. Keep simple spacing. */
-  :deep(ul li),
-  :deep(ol li) {
-    margin-bottom: 6px;
-    line-height: 1.5;
-    list-style: inherit;
-  }
-
-
-  /* Nested list styling */
-  :deep(ul ul),
-  :deep(ol ol),
-  :deep(ul ol),
-  :deep(ol ul) {
-    margin: 5px 0;
-    padding-left: 20px;
-  }
-
-  /* Nested list marker variations */
-  :deep(ul ul) {
-    list-style-type: circle;
-  }
-
-  :deep(ul ul ul) {
-    list-style-type: square;
-  }
-
-  /* Link styling for clickable appearance */
-  :deep(a) {
-    color: #2563eb;
-    text-decoration: underline;
-    cursor: pointer;
-    transition: color 0.2s ease;
-    position: relative;
-  }
-
-  /* Subtitle style (between H2 and body text) */
-  :deep(.subtitle) {
-    font-size: 1.25rem; /* ~20px */
-    font-weight: 500;
-    color: #374151;
-    margin-top: 0.75rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
-    font-family: inherit;
-  }
-
-  :deep(a:hover) {
-    color: #1d4ed8;
-    text-decoration: underline;
-  }
-
-  :deep(a:visited) {
-    color: #7c3aed;
-  }
-
-  /* Show hint on hover that Ctrl+Click opens the link */
-  :deep(a:hover::after) {
-    content: 'Ctrl+Click to open';
-    position: absolute;
-    bottom: -20px;
-    left: 0;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 11px;
-    white-space: nowrap;
-    z-index: 1000;
-    pointer-events: none;
-  }
-
-  /* Mac users see Cmd+Click instead */
-  @media (pointer: fine) {
-    :deep(a:hover::after) {
-      content: '⌘+Click to open' attr(data-platform);
-    }
-  }
-
-  /* Make links functional in contenteditable */
-  :deep(a[href]) {
-    pointer-events: auto;
-  }
-
+/* Custom styles for markdown rendering */
+:deep(.prose) {
+  /* Ensure headings have proper sizing */
+  h1 { font-size: 2.25rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 1rem; }
+  h2 { font-size: 1.875rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.875rem; }
+  h3 { font-size: 1.5rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.75rem; }
+  h4 { font-size: 1.25rem; font-weight: 600; margin-top: 0.875rem; margin-bottom: 0.625rem; }
+  h5 { font-size: 1.125rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.5rem; }
+  h6 { font-size: 1rem; font-weight: 600; margin-top: 0.625rem; margin-bottom: 0.5rem; }
+  
+  /* Ensure underline works properly */
+  u { text-decoration: underline; }
+  
+  /* Ensure bold and italic work properly */
+  strong { font-weight: 700; }
+  em { font-style: italic; }
+  
+  /* Other markdown elements */
+  p { margin-bottom: 1rem; line-height: 1.6; }
+  a { color: #2563EB; text-decoration: underline; }
+  ul, ol { margin: 1rem 0; padding-left: 1.5rem; }
+  blockquote { border-left: 4px solid #d1d5db; padding-left: 1rem; margin: 1rem 0; font-style: italic; }
+  code { background-color: #f3f4f6; padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-family: monospace; }
+  pre { background-color: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; }
+  hr { border: none; border-top: 1px solid #d1d5db; margin: 2rem 0; }
+}
 </style>

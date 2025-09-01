@@ -255,8 +255,11 @@
       items: [
         { type: 'item', label: 'Bold', emit: 'format-bold', icon: Bold, shortcut: { mac: ['Command'], key: 'B', pc: 'Ctrl' } },
         { type: 'item', label: 'Italic', emit: 'format-italic', icon: Italic, shortcut: { mac: ['Command'], key: 'I', pc: 'Ctrl' } },
-        { type: 'item', label: 'Underline', emit: 'format-underline', icon: Underline, shortcut: { mac: ['Command'], key: 'U', pc: 'Ctrl' } },
+  { type: 'item', label: 'Underline', emit: 'format-underline', icon: Underline, shortcut: { mac: ['Command'], key: 'U', pc: 'Ctrl' } },
         { type: 'item', label: 'Strikethrough', emit: 'format-strikethrough', icon: Strikethrough, shortcut: { mac: ['Command', 'Shift'], key: 'X', pc: 'Ctrl' } },
+  { type: 'separator' },
+  // Link moved from Insert -> Format
+  { type: 'item', label: 'Link', emit: 'insert-link', icon: Link, shortcut: { mac: ['Command'], key: 'K', pc: 'Ctrl' } },
         { type: 'separator' },
         {
           type: 'sub', label: 'Heading', icon: Heading, items: [
@@ -277,7 +280,6 @@
     {
       label: 'Insert',
       items: [
-        { type: 'item', label: 'Link', emit: 'insert-link', icon: Link, shortcut: { mac: ['Command'], key: 'K', pc: 'Ctrl' } },
         { type: 'item', label: 'Image', emit: 'insert-image', icon: Image },
         { type: 'item', label: 'Table', emit: 'insert-table', icon: Table },
         { type: 'item', label: 'Code Block', emit: 'insert-code-block', icon: Code2 },
