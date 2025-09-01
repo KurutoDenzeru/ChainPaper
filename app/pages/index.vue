@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50 flex flex-col">
     <div class="fixed inset-x-1 top-1 z-50 pointer-events-none">
       <div class="pointer-events-auto">
-        <MarkdownMenuBar @word-count="showWordDialog = true" @insert-link="insertLink"
+        <MarkdownMenuBar @word-count="showWordDialog = true" @insert-link="insertLink" @insert-image="insertImage"
           @set-heading="handleSetHeading" />
       </div>
       <div class="mt-2 pointer-events-auto">
@@ -43,48 +43,48 @@
   </div>
 </template>
 <script setup lang="ts">
-import ImageInsertDialog from '@/components/editor/ImageInsertDialog.vue'
-const imageDialogOpen = ref(false)
+  import ImageInsertDialog from '@/components/editor/ImageInsertDialog.vue'
+  const imageDialogOpen = ref(false)
 
-function handleImageInsert(src: string, name: string, previewDataUri?: string) {
-  // Insert markdown image at cursor or selection
-  if (mode.value === 'source') {
-    const ta = getActiveTextarea(); if (!ta) return
-    const { start, end, value } = getSelection(ta)
-  // store attachment and insert short reference
-  const dataUrl = previewDataUri || src
-  const attachName = addAttachment(dataUrl, name)
-  const md = `![[${attachName}]]`
-  replaceRange(ta, start, end, md)
-    return
+  function handleImageInsert(src: string, name: string, previewDataUri?: string) {
+    // Insert markdown image at cursor or selection
+    if (mode.value === 'source') {
+      const ta = getActiveTextarea(); if (!ta) return
+      const { start, end, value } = getSelection(ta)
+      // store attachment and insert short reference
+      const dataUrl = previewDataUri || src
+      const attachName = addAttachment(dataUrl, name)
+      const md = `![[${attachName}]]`
+      replaceRange(ta, start, end, md)
+      return
+    }
+    // Reader mode: insert image at selection
+    const sel = window.getSelection()
+    if (!sel || sel.rangeCount === 0) return
+    const range = sel.getRangeAt(0)
+    const img = document.createElement('img')
+    // Use actual preview data if available for immediate rendering in reader mode
+    img.src = previewDataUri && previewDataUri.startsWith('data:image/') ? previewDataUri : src
+    img.alt = name.replace(/\.[^/.]+$/, '')
+    img.className = 'max-w-full rounded shadow'
+    range.deleteContents()
+    range.insertNode(img)
+    range.setStartAfter(img)
+    range.collapse(true)
+    sel.removeAllRanges(); sel.addRange(range)
+    // Also persist the image into the markdown content so it remains after re-render
+    try {
+      const alt = name.replace(/\.[^/.]+$/, '')
+      const dataUrl = previewDataUri || src
+      const md = `![$\{alt\}](${dataUrl})`
+      // Append with spacing to keep it on its own line
+      const next = content.value + '\n\n' + md + '\n'
+      store.setContent(next)
+      // update reader selection focus (optional)
+    } catch (e) {
+      console.warn('Failed to persist inserted image to content', e)
+    }
   }
-  // Reader mode: insert image at selection
-  const sel = window.getSelection()
-  if (!sel || sel.rangeCount === 0) return
-  const range = sel.getRangeAt(0)
-  const img = document.createElement('img')
-  // Use actual preview data if available for immediate rendering in reader mode
-  img.src = previewDataUri && previewDataUri.startsWith('data:image/') ? previewDataUri : src
-  img.alt = name.replace(/\.[^/.]+$/, '')
-  img.className = 'max-w-full rounded shadow'
-  range.deleteContents()
-  range.insertNode(img)
-  range.setStartAfter(img)
-  range.collapse(true)
-  sel.removeAllRanges(); sel.addRange(range)
-  // Also persist the image into the markdown content so it remains after re-render
-  try {
-    const alt = name.replace(/\.[^/.]+$/, '')
-    const dataUrl = previewDataUri || src
-    const md = `![$\{alt\}](${dataUrl})`
-    // Append with spacing to keep it on its own line
-    const next = content.value + '\n\n' + md + '\n'
-    store.setContent(next)
-    // update reader selection focus (optional)
-  } catch (e) {
-    console.warn('Failed to persist inserted image to content', e)
-  }
-}
   // Handles heading and paragraph formatting from menu/toolbar
   function handleSetHeading(level: number) {
     if (mode.value === 'source') {
