@@ -133,6 +133,11 @@
     :open="showAboutDialog"
     @update:open="showAboutDialog = $event"
   />
+
+  <MarkdownGuideDialog
+    :open="showGuideDialog"
+    @update:open="showGuideDialog = $event"
+  />
 </template>
 
 <script setup lang="ts">
@@ -142,7 +147,7 @@
     Edit3, Command, FileText, FolderOpen, Save, Download,
     Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
     Strikethrough, Heading, List, ListOrdered, Quote, Link, Image, Table,
-    Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, Keyboard, BookOpen, Info
+    Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info
   } from 'lucide-vue-next'
   import {
     Menubar,
@@ -164,6 +169,7 @@
   import MarkdownExportDialog from '../editor/MarkdownExportDialog.vue'
   import MarkdownSaveDialog from '../editor/MarkdownSaveDialog.vue'
   import MarkdownAboutDialog from '../editor/MarkdownAboutDialog.vue'
+  import MarkdownGuideDialog from '../editor/MarkdownGuideDialog.vue'
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
   const store = useMarkdownDocStore()
@@ -200,6 +206,7 @@
     (e: 'verify-authorship'): void
     (e: 'show-shortcuts'): void
     (e: 'show-about'): void
+    (e: 'show-documentation'): void
     (e: 'toggle-preview'): void
   }>()
 
@@ -213,6 +220,7 @@
   const showExportDialog = ref(false)
   const showSaveDialog = ref(false)
   const showAboutDialog = ref(false)
+  const showGuideDialog = ref(false)
   const exportInitialFormat = ref<'markdown' | 'html' | 'json' | 'pdf' | null>(null)
 
   // Markdown-specific menu data
@@ -307,8 +315,6 @@
     {
       label: 'Help',
       items: [
-        { type: 'item', label: 'Keyboard Shortcuts', emit: 'show-shortcuts', icon: Keyboard },
-        { type: 'separator' },
         { type: 'item', label: 'About ChainPaper', emit: 'show-about', icon: Info },
         { type: 'separator' },
         { type: 'item', label: 'Markdown Guide', emit: 'show-documentation', icon: BookOpen }
@@ -361,6 +367,11 @@
 
     if (item.emit === 'show-about') {
       showAboutDialog.value = true
+      return
+    }
+
+    if (item.emit === 'show-documentation') {
+      showGuideDialog.value = true
       return
     }
 
