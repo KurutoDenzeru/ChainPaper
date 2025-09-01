@@ -14,9 +14,6 @@
       </div>
 
       <!-- View Controls -->
-      <Button variant="ghost" size="sm" @click="$emit('toggle-sidebar')" class="h-8 w-8 p-0">
-        <Sidebar class="w-4 h-4" />
-      </Button>
       <Button variant="ghost" size="sm" @click="$emit('toggle-find')" class="h-8 w-8 p-0">
         <Search class="w-4 h-4" />
       </Button>
@@ -356,7 +353,7 @@
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
   import TableInserter from '@/components/editor/TableInserter.vue'
-  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Sidebar, Search, MoreHorizontal, BookOpen, Edit } from 'lucide-vue-next'
+  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit } from 'lucide-vue-next'
 
   interface ActiveState { bold: boolean; italic: boolean; underline: boolean; strike: boolean; bullet: boolean; ordered: boolean }
   const props = defineProps<{
@@ -373,7 +370,7 @@
   }>()
 
   const emit = defineEmits([
-    'toggle-sidebar', 'toggle-find', 'toggle-menubar',
+    'toggle-find', 'toggle-menubar',
     'format-bold', 'format-italic', 'format-underline', 'format-strikethrough',
     'toggle-bullet-list', 'toggle-ordered-list',
     'insert-link', 'insert-image', 'insert-table', 'insert-code-block',

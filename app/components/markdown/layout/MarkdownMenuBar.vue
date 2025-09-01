@@ -77,19 +77,23 @@
                                 <Command class="w-3 h-3 text-gray-600" />
                               </span>
                               <span v-else
-                                class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">{{ mod }}</span>
+                                class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">{{
+                                mod }}</span>
                             </template>
                           </div>
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
                           <span
-                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{ getShortcut(item)?.key }}</span>
+                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
+                            getShortcut(item)?.key }}</span>
                         </template>
                         <template v-else>
                           <span
-                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs font-medium mr-1">{{ getShortcut(item)?.pc || getShortcut(item)?.key || 'Ctrl' }}</span>
+                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs font-medium mr-1">{{
+                              getShortcut(item)?.pc || getShortcut(item)?.key || 'Ctrl' }}</span>
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
                           <span
-                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{ getShortcut(item)?.key }}</span>
+                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
+                            getShortcut(item)?.key }}</span>
                         </template>
                       </div>
                     </MenubarShortcut>
@@ -105,282 +109,285 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import { 
-  Edit3, Command, FileText, FolderOpen, Save, Download, Globe, FileDown,
-  Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
-  Strikethrough, Heading, List, ListOrdered, Quote, Link, Image, Table,
-  Code2, Calculator, Calendar, Wrench, BarChart3, Eye, Sidebar, ZoomIn,
-  SpellCheck, Hash, Shield, Keyboard, BookOpen
-} from 'lucide-vue-next'
-import {
-  Menubar,
-  MenubarCheckboxItem,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarSeparator,
-  MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
-  MenubarTrigger,
-} from '@/components/ui/menubar'
-import { Input } from '@/components/ui/input'
-import TableInserter from '@/components/editor/TableInserter.vue'
-import { useMarkdownDocStore } from '@/stores/markdownDoc'
+  import { ref, nextTick, onMounted } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import {
+    Edit3, Command, FileText, FolderOpen, Save, Download, Globe, FileDown,
+    Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
+    Strikethrough, Heading, List, ListOrdered, Quote, Link, Image, Table,
+    Code2, Calculator, Calendar, Wrench, BarChart3, Eye, ZoomIn,
+    SpellCheck, Hash, Shield, Keyboard, BookOpen
+  } from 'lucide-vue-next'
+  import {
+    Menubar,
+    MenubarCheckboxItem,
+    MenubarContent,
+    MenubarItem,
+    MenubarMenu,
+    MenubarSeparator,
+    MenubarShortcut,
+    MenubarSub,
+    MenubarSubContent,
+    MenubarSubTrigger,
+    MenubarTrigger,
+  } from '@/components/ui/menubar'
+  import { Input } from '@/components/ui/input'
+  import TableInserter from '@/components/editor/TableInserter.vue'
+  import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
-const store = useMarkdownDocStore()
-const { title, isDirty } = storeToRefs(store)
+  const store = useMarkdownDocStore()
+  const { title, isDirty } = storeToRefs(store)
 
-// Markdown-specific emits
-const emit = defineEmits<{
-  (e: 'open-document'): void
-  (e: 'export-markdown'): void
-  (e: 'export-html'): void
-  (e: 'export-pdf'): void
-  (e: 'undo'): void
-  (e: 'redo'): void
-  (e: 'cut'): void
-  (e: 'copy'): void
-  (e: 'paste'): void
-  (e: 'select-all'): void
-  (e: 'toggle-find'): void
-  (e: 'toggle-sidebar'): void
-  (e: 'set-zoom', level: number | 'fit'): void
-  (e: 'insert-table', rows?: number, cols?: number, header?: boolean): void
-  (e: 'insert-image'): void
-  (e: 'insert-link'): void
-  (e: 'insert-code-block'): void
-  (e: 'insert-math'): void
-  (e: 'insert-date'): void
-  (e: 'format-bold'): void
-  (e: 'format-italic'): void
-  (e: 'format-underline'): void
-  (e: 'format-strikethrough'): void
-  (e: 'set-heading', level: number): void
-  (e: 'toggle-bullet-list'): void
-  (e: 'toggle-ordered-list'): void
-  (e: 'toggle-blockquote'): void
-  (e: 'spell-check'): void
-  (e: 'word-count'): void
-  (e: 'verify-authorship'): void
-  (e: 'show-shortcuts'): void
-  (e: 'toggle-preview'): void
-}>()
+  // Markdown-specific emits
+  const emit = defineEmits<{
+    (e: 'open-document'): void
+    (e: 'export-markdown'): void
+    (e: 'export-html'): void
+    (e: 'export-pdf'): void
+    (e: 'undo'): void
+    (e: 'redo'): void
+    (e: 'cut'): void
+    (e: 'copy'): void
+    (e: 'paste'): void
+    (e: 'select-all'): void
+    (e: 'toggle-find'): void
+    (e: 'set-zoom', level: number | 'fit'): void
+    (e: 'insert-table', rows?: number, cols?: number, header?: boolean): void
+    (e: 'insert-image'): void
+    (e: 'insert-link'): void
+    (e: 'insert-code-block'): void
+    (e: 'insert-math'): void
+    (e: 'insert-date'): void
+    (e: 'format-bold'): void
+    (e: 'format-italic'): void
+    (e: 'format-underline'): void
+    (e: 'format-strikethrough'): void
+    (e: 'set-heading', level: number): void
+    (e: 'toggle-bullet-list'): void
+    (e: 'toggle-ordered-list'): void
+    (e: 'toggle-blockquote'): void
+    (e: 'spell-check'): void
+    (e: 'word-count'): void
+    (e: 'verify-authorship'): void
+    (e: 'show-shortcuts'): void
+    (e: 'toggle-preview'): void
+  }>()
 
-// View state
-const showToolbar = ref(true)
-const showStatusBar = ref(true)
-const showPreview = ref(false)
+  // View state
+  const showToolbar = ref(true)
+  const showStatusBar = ref(true)
+  const showPreview = ref(false)
 
-// Markdown-specific menu data
-const menus = ref([
-  {
-    label: 'File',
-    items: [
-      { type: 'item', label: 'New Markdown', emit: 'new-document', icon: FileText, shortcut: { mac: ['Command'], key: 'N', pc: 'Ctrl' } },
-      { type: 'item', label: 'Open', emit: 'open-document', icon: FolderOpen, shortcut: { mac: ['Command'], key: 'O', pc: 'Ctrl' } },
-      { type: 'separator' },
-      { type: 'item', label: 'Save', emit: 'save-document', icon: Save, shortcut: { mac: ['Command'], key: 'S', pc: 'Ctrl' } },
-      { type: 'separator' },
-      { type: 'sub', label: 'Export', icon: Download, items: [
-        { type: 'item', label: 'Export as Markdown', emit: 'export-markdown', icon: FileText },
-        { type: 'item', label: 'Export as HTML', emit: 'export-html', icon: Globe },
-        { type: 'item', label: 'Export as PDF', emit: 'export-pdf', icon: FileDown }
-      ]}
-    ]
-  },
-  {
-    label: 'Edit',
-    items: [
-      { type: 'item', label: 'Undo', emit: 'undo', icon: Undo2, shortcut: { mac: ['Command'], key: 'Z', pc: 'Ctrl' } },
-      { type: 'item', label: 'Redo', emit: 'redo', icon: Redo2, shortcut: { mac: ['Command', 'Shift'], key: 'Z', pc: 'Ctrl' } },
-      { type: 'separator' },
-      { type: 'item', label: 'Cut', emit: 'cut', icon: Scissors, shortcut: { mac: ['Command'], key: 'X', pc: 'Ctrl' } },
-      { type: 'item', label: 'Copy', emit: 'copy', icon: Copy, shortcut: { mac: ['Command'], key: 'C', pc: 'Ctrl' } },
-      { type: 'item', label: 'Paste', emit: 'paste', icon: Clipboard, shortcut: { mac: ['Command'], key: 'V', pc: 'Ctrl' } },
-      { type: 'separator' },
-      { type: 'item', label: 'Select All', emit: 'select-all', shortcut: { mac: ['Command'], key: 'A', pc: 'Ctrl' } },
-      { type: 'item', label: 'Find', emit: 'toggle-find', icon: Search, shortcut: { mac: ['Command'], key: 'F', pc: 'Ctrl' } }
-    ]
-  },
-  {
-    label: 'Format',
-    items: [
-      { type: 'item', label: 'Bold', emit: 'format-bold', icon: Bold, shortcut: { mac: ['Command'], key: 'B', pc: 'Ctrl' } },
-      { type: 'item', label: 'Italic', emit: 'format-italic', icon: Italic, shortcut: { mac: ['Command'], key: 'I', pc: 'Ctrl' } },
-      { type: 'item', label: 'Underline', emit: 'format-underline', icon: Underline, shortcut: { mac: ['Command'], key: 'U', pc: 'Ctrl' } },
-      { type: 'item', label: 'Strikethrough', emit: 'format-strikethrough', icon: Strikethrough, shortcut: { mac: ['Command', 'Shift'], key: 'X', pc: 'Ctrl' } },
-      { type: 'separator' },
-      { type: 'sub', label: 'Heading', icon: Heading, items: [
-        { type: 'item', label: 'Heading 1', emit: 'set-heading', payload: 1, shortcut: { mac: ['Command'], key: '1', pc: 'Ctrl' } },
-        { type: 'item', label: 'Heading 2', emit: 'set-heading', payload: 2, shortcut: { mac: ['Command'], key: '2', pc: 'Ctrl' } },
-        { type: 'item', label: 'Heading 3', emit: 'set-heading', payload: 3, shortcut: { mac: ['Command'], key: '3', pc: 'Ctrl' } },
-        { type: 'item', label: 'Heading 4', emit: 'set-heading', payload: 4, shortcut: { mac: ['Command'], key: '4', pc: 'Ctrl' } },
-        { type: 'item', label: 'Heading 5', emit: 'set-heading', payload: 5, shortcut: { mac: ['Command'], key: '5', pc: 'Ctrl' } },
-        { type: 'item', label: 'Heading 6', emit: 'set-heading', payload: 6, shortcut: { mac: ['Command'], key: '6', pc: 'Ctrl' } }
-      ]},
-      { type: 'separator' },
-      { type: 'item', label: 'Bullet List', emit: 'toggle-bullet-list', icon: List },
-      { type: 'item', label: 'Numbered List', emit: 'toggle-ordered-list', icon: ListOrdered },
-      { type: 'item', label: 'Blockquote', emit: 'toggle-blockquote', icon: Quote }
-    ]
-  },
-  {
-    label: 'Insert',
-    items: [
-      { type: 'item', label: 'Link', emit: 'insert-link', icon: Link, shortcut: { mac: ['Command'], key: 'K', pc: 'Ctrl' } },
-      { type: 'item', label: 'Image', emit: 'insert-image', icon: Image },
-      { type: 'item', label: 'Table', emit: 'insert-table', icon: Table },
-      { type: 'item', label: 'Code Block', emit: 'insert-code-block', icon: Code2 },
-      { type: 'separator' },
-      { type: 'item', label: 'Math Expression', emit: 'insert-math', icon: Calculator },
-      { type: 'item', label: 'Date', emit: 'insert-date', icon: Calendar }
-    ]
-  },
-  {
-    label: 'View',
-    items: [
-      { type: 'checkbox', label: 'Show Toolbar', bind: 'showToolbar', icon: Wrench },
-      { type: 'checkbox', label: 'Show Status Bar', bind: 'showStatusBar', icon: BarChart3 },
-      { type: 'checkbox', label: 'Preview Mode', bind: 'showPreview', emit: 'toggle-preview', icon: Eye },
-      { type: 'separator' },
-      { type: 'item', label: 'Toggle Sidebar', emit: 'toggle-sidebar', icon: Sidebar, shortcut: { mac: ['Command'], key: '\\', pc: 'Ctrl' } },
-      { type: 'separator' },
-      { type: 'sub', label: 'Zoom', icon: ZoomIn, items: [
-        { type: 'item', label: 'Fit Page', emit: 'set-zoom', payload: 'fit' },
+  // Markdown-specific menu data
+  const menus = ref([
+    {
+      label: 'File',
+      items: [
+        { type: 'item', label: 'New Markdown', emit: 'new-document', icon: FileText, shortcut: { mac: ['Command'], key: 'N', pc: 'Ctrl' } },
+        { type: 'item', label: 'Open', emit: 'open-document', icon: FolderOpen, shortcut: { mac: ['Command'], key: 'O', pc: 'Ctrl' } },
         { type: 'separator' },
-        { type: 'item', label: '50%', emit: 'set-zoom', payload: 50 },
-        { type: 'item', label: '75%', emit: 'set-zoom', payload: 75 },
-        { type: 'item', label: '100%', emit: 'set-zoom', payload: 100 },
-        { type: 'item', label: '125%', emit: 'set-zoom', payload: 125 },
-        { type: 'item', label: '150%', emit: 'set-zoom', payload: 150 },
-        { type: 'item', label: '200%', emit: 'set-zoom', payload: 200 }
-      ]}
-    ]
-  },
-  {
-    label: 'Tools',
-    items: [
-      { type: 'item', label: 'Spell Check', emit: 'spell-check', icon: SpellCheck },
-      { type: 'item', label: 'Word Count', emit: 'word-count', icon: Hash },
-      { type: 'separator' },
-      { type: 'item', label: 'Verify Authorship', emit: 'verify-authorship', icon: Shield }
-    ]
-  },
-  {
-    label: 'Help',
-    items: [
-      { type: 'item', label: 'Keyboard Shortcuts', emit: 'show-shortcuts', icon: Keyboard },
-      { type: 'separator' },
-      { type: 'item', label: 'Markdown Guide', emit: 'show-documentation', icon: BookOpen }
-    ]
+        { type: 'item', label: 'Save', emit: 'save-document', icon: Save, shortcut: { mac: ['Command'], key: 'S', pc: 'Ctrl' } },
+        { type: 'separator' },
+        {
+          type: 'sub', label: 'Export', icon: Download, items: [
+            { type: 'item', label: 'Export as Markdown', emit: 'export-markdown', icon: FileText },
+            { type: 'item', label: 'Export as HTML', emit: 'export-html', icon: Globe },
+            { type: 'item', label: 'Export as PDF', emit: 'export-pdf', icon: FileDown }
+          ]
+        }
+      ]
+    },
+    {
+      label: 'Edit',
+      items: [
+        { type: 'item', label: 'Undo', emit: 'undo', icon: Undo2, shortcut: { mac: ['Command'], key: 'Z', pc: 'Ctrl' } },
+        { type: 'item', label: 'Redo', emit: 'redo', icon: Redo2, shortcut: { mac: ['Command', 'Shift'], key: 'Z', pc: 'Ctrl' } },
+        { type: 'separator' },
+        { type: 'item', label: 'Cut', emit: 'cut', icon: Scissors, shortcut: { mac: ['Command'], key: 'X', pc: 'Ctrl' } },
+        { type: 'item', label: 'Copy', emit: 'copy', icon: Copy, shortcut: { mac: ['Command'], key: 'C', pc: 'Ctrl' } },
+        { type: 'item', label: 'Paste', emit: 'paste', icon: Clipboard, shortcut: { mac: ['Command'], key: 'V', pc: 'Ctrl' } },
+        { type: 'separator' },
+        { type: 'item', label: 'Select All', emit: 'select-all', shortcut: { mac: ['Command'], key: 'A', pc: 'Ctrl' } },
+        { type: 'item', label: 'Find', emit: 'toggle-find', icon: Search, shortcut: { mac: ['Command'], key: 'F', pc: 'Ctrl' } }
+      ]
+    },
+    {
+      label: 'Format',
+      items: [
+        { type: 'item', label: 'Bold', emit: 'format-bold', icon: Bold, shortcut: { mac: ['Command'], key: 'B', pc: 'Ctrl' } },
+        { type: 'item', label: 'Italic', emit: 'format-italic', icon: Italic, shortcut: { mac: ['Command'], key: 'I', pc: 'Ctrl' } },
+        { type: 'item', label: 'Underline', emit: 'format-underline', icon: Underline, shortcut: { mac: ['Command'], key: 'U', pc: 'Ctrl' } },
+        { type: 'item', label: 'Strikethrough', emit: 'format-strikethrough', icon: Strikethrough, shortcut: { mac: ['Command', 'Shift'], key: 'X', pc: 'Ctrl' } },
+        { type: 'separator' },
+        {
+          type: 'sub', label: 'Heading', icon: Heading, items: [
+            { type: 'item', label: 'Heading 1', emit: 'set-heading', payload: 1, shortcut: { mac: ['Command'], key: '1', pc: 'Ctrl' } },
+            { type: 'item', label: 'Heading 2', emit: 'set-heading', payload: 2, shortcut: { mac: ['Command'], key: '2', pc: 'Ctrl' } },
+            { type: 'item', label: 'Heading 3', emit: 'set-heading', payload: 3, shortcut: { mac: ['Command'], key: '3', pc: 'Ctrl' } },
+            { type: 'item', label: 'Heading 4', emit: 'set-heading', payload: 4, shortcut: { mac: ['Command'], key: '4', pc: 'Ctrl' } },
+            { type: 'item', label: 'Heading 5', emit: 'set-heading', payload: 5, shortcut: { mac: ['Command'], key: '5', pc: 'Ctrl' } },
+            { type: 'item', label: 'Heading 6', emit: 'set-heading', payload: 6, shortcut: { mac: ['Command'], key: '6', pc: 'Ctrl' } }
+          ]
+        },
+        { type: 'separator' },
+        { type: 'item', label: 'Bullet List', emit: 'toggle-bullet-list', icon: List },
+        { type: 'item', label: 'Numbered List', emit: 'toggle-ordered-list', icon: ListOrdered },
+        { type: 'item', label: 'Blockquote', emit: 'toggle-blockquote', icon: Quote }
+      ]
+    },
+    {
+      label: 'Insert',
+      items: [
+        { type: 'item', label: 'Link', emit: 'insert-link', icon: Link, shortcut: { mac: ['Command'], key: 'K', pc: 'Ctrl' } },
+        { type: 'item', label: 'Image', emit: 'insert-image', icon: Image },
+        { type: 'item', label: 'Table', emit: 'insert-table', icon: Table },
+        { type: 'item', label: 'Code Block', emit: 'insert-code-block', icon: Code2 },
+        { type: 'separator' },
+        { type: 'item', label: 'Math Expression', emit: 'insert-math', icon: Calculator },
+        { type: 'item', label: 'Date', emit: 'insert-date', icon: Calendar }
+      ]
+    },
+    {
+      label: 'View',
+      items: [
+        { type: 'checkbox', label: 'Show Toolbar', bind: 'showToolbar', icon: Wrench },
+        { type: 'checkbox', label: 'Show Status Bar', bind: 'showStatusBar', icon: BarChart3 },
+        { type: 'checkbox', label: 'Preview Mode', bind: 'showPreview', emit: 'toggle-preview', icon: Eye },
+        { type: 'separator' },
+        {
+          type: 'sub', label: 'Zoom', icon: ZoomIn, items: [
+            { type: 'item', label: 'Fit Page', emit: 'set-zoom', payload: 'fit' },
+            { type: 'separator' },
+            { type: 'item', label: '50%', emit: 'set-zoom', payload: 50 },
+            { type: 'item', label: '75%', emit: 'set-zoom', payload: 75 },
+            { type: 'item', label: '100%', emit: 'set-zoom', payload: 100 },
+            { type: 'item', label: '125%', emit: 'set-zoom', payload: 125 },
+            { type: 'item', label: '150%', emit: 'set-zoom', payload: 150 },
+            { type: 'item', label: '200%', emit: 'set-zoom', payload: 200 }
+          ]
+        }
+      ]
+    },
+    {
+      label: 'Tools',
+      items: [
+        { type: 'item', label: 'Spell Check', emit: 'spell-check', icon: SpellCheck },
+        { type: 'item', label: 'Word Count', emit: 'word-count', icon: Hash },
+        { type: 'separator' },
+        { type: 'item', label: 'Verify Authorship', emit: 'verify-authorship', icon: Shield }
+      ]
+    },
+    {
+      label: 'Help',
+      items: [
+        { type: 'item', label: 'Keyboard Shortcuts', emit: 'show-shortcuts', icon: Keyboard },
+        { type: 'separator' },
+        { type: 'item', label: 'Markdown Guide', emit: 'show-documentation', icon: BookOpen }
+      ]
+    }
+  ])
+
+  // bindings for checkbox menu items
+  const bindings: Record<string, { value: any }> = {
+    showToolbar: { value: showToolbar },
+    showStatusBar: { value: showStatusBar },
+    showPreview: { value: showPreview }
   }
-])
 
-// bindings for checkbox menu items
-const bindings: Record<string, { value: any }> = {
-  showToolbar: { value: showToolbar },
-  showStatusBar: { value: showStatusBar },
-  showPreview: { value: showPreview }
-}
+  // Generic emitter for menu items
+  function handleMenuEmit(item: any) {
+    if (!item) return
+    if (!item.emit) return
 
-// Generic emitter for menu items
-function handleMenuEmit(item: any) {
-  if (!item) return
-  if (!item.emit) return
-  
-  if (item.emit === 'new-document') {
-    newDoc()
-    return
+    if (item.emit === 'new-document') {
+      newDoc()
+      return
+    }
+
+    if (item.emit === 'save-document') {
+      save()
+      return
+    }
+
+    if (item.emit === 'show-documentation') {
+      window.open('https://www.markdownguide.org/', '_blank')
+      return
+    }
+
+    // Special handling for zoom menu
+    if (item.emit === 'set-zoom' && item.payload !== undefined) {
+      emit('set-zoom', item.payload)
+      return
+    }
+
+    if (item.payload !== undefined) emit(item.emit as any, item.payload)
+    else emit(item.emit as any)
   }
-  
-  if (item.emit === 'save-document') {
-    save()
-    return
+
+  function isDisabled(item: any) {
+    if (!item || !item.disabledProp) return false
+    if (item.disabledProp === 'isDirty') return !isDirty.value
+    return false
   }
-  
-  if (item.emit === 'show-documentation') {
-    window.open('https://www.markdownguide.org/', '_blank')
-    return
+
+  function getBinding(item: any) {
+    if (!item || !item.bind) return { value: false }
+    return bindings[item.bind] ?? { value: false }
   }
-  
-  // Special handling for zoom menu
-  if (item.emit === 'set-zoom' && item.payload !== undefined) {
-    emit('set-zoom', item.payload)
-    return
+
+  function getShortcut(item: any) {
+    return (item as any).shortcut
   }
-  
-  if (item.payload !== undefined) emit(item.emit as any, item.payload)
-  else emit(item.emit as any)
-}
 
-function isDisabled(item: any) {
-  if (!item || !item.disabledProp) return false
-  if (item.disabledProp === 'isDirty') return !isDirty.value
-  return false
-}
-
-function getBinding(item: any) {
-  if (!item || !item.bind) return { value: false }
-  return bindings[item.bind] ?? { value: false }
-}
-
-function getShortcut(item: any) {
-  return (item as any).shortcut
-}
-
-function getIcon(item: any) {
-  return item && (item as any).icon ? (item as any).icon : null
-}
-
-// Title editing state
-const isEditingTitle = ref(false)
-const editingTitle = ref('')
-const titleInput = ref<HTMLInputElement | null>(null)
-
-// detect platform on client to show correct modifier icon in shortcuts
-const isMac = ref(false)
-onMounted(() => {
-  try {
-    isMac.value = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)
-  } catch (e) {
-    isMac.value = false
+  function getIcon(item: any) {
+    return item && (item as any).icon ? (item as any).icon : null
   }
-})
 
-function startEditingTitle() {
-  isEditingTitle.value = true
-  editingTitle.value = title.value || ''
-  nextTick(() => {
-    titleInput.value?.focus()
-    titleInput.value?.select()
+  // Title editing state
+  const isEditingTitle = ref(false)
+  const editingTitle = ref('')
+  const titleInput = ref<HTMLInputElement | null>(null)
+
+  // detect platform on client to show correct modifier icon in shortcuts
+  const isMac = ref(false)
+  onMounted(() => {
+    try {
+      isMac.value = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)
+    } catch (e) {
+      isMac.value = false
+    }
   })
-}
 
-function saveTitle() {
-  if (editingTitle.value.trim()) {
-    updateTitle(editingTitle.value.trim())
+  function startEditingTitle() {
+    isEditingTitle.value = true
+    editingTitle.value = title.value || ''
+    nextTick(() => {
+      titleInput.value?.focus()
+      titleInput.value?.select()
+    })
   }
-  isEditingTitle.value = false
-}
 
-function cancelEdit() {
-  isEditingTitle.value = false
-  editingTitle.value = ''
-}
+  function saveTitle() {
+    if (editingTitle.value.trim()) {
+      updateTitle(editingTitle.value.trim())
+    }
+    isEditingTitle.value = false
+  }
 
-function updateTitle(newTitle: string) {
-  store.setTitle(newTitle)
-}
+  function cancelEdit() {
+    isEditingTitle.value = false
+    editingTitle.value = ''
+  }
 
-function save() {
-  store.save()
-}
+  function updateTitle(newTitle: string) {
+    store.setTitle(newTitle)
+  }
 
-function newDoc() {
-  store.newDocument()
-}
+  function save() {
+    store.save()
+  }
+
+  function newDoc() {
+    store.newDocument()
+  }
 </script>
