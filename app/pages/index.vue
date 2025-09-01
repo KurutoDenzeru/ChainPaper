@@ -2,14 +2,15 @@
   <div class="min-h-screen bg-gray-50 flex flex-col">
     <div class="fixed inset-x-1 top-1 z-50 pointer-events-none">
       <div class="pointer-events-auto">
-        <MarkdownMenuBar @word-count="showWordDialog = true" @insert-link="insertLink" />
+        <MarkdownMenuBar @word-count="showWordDialog = true" @insert-link="insertLink"
+          @set-heading="handleSetHeading" />
       </div>
       <div class="mt-2 pointer-events-auto">
         <MarkdownToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
           @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
           @format-strikethrough="applyStrike" @toggle-bullet-list="applyBulletList"
           @toggle-ordered-list="applyOrderedList" @insert-link="insertLink" @insert-image="insertImage"
-          @insert-code-block="insertCodeBlockBlock" @insert-table="insertTable" @set-heading="setHeading"
+          @insert-code-block="insertCodeBlockBlock" @insert-table="insertTable" @set-heading="handleSetHeading"
           @set-alignment="setAlignmentComment" @set-zoom="setZoom" @set-text-color="applyColor"
           @set-highlight="applyHighlight" @update:mode="v => mode = v" />
       </div>
@@ -41,6 +42,41 @@
   </div>
 </template>
 <script setup lang="ts">
+  // Handles heading and paragraph formatting from menu/toolbar
+  function handleSetHeading(level: number) {
+    if (mode.value === 'source') {
+      const ta = getActiveTextarea(); if (!ta) return
+      const { start, end, value } = getSelection(ta)
+      const lineStart = value.lastIndexOf('\n', start - 1) + 1
+      const lineEnd = value.indexOf('\n', end)
+      const actualEnd = lineEnd === -1 ? value.length : lineEnd
+      let line = value.slice(lineStart, actualEnd).replace(/^#{1,6}\s+/, '')
+      let prefix = level > 0 ? '#'.repeat(level) + ' ' : ''
+      // Paragraph: remove heading prefix
+      if (level === 0) prefix = ''
+      replaceRange(ta, lineStart, actualEnd, prefix + line)
+      return
+    }
+    // Reader mode: wrap selection in heading or paragraph
+    const sel = window.getSelection()
+    if (!sel || sel.rangeCount === 0) return
+    const range = sel.getRangeAt(0)
+    const selectedText = sel.toString()
+    if (!selectedText) return
+    let el
+    if (level === 0) {
+      el = document.createElement('p')
+    } else {
+      el = document.createElement('h' + level)
+    }
+    el.textContent = selectedText
+    range.deleteContents()
+    range.insertNode(el)
+    // Move cursor after inserted element
+    range.setStartAfter(el)
+    range.collapse(true)
+    sel.removeAllRanges(); sel.addRange(range)
+  }
   import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
   import { storeToRefs } from 'pinia'
   import MarkdownMenuBar from '@/components/markdown/layout/MarkdownMenuBar.vue'

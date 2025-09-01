@@ -128,7 +128,8 @@
   import {
     Edit3, Command, FileText, FolderOpen, Save, Download,
     Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
-    Strikethrough, Heading, List, ListOrdered, Quote, Link, Image, Table,
+    Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
+    List, ListOrdered, Quote, Link, Image, Table,
     Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info
   } from 'lucide-vue-next'
   import {
@@ -245,12 +246,12 @@
         { type: 'separator' },
         {
           type: 'sub', label: 'Heading', icon: Heading, items: [
-            { type: 'item', label: 'Heading 1', emit: 'set-heading', payload: 1, shortcut: { mac: ['Command'], key: '1', pc: 'Ctrl' } },
-            { type: 'item', label: 'Heading 2', emit: 'set-heading', payload: 2, shortcut: { mac: ['Command'], key: '2', pc: 'Ctrl' } },
-            { type: 'item', label: 'Heading 3', emit: 'set-heading', payload: 3, shortcut: { mac: ['Command'], key: '3', pc: 'Ctrl' } },
-            { type: 'item', label: 'Heading 4', emit: 'set-heading', payload: 4, shortcut: { mac: ['Command'], key: '4', pc: 'Ctrl' } },
-            { type: 'item', label: 'Heading 5', emit: 'set-heading', payload: 5, shortcut: { mac: ['Command'], key: '5', pc: 'Ctrl' } },
-            { type: 'item', label: 'Heading 6', emit: 'set-heading', payload: 6, shortcut: { mac: ['Command'], key: '6', pc: 'Ctrl' } }
+            { type: 'item', label: 'Heading 1', emit: 'set-heading', payload: 1, icon: Heading1, shortcut: { mac: ['Command'], key: '1', pc: 'Ctrl' } },
+            { type: 'item', label: 'Heading 2', emit: 'set-heading', payload: 2, icon: Heading2, shortcut: { mac: ['Command'], key: '2', pc: 'Ctrl' } },
+            { type: 'item', label: 'Heading 3', emit: 'set-heading', payload: 3, icon: Heading3, shortcut: { mac: ['Command'], key: '3', pc: 'Ctrl' } },
+            { type: 'item', label: 'Heading 4', emit: 'set-heading', payload: 4, icon: Heading4, shortcut: { mac: ['Command'], key: '4', pc: 'Ctrl' } },
+            { type: 'item', label: 'Heading 5', emit: 'set-heading', payload: 5, icon: Heading5, shortcut: { mac: ['Command'], key: '5', pc: 'Ctrl' } },
+            { type: 'item', label: 'Heading 6', emit: 'set-heading', payload: 6, icon: Heading6, shortcut: { mac: ['Command'], key: '6', pc: 'Ctrl' } }
           ]
         },
         { type: 'separator' },
