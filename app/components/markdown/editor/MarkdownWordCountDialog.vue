@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="max-w-2xl">
+    <DialogContent class="!max-w-3xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Hash class="w-5 h-5 text-blue-600" />
@@ -100,8 +100,8 @@
             Heading Structure
           </h4>
           <div class="space-y-2">
-            <div v-for="heading in headingBreakdown" :key="`${heading.level}-${heading.text}`" 
-                 class="flex items-center gap-2 text-sm">
+            <div v-for="heading in headingBreakdown" :key="`${heading.level}-${heading.text}`"
+              class="flex items-center gap-2 text-sm">
               <div class="flex-shrink-0" :style="{ marginLeft: `${(heading.level - 1) * 16}px` }">
                 <component :is="getHeadingIcon(heading.level)" class="w-4 h-4 text-gray-500" />
               </div>
@@ -118,8 +118,8 @@
             Most Frequent Words
           </h4>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-            <div v-for="word in topWords" :key="word.word" 
-                 class="flex justify-between items-center p-2 bg-gray-50 rounded text-sm">
+            <div v-for="word in topWords" :key="word.word"
+              class="flex justify-between items-center p-2 bg-gray-50 rounded text-sm">
               <span class="font-medium">{{ word.word }}</span>
               <span class="text-gray-600">{{ word.count }}</span>
             </div>
@@ -128,169 +128,171 @@
       </div>
 
       <DialogFooter>
-        <Button variant="outline" @click="exportStats">
-          <Download class="w-4 h-4 mr-2" />
-          Export Stats
-        </Button>
-        <Button variant="outline" @click="$emit('update:open', false)">
-          Close
-        </Button>
+        <div class="flex gap-2 w-full">
+          <Button variant="outline" class="w-1/2" @click="exportStats">
+            <Download class="w-4 h-4 mr-2" />
+            Export Stats
+          </Button>
+          <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">
+            Close
+          </Button>
+        </div>
       </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { 
-  Hash, 
-  FileText, 
-  Heading, 
-  BarChart3, 
-  Download,
-  Heading1,
-  Heading2,
-  Heading3,
-  Heading4,
-  Heading5,
-  Heading6
-} from 'lucide-vue-next'
-import { useMarkdownDocStore } from '@/stores/markdownDoc'
+  import { computed } from 'vue'
+  import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+  } from '@/components/ui/dialog'
+  import { Button } from '@/components/ui/button'
+  import {
+    Hash,
+    FileText,
+    Heading,
+    BarChart3,
+    Download,
+    Heading1,
+    Heading2,
+    Heading3,
+    Heading4,
+    Heading5,
+    Heading6
+  } from 'lucide-vue-next'
+  import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
-interface Props {
-  open: boolean
-}
-
-defineProps<Props>()
-defineEmits<{
-  'update:open': [value: boolean]
-}>()
-
-const store = useMarkdownDocStore()
-
-// Calculate statistics
-const stats = computed(() => {
-  const content = store.content
-  
-  // Basic counts
-  const characters = content.length
-  const charactersNoSpaces = content.replace(/\s/g, '').length
-  const words = content.trim() ? content.trim().split(/\s+/).length : 0
-  const lines = content.split('\n').length
-  const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim()).length
-  
-  // Sentences (simple approximation)
-  const sentences = content.split(/[.!?]+/).filter(s => s.trim()).length
-  const avgWordsPerSentence = sentences > 0 ? Math.round(words / sentences * 10) / 10 : 0
-  
-  // Reading time (average 200 words per minute)
-  const readingMinutes = Math.ceil(words / 200)
-  const readingTime = readingMinutes === 1 ? '1 minute' : `${readingMinutes} minutes`
-  
-  // Markdown elements
-  const headings = (content.match(/^#{1,6}\s+/gm) || []).length
-  const links = (content.match(/\[.*?\]\(.*?\)/g) || []).length
-  const images = (content.match(/!\[.*?\]\(.*?\)/g) || []).length
-  const codeBlocks = (content.match(/```[\s\S]*?```/g) || []).length + (content.match(/`[^`\n]+`/g) || []).length
-  const lists = (content.match(/^[\s]*[-*+]\s+/gm) || []).length + (content.match(/^[\s]*\d+\.\s+/gm) || []).length
-  const tables = (content.match(/\|.*\|/g) || []).length
-  
-  return {
-    characters,
-    charactersNoSpaces,
-    words,
-    lines,
-    paragraphs,
-    sentences,
-    avgWordsPerSentence,
-    readingTime,
-    headings,
-    links,
-    images,
-    codeBlocks,
-    lists,
-    tables
+  interface Props {
+    open: boolean
   }
-})
 
-// Heading breakdown
-const headingBreakdown = computed(() => {
-  const content = store.content
-  const headingMatches = content.matchAll(/^(#{1,6})\s+(.+)$/gm)
-  const headings = []
-  
-  for (const match of headingMatches) {
-    if (match[1] && match[2]) {
-      headings.push({
-        level: match[1].length,
-        text: match[2].trim()
-      })
+  defineProps<Props>()
+  defineEmits<{
+    'update:open': [value: boolean]
+  }>()
+
+  const store = useMarkdownDocStore()
+
+  // Calculate statistics
+  const stats = computed(() => {
+    const content = store.content
+
+    // Basic counts
+    const characters = content.length
+    const charactersNoSpaces = content.replace(/\s/g, '').length
+    const words = content.trim() ? content.trim().split(/\s+/).length : 0
+    const lines = content.split('\n').length
+    const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim()).length
+
+    // Sentences (simple approximation)
+    const sentences = content.split(/[.!?]+/).filter(s => s.trim()).length
+    const avgWordsPerSentence = sentences > 0 ? Math.round(words / sentences * 10) / 10 : 0
+
+    // Reading time (average 200 words per minute)
+    const readingMinutes = Math.ceil(words / 200)
+    const readingTime = readingMinutes === 1 ? '1 minute' : `${readingMinutes} minutes`
+
+    // Markdown elements
+    const headings = (content.match(/^#{1,6}\s+/gm) || []).length
+    const links = (content.match(/\[.*?\]\(.*?\)/g) || []).length
+    const images = (content.match(/!\[.*?\]\(.*?\)/g) || []).length
+    const codeBlocks = (content.match(/```[\s\S]*?```/g) || []).length + (content.match(/`[^`\n]+`/g) || []).length
+    const lists = (content.match(/^[\s]*[-*+]\s+/gm) || []).length + (content.match(/^[\s]*\d+\.\s+/gm) || []).length
+    const tables = (content.match(/\|.*\|/g) || []).length
+
+    return {
+      characters,
+      charactersNoSpaces,
+      words,
+      lines,
+      paragraphs,
+      sentences,
+      avgWordsPerSentence,
+      readingTime,
+      headings,
+      links,
+      images,
+      codeBlocks,
+      lists,
+      tables
+    }
+  })
+
+  // Heading breakdown
+  const headingBreakdown = computed(() => {
+    const content = store.content
+    const headingMatches = content.matchAll(/^(#{1,6})\s+(.+)$/gm)
+    const headings = []
+
+    for (const match of headingMatches) {
+      if (match[1] && match[2]) {
+        headings.push({
+          level: match[1].length,
+          text: match[2].trim()
+        })
+      }
+    }
+
+    return headings
+  })
+
+  // Top words analysis
+  const topWords = computed(() => {
+    const content = store.content.toLowerCase()
+    const words = content.match(/\b[a-z]{3,}\b/g) || []
+
+    // Common words to exclude
+    const commonWords = new Set([
+      'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'man', 'new', 'now', 'old', 'see', 'two', 'way', 'who', 'boy', 'did', 'its', 'let', 'put', 'say', 'she', 'too', 'use'
+    ])
+
+    const wordCount = new Map<string, number>()
+
+    for (const word of words) {
+      if (!commonWords.has(word)) {
+        wordCount.set(word, (wordCount.get(word) || 0) + 1)
+      }
+    }
+
+    return Array.from(wordCount.entries())
+      .map(([word, count]) => ({ word, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 12)
+  })
+
+  function getHeadingIcon(level: number) {
+    switch (level) {
+      case 1: return Heading1
+      case 2: return Heading2
+      case 3: return Heading3
+      case 4: return Heading4
+      case 5: return Heading5
+      case 6: return Heading6
+      default: return Heading
     }
   }
-  
-  return headings
-})
 
-// Top words analysis
-const topWords = computed(() => {
-  const content = store.content.toLowerCase()
-  const words = content.match(/\b[a-z]{3,}\b/g) || []
-  
-  // Common words to exclude
-  const commonWords = new Set([
-    'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'man', 'new', 'now', 'old', 'see', 'two', 'way', 'who', 'boy', 'did', 'its', 'let', 'put', 'say', 'she', 'too', 'use'
-  ])
-  
-  const wordCount = new Map<string, number>()
-  
-  for (const word of words) {
-    if (!commonWords.has(word)) {
-      wordCount.set(word, (wordCount.get(word) || 0) + 1)
+  function exportStats() {
+    const statsData = {
+      title: store.title,
+      timestamp: new Date().toISOString(),
+      statistics: stats.value,
+      headingStructure: headingBreakdown.value,
+      topWords: topWords.value
     }
-  }
-  
-  return Array.from(wordCount.entries())
-    .map(([word, count]) => ({ word, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 12)
-})
 
-function getHeadingIcon(level: number) {
-  switch (level) {
-    case 1: return Heading1
-    case 2: return Heading2
-    case 3: return Heading3
-    case 4: return Heading4
-    case 5: return Heading5
-    case 6: return Heading6
-    default: return Heading
+    const blob = new Blob([JSON.stringify(statsData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${store.title.replace(/[^a-z0-9]/gi, '_')}_stats.json`
+    link.click()
+    URL.revokeObjectURL(url)
   }
-}
-
-function exportStats() {
-  const statsData = {
-    title: store.title,
-    timestamp: new Date().toISOString(),
-    statistics: stats.value,
-    headingStructure: headingBreakdown.value,
-    topWords: topWords.value
-  }
-  
-  const blob = new Blob([JSON.stringify(statsData, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `${store.title.replace(/[^a-z0-9]/gi, '_')}_stats.json`
-  link.click()
-  URL.revokeObjectURL(url)
-}
 </script>

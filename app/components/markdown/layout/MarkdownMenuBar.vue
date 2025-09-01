@@ -78,13 +78,13 @@
                               </span>
                               <span v-else
                                 class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">{{
-                                mod }}</span>
+                                  mod }}</span>
                             </template>
                           </div>
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
                           <span
                             class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
-                            getShortcut(item)?.key }}</span>
+                              getShortcut(item)?.key }}</span>
                         </template>
                         <template v-else>
                           <span
@@ -93,7 +93,7 @@
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
                           <span
                             class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
-                            getShortcut(item)?.key }}</span>
+                              getShortcut(item)?.key }}</span>
                         </template>
                       </div>
                     </MenubarShortcut>
@@ -106,38 +106,20 @@
       </div>
     </div>
   </Menubar>
-  
+
   <!-- Dialogs -->
-  <MarkdownWordCountDialog 
-    :open="showWordCountDialog"
-    @update:open="showWordCountDialog = $event"
-  />
+  <MarkdownWordCountDialog :open="showWordCountDialog" @update:open="showWordCountDialog = $event" />
 
-  <MarkdownAuthProofDialog
-    :open="showAuthProofDialog"
-    @update:open="showAuthProofDialog = $event"
-  />
+  <MarkdownAuthProofDialog :open="showAuthProofDialog" @update:open="showAuthProofDialog = $event" />
 
-  <MarkdownExportDialog
-    :open="showExportDialog"
-    :initialFormat="exportInitialFormat"
-    @update:open="onExportDialogUpdate"
-  />
+  <MarkdownExportDialog :open="showExportDialog" :initialFormat="exportInitialFormat"
+    @update:open="onExportDialogUpdate" />
 
-  <MarkdownSaveDialog
-    :open="showSaveDialog"
-    @update:open="showSaveDialog = $event"
-  />
+  <MarkdownSaveDialog :open="showSaveDialog" @update:open="showSaveDialog = $event" />
 
-  <MarkdownAboutDialog
-    :open="showAboutDialog"
-    @update:open="showAboutDialog = $event"
-  />
+  <MarkdownAboutDialog :open="showAboutDialog" @update:open="showAboutDialog = $event" />
 
-  <MarkdownGuideDialog
-    :open="showGuideDialog"
-    @update:open="showGuideDialog = $event"
-  />
+  <MarkdownGuideDialog :open="showGuideDialog" @update:open="showGuideDialog = $event" />
 </template>
 
 <script setup lang="ts">
@@ -233,7 +215,7 @@
         { type: 'separator' },
         { type: 'item', label: 'Save', emit: 'save-document', icon: Save, shortcut: { mac: ['Command'], key: 'S', pc: 'Ctrl' } },
         { type: 'separator' },
-  { type: 'item', label: 'Export', emit: 'export-document', icon: Download }
+        { type: 'item', label: 'Export', emit: 'export-document', icon: Download }
       ]
     },
     {
@@ -255,11 +237,11 @@
       items: [
         { type: 'item', label: 'Bold', emit: 'format-bold', icon: Bold, shortcut: { mac: ['Command'], key: 'B', pc: 'Ctrl' } },
         { type: 'item', label: 'Italic', emit: 'format-italic', icon: Italic, shortcut: { mac: ['Command'], key: 'I', pc: 'Ctrl' } },
-  { type: 'item', label: 'Underline', emit: 'format-underline', icon: Underline, shortcut: { mac: ['Command'], key: 'U', pc: 'Ctrl' } },
+        { type: 'item', label: 'Underline', emit: 'format-underline', icon: Underline, shortcut: { mac: ['Command'], key: 'U', pc: 'Ctrl' } },
         { type: 'item', label: 'Strikethrough', emit: 'format-strikethrough', icon: Strikethrough, shortcut: { mac: ['Command', 'Shift'], key: 'X', pc: 'Ctrl' } },
-  { type: 'separator' },
-  // Link moved from Insert -> Format
-  { type: 'item', label: 'Link', emit: 'insert-link', icon: Link, shortcut: { mac: ['Command'], key: 'K', pc: 'Ctrl' } },
+        { type: 'separator' },
+        // Link moved from Insert -> Format
+        { type: 'item', label: 'Link', emit: 'insert-link', icon: Link, shortcut: { mac: ['Command'], key: 'K', pc: 'Ctrl' } },
         { type: 'separator' },
         {
           type: 'sub', label: 'Heading', icon: Heading, items: [

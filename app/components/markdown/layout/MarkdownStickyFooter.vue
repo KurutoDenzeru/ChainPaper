@@ -17,10 +17,11 @@
           </div>
 
           <div class="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer"
-            @click="$emit('word-count')">
+            @click="showWordCountDialog = true">
             <span class="font-medium">Words</span>
             <span class="text-gray-800">{{ wordCount || 0 }}</span>
           </div>
+  <MarkdownWordCountDialog :open="showWordCountDialog" :stats="{ words: wordCount, characters: characterCount }" @update:open="v => showWordCountDialog = v" />
           <div class="hidden sm:flex items-center gap-2">•</div>
           <div class="hidden sm:flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
             <span class="font-medium">Characters</span>
@@ -77,6 +78,8 @@
 </template>
 
 <script setup lang="ts">
+  import MarkdownWordCountDialog from '@/components/markdown/editor/MarkdownWordCountDialog.vue'
+  const showWordCountDialog = ref(false)
   import { ref, computed, watch } from 'vue'
   import { Minus, Plus, BookOpen, Edit } from 'lucide-vue-next'
   import { Button } from '@/components/ui/button'

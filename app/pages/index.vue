@@ -25,7 +25,9 @@
               <textarea v-if="mode === 'source'" ref="textareaEl" v-model="content"
                 class="w-full h-full outline-none resize-none font-mono text-sm p-6" placeholder="Write Markdown..."
                 @input="recount" />
-              <div v-else class="prose prose-gray max-w-none overflow-auto h-full p-6 prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg prose-h6:text-base" v-html="renderedHtml" />
+              <div v-else
+                class="prose prose-gray max-w-none overflow-auto h-full p-6 prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg prose-h6:text-base"
+                v-html="renderedHtml" />
             </div>
           </div>
         </div>
@@ -34,7 +36,8 @@
     <MarkdownFooter :wordCount="wordCount" :characterCount="stats.charsWithSpaces" :mode="mode" :zoom="zoom"
       @set-zoom="setZoom" @word-count="showWordDialog = true" @toggle-mode="toggleMode" />
     <MarkdownWordCountDialog :open="showWordDialog" :stats="stats" @update:open="v => showWordDialog = v" />
-  <LinkInsertDialog :open="linkDialogOpen" :selectedText="linkDialogSelectedText" @update:open="v => linkDialogOpen = v" @insert="handleLinkInsert" />
+    <LinkInsertDialog :open="linkDialogOpen" :selectedText="linkDialogSelectedText"
+      @update:open="v => linkDialogOpen = v" @insert="handleLinkInsert" />
   </div>
 </template>
 <script setup lang="ts">
@@ -53,7 +56,6 @@
     import('markdown-it').then(m => { MarkdownIt = (m as any).default || m })
   }
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
-  import WordCountDialog from '@/components/markdown/editor/MarkdownWordCountDialog.vue'
 
   const store = useMarkdownDocStore()
   const { content, canUndo, canRedo } = storeToRefs(store)
@@ -150,7 +152,7 @@
   // Individual formatting functions
   function applyBold() { applyAround('**')() }
   function applyItalic() { applyAround('*')() }
-  function applyUnderline() { 
+  function applyUnderline() {
     // Use HTML tags for underline since markdown doesn't support it natively
     surroundWithHtml('<u>', '</u>')
   }
@@ -273,11 +275,11 @@
   const renderedHtml = computed(() => {
     if (mode.value !== 'reader') return ''
     if (!MarkdownIt) return '<p class="text-gray-400 text-sm">Loading renderer...</p>'
-    
+
     // Configure markdown-it with proper options
-    const md = new MarkdownIt({ 
-      html: true, 
-      linkify: true, 
+    const md = new MarkdownIt({
+      html: true,
+      linkify: true,
       breaks: true,
       typographer: true
     })
@@ -285,15 +287,15 @@
     // Render convention: treat strong markup created with double-underscore (__text__) as underline
     // Leave double-asterisk (**) as bold. We override the strong_open/strong_close renderer
     // to emit <u>...</u> when the token.markup is '__'.
-    const defaultStrongOpen = md.renderer.rules.strong_open || function(tokens: any, idx: any, options: any, env: any, self: any) { return self.renderToken(tokens, idx, options) }
-    const defaultStrongClose = md.renderer.rules.strong_close || function(tokens: any, idx: any, options: any, env: any, self: any) { return self.renderToken(tokens, idx, options) }
+    const defaultStrongOpen = md.renderer.rules.strong_open || function (tokens: any, idx: any, options: any, env: any, self: any) { return self.renderToken(tokens, idx, options) }
+    const defaultStrongClose = md.renderer.rules.strong_close || function (tokens: any, idx: any, options: any, env: any, self: any) { return self.renderToken(tokens, idx, options) }
 
-    md.renderer.rules.strong_open = function(tokens: any, idx: any, options: any, env: any, self: any) {
+    md.renderer.rules.strong_open = function (tokens: any, idx: any, options: any, env: any, self: any) {
       const tok = tokens[idx]
       if (tok && tok.markup === '__') return '<u>'
       return defaultStrongOpen(tokens, idx, options, env, self)
     }
-    md.renderer.rules.strong_close = function(tokens: any, idx: any, options: any, env: any, self: any) {
+    md.renderer.rules.strong_close = function (tokens: any, idx: any, options: any, env: any, self: any) {
       const tok = tokens[idx]
       if (tok && tok.markup === '__') return '</u>'
       return defaultStrongClose(tokens, idx, options, env, self)
@@ -338,30 +340,110 @@
 </script>
 
 <style scoped>
-/* Custom styles for markdown rendering */
-:deep(.prose) {
-  /* Ensure headings have proper sizing */
-  h1 { font-size: 2.25rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 1rem; }
-  h2 { font-size: 1.875rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.875rem; }
-  h3 { font-size: 1.5rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.75rem; }
-  h4 { font-size: 1.25rem; font-weight: 600; margin-top: 0.875rem; margin-bottom: 0.625rem; }
-  h5 { font-size: 1.125rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.5rem; }
-  h6 { font-size: 1rem; font-weight: 600; margin-top: 0.625rem; margin-bottom: 0.5rem; }
-  
-  /* Ensure underline works properly */
-  u { text-decoration: underline; }
-  
-  /* Ensure bold and italic work properly */
-  strong { font-weight: 700; }
-  em { font-style: italic; }
-  
-  /* Other markdown elements */
-  p { margin-bottom: 1rem; line-height: 1.6; }
-  a { color: #2563EB; text-decoration: underline; }
-  ul, ol { margin: 1rem 0; padding-left: 1.5rem; }
-  blockquote { border-left: 4px solid #d1d5db; padding-left: 1rem; margin: 1rem 0; font-style: italic; }
-  code { background-color: #f3f4f6; padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-family: monospace; }
-  pre { background-color: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; }
-  hr { border: none; border-top: 1px solid #d1d5db; margin: 2rem 0; }
-}
+
+  /* Custom styles for markdown rendering */
+  :deep(.prose) {
+
+    /* Ensure headings have proper sizing */
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      font-size: 1.875rem;
+      font-weight: 600;
+      margin-top: 1.25rem;
+      margin-bottom: 0.875rem;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-top: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    h4 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-top: 0.875rem;
+      margin-bottom: 0.625rem;
+    }
+
+    h5 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-top: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h6 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 0.625rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Ensure underline works properly */
+    u {
+      text-decoration: underline;
+    }
+
+    /* Ensure bold and italic work properly */
+    strong {
+      font-weight: 700;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    /* Other markdown elements */
+    p {
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    a {
+      color: #2563EB;
+      text-decoration: underline;
+    }
+
+    ul,
+    ol {
+      margin: 1rem 0;
+      padding-left: 1.5rem;
+    }
+
+    blockquote {
+      border-left: 4px solid #d1d5db;
+      padding-left: 1rem;
+      margin: 1rem 0;
+      font-style: italic;
+    }
+
+    code {
+      background-color: #f3f4f6;
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      font-family: monospace;
+    }
+
+    pre {
+      background-color: #f3f4f6;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #d1d5db;
+      margin: 2rem 0;
+    }
+  }
 </style>
