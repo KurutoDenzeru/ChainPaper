@@ -134,11 +134,10 @@
   import { ref, nextTick, onMounted } from 'vue'
   import { storeToRefs } from 'pinia'
   import {
-    Edit3, Command, FileText, FolderOpen, Save, Download, Globe, FileDown,
+    Edit3, Command, FileText, FolderOpen, Save, Download,
     Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
     Strikethrough, Heading, List, ListOrdered, Quote, Link, Image, Table,
-    Code2, Calculator, Calendar, Wrench, BarChart3, Eye, ZoomIn,
-    SpellCheck, Hash, Shield, Keyboard, BookOpen
+    Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, Keyboard, BookOpen
   } from 'lucide-vue-next'
   import {
     Menubar,
@@ -182,8 +181,6 @@
     (e: 'insert-image'): void
     (e: 'insert-link'): void
     (e: 'insert-code-block'): void
-    (e: 'insert-math'): void
-    (e: 'insert-date'): void
     (e: 'format-bold'): void
     (e: 'format-italic'): void
     (e: 'format-underline'): void
@@ -220,13 +217,7 @@
         { type: 'separator' },
         { type: 'item', label: 'Save', emit: 'save-document', icon: Save, shortcut: { mac: ['Command'], key: 'S', pc: 'Ctrl' } },
         { type: 'separator' },
-        {
-          type: 'sub', label: 'Export', icon: Download, items: [
-            { type: 'item', label: 'Export as Markdown', emit: 'export-markdown', icon: FileText },
-            { type: 'item', label: 'Export as HTML', emit: 'export-html', icon: Globe },
-            { type: 'item', label: 'Export as PDF', emit: 'export-pdf', icon: FileDown }
-          ]
-        }
+  { type: 'item', label: 'Export', emit: 'export-document', icon: Download }
       ]
     },
     {
@@ -274,9 +265,6 @@
         { type: 'item', label: 'Image', emit: 'insert-image', icon: Image },
         { type: 'item', label: 'Table', emit: 'insert-table', icon: Table },
         { type: 'item', label: 'Code Block', emit: 'insert-code-block', icon: Code2 },
-        { type: 'separator' },
-        { type: 'item', label: 'Math Expression', emit: 'insert-math', icon: Calculator },
-        { type: 'item', label: 'Date', emit: 'insert-date', icon: Calendar }
       ]
     },
     {
@@ -303,7 +291,6 @@
     {
       label: 'Tools',
       items: [
-        { type: 'item', label: 'Spell Check', emit: 'spell-check', icon: SpellCheck },
         { type: 'item', label: 'Word Count', emit: 'word-count', icon: Hash },
         { type: 'separator' },
         { type: 'item', label: 'Verify Authorship', emit: 'verify-authorship', icon: Shield }
@@ -342,10 +329,12 @@
       return
     }
 
-    if (item.emit === 'export-markdown' || item.emit === 'export-html' || item.emit === 'export-pdf') {
+    if (item.emit === 'export-markdown' || item.emit === 'export-html' || item.emit === 'export-pdf' || item.emit === 'export-document') {
+      // If a specific format was requested, preselect it; otherwise open export dialog without preselection
       if (item.emit === 'export-markdown') exportInitialFormat.value = 'markdown'
       else if (item.emit === 'export-html') exportInitialFormat.value = 'html'
       else if (item.emit === 'export-pdf') exportInitialFormat.value = 'pdf'
+      else exportInitialFormat.value = null
       showExportDialog.value = true
       return
     }

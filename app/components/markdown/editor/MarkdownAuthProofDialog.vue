@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="max-w-4xl max-h-[90vh] overflow-y-auto">
+    <DialogContent class="max-w-7xl max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <FileSignature class="w-5 h-5 text-indigo-600" />
