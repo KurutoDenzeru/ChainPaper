@@ -106,6 +106,28 @@
       </div>
     </div>
   </Menubar>
+  
+  <!-- Dialogs -->
+  <MarkdownWordCountDialog 
+    :open="showWordCountDialog"
+    @update:open="showWordCountDialog = $event"
+  />
+
+  <MarkdownAuthProofDialog
+    :open="showAuthProofDialog"
+    @update:open="showAuthProofDialog = $event"
+  />
+
+  <MarkdownExportDialog
+    :open="showExportDialog"
+    :initialFormat="exportInitialFormat"
+    @update:open="onExportDialogUpdate"
+  />
+
+  <MarkdownSaveDialog
+    :open="showSaveDialog"
+    @update:open="showSaveDialog = $event"
+  />
 </template>
 
 <script setup lang="ts">
@@ -133,6 +155,10 @@
   } from '@/components/ui/menubar'
   import { Input } from '@/components/ui/input'
   import TableInserter from '@/components/editor/TableInserter.vue'
+  import MarkdownWordCountDialog from '../editor/MarkdownWordCountDialog.vue'
+  import MarkdownAuthProofDialog from '../editor/MarkdownAuthProofDialog.vue'
+  import MarkdownExportDialog from '../editor/MarkdownExportDialog.vue'
+  import MarkdownSaveDialog from '../editor/MarkdownSaveDialog.vue'
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
   const store = useMarkdownDocStore()
@@ -177,6 +203,12 @@
   const showToolbar = ref(true)
   const showStatusBar = ref(true)
   const showPreview = ref(false)
+  // Dialog state
+  const showWordCountDialog = ref(false)
+  const showAuthProofDialog = ref(false)
+  const showExportDialog = ref(false)
+  const showSaveDialog = ref(false)
+  const exportInitialFormat = ref<'markdown' | 'html' | 'json' | 'pdf' | null>(null)
 
   // Markdown-specific menu data
   const menus = ref([
@@ -305,7 +337,26 @@
     }
 
     if (item.emit === 'save-document') {
-      save()
+      // open save dialog
+      showSaveDialog.value = true
+      return
+    }
+
+    if (item.emit === 'export-markdown' || item.emit === 'export-html' || item.emit === 'export-pdf') {
+      if (item.emit === 'export-markdown') exportInitialFormat.value = 'markdown'
+      else if (item.emit === 'export-html') exportInitialFormat.value = 'html'
+      else if (item.emit === 'export-pdf') exportInitialFormat.value = 'pdf'
+      showExportDialog.value = true
+      return
+    }
+
+    if (item.emit === 'word-count') {
+      showWordCountDialog.value = true
+      return
+    }
+
+    if (item.emit === 'verify-authorship') {
+      showAuthProofDialog.value = true
       return
     }
 
@@ -384,10 +435,17 @@
   }
 
   function save() {
-    store.save()
+    // open the Save dialog when user selects Save from menu
+    showSaveDialog.value = true
   }
 
   function newDoc() {
-    store.newDocument()
+    // reset store to create a fresh document
+    store.reset()
+  }
+
+  function onExportDialogUpdate(v: boolean) {
+    showExportDialog.value = v
+    if (!v) exportInitialFormat.value = null
   }
 </script>

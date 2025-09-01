@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { stableStringify, digestSHA256, toHex } from '@/lib/crypto'
+import { stableStringify, digestSHA256, toHex, signData, verifySignature, importPublicKey, toBase64, fromBase64 } from '@/lib/crypto'
 
 export const useMarkdownDocStore = defineStore('markdownDoc', () => {
   const title = ref('Untitled Markdown')
@@ -46,7 +46,35 @@ export const useMarkdownDocStore = defineStore('markdownDoc', () => {
   async function exportJSON(){ const obj = exportObject.value; return { obj, str: stableStringify(obj) } }
   async function createHash(){ const { str } = await exportJSON(); const hashBytes = await digestSHA256(str); return toHex(hashBytes) }
 
-  return { title, content, isDirty, user, canUndo, canRedo, setTitle, setContent, reset, markSaved, undo, redo, exportJSON, createHash }
+  async function createProof(privateKey: CryptoKey) {
+    const hash = await createHash()
+    const signatureBytes = await signData(privateKey, hash)
+    const signature = toBase64(signatureBytes)
+    return { hash, signature }
+  }
+
+  async function verifyProof(publicKeyB64: string, proof: { hash: string, signature: string }) {
+    try {
+      const computedHash = await createHash()
+      const publicKey = await importPublicKey(publicKeyB64)
+      const signatureBytes = fromBase64(proof.signature)
+      const valid = await verifySignature(publicKey, proof.hash, signatureBytes)
+      
+      return {
+        valid: valid && computedHash === proof.hash,
+        computedHash,
+        error: computedHash !== proof.hash ? 'Document hash mismatch' : null
+      }
+    } catch (error: any) {
+      return {
+        valid: false,
+        computedHash: null,
+        error: error.message
+      }
+    }
+  }
+
+  return { title, content, isDirty, user, canUndo, canRedo, setTitle, setContent, reset, markSaved, undo, redo, exportJSON, createHash, createProof, verifyProof }
 })
 
 export default useMarkdownDocStore
