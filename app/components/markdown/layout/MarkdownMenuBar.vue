@@ -316,6 +316,10 @@
 
   // Generic emitter for menu items
   function handleMenuEmit(item: any) {
+    if (item.emit === 'insert-image') {
+      emit('insert-image')
+      return
+    }
     if (!item) return
     if (!item.emit) return
 

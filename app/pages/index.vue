@@ -39,9 +39,52 @@
     <MarkdownWordCountDialog :open="showWordDialog" :stats="stats" @update:open="v => showWordDialog = v" />
     <LinkInsertDialog :open="linkDialogOpen" :selectedText="linkDialogSelectedText"
       @update:open="v => linkDialogOpen = v" @insert="handleLinkInsert" />
+    <ImageInsertDialog :open="imageDialogOpen" @update:open="v => imageDialogOpen = v" @insert="handleImageInsert" />
   </div>
 </template>
 <script setup lang="ts">
+import ImageInsertDialog from '@/components/editor/ImageInsertDialog.vue'
+const imageDialogOpen = ref(false)
+
+function handleImageInsert(src: string, name: string, previewDataUri?: string) {
+  // Insert markdown image at cursor or selection
+  if (mode.value === 'source') {
+    const ta = getActiveTextarea(); if (!ta) return
+    const { start, end, value } = getSelection(ta)
+  // store attachment and insert short reference
+  const dataUrl = previewDataUri || src
+  const attachName = addAttachment(dataUrl, name)
+  const md = `![[${attachName}]]`
+  replaceRange(ta, start, end, md)
+    return
+  }
+  // Reader mode: insert image at selection
+  const sel = window.getSelection()
+  if (!sel || sel.rangeCount === 0) return
+  const range = sel.getRangeAt(0)
+  const img = document.createElement('img')
+  // Use actual preview data if available for immediate rendering in reader mode
+  img.src = previewDataUri && previewDataUri.startsWith('data:image/') ? previewDataUri : src
+  img.alt = name.replace(/\.[^/.]+$/, '')
+  img.className = 'max-w-full rounded shadow'
+  range.deleteContents()
+  range.insertNode(img)
+  range.setStartAfter(img)
+  range.collapse(true)
+  sel.removeAllRanges(); sel.addRange(range)
+  // Also persist the image into the markdown content so it remains after re-render
+  try {
+    const alt = name.replace(/\.[^/.]+$/, '')
+    const dataUrl = previewDataUri || src
+    const md = `![$\{alt\}](${dataUrl})`
+    // Append with spacing to keep it on its own line
+    const next = content.value + '\n\n' + md + '\n'
+    store.setContent(next)
+    // update reader selection focus (optional)
+  } catch (e) {
+    console.warn('Failed to persist inserted image to content', e)
+  }
+}
   // Handles heading and paragraph formatting from menu/toolbar
   function handleSetHeading(level: number) {
     if (mode.value === 'source') {
@@ -95,6 +138,8 @@
 
   const store = useMarkdownDocStore()
   const { content, canUndo, canRedo } = storeToRefs(store)
+  const addAttachment = store.addAttachment
+  const getAttachment = store.getAttachment
 
   const wordCount = ref(0)
   const zoom = ref(100)
@@ -256,10 +301,7 @@
     linkDialogOpen.value = true
   }
   function insertImage() {
-    if (mode.value !== 'source') return // only work in source mode
-    const ta = getActiveTextarea(); if (!ta) return
-    const { start, end } = getSelection(ta)
-    replaceRange(ta, start, end, `![alt text](https://placehold.co/400x200)`)
+    imageDialogOpen.value = true
   }
   function insertCodeBlockBlock() {
     if (mode.value !== 'source') return // only work in source mode
@@ -338,7 +380,16 @@
     }
 
     try {
-      return md.render(content.value)
+      // Expand attachment shorthand ![[name]] into markdown image syntax with the stored data URI.
+      const contentWithAttachments = (content.value || '').replace(/!\[\[([^\]]+)\]\]/g, (m: string, name: string) => {
+        try {
+          const data = getAttachment(name)
+          return data ? `![](${data})` : m
+        } catch (e) {
+          return m
+        }
+      })
+      return md.render(contentWithAttachments)
     } catch {
       return '<pre class="text-red-600">Render error</pre>'
     }

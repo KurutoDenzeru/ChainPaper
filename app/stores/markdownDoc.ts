@@ -7,6 +7,8 @@ export const useMarkdownDocStore = defineStore('markdownDoc', () => {
   const content = ref<string>('')
   const isDirty = ref(false)
   const user = ref({ name: 'Markdown User', email: undefined as string | undefined })
+  // attachments stored in-memory and exported with the document
+  const attachments = ref<Record<string, string>>({})
 
   // history (simple linear stack)
   const history = ref<string[]>([''])
@@ -38,10 +40,32 @@ export const useMarkdownDocStore = defineStore('markdownDoc', () => {
   function reset(){ title.value = 'Untitled Markdown'; content.value=''; isDirty.value=false; history.value=['']; historyIndex.value=0 }
   function markSaved(){ isDirty.value = false }
 
+  // Attachment helpers
+  function sanitizeName(name: string) {
+    return name.replace(/[^a-zA-Z0-9._-]/g, '-').replace(/-+/g, '-')
+  }
+  function addAttachment(dataUri: string, originalName?: string) {
+    const base = originalName ? sanitizeName(originalName) : `attachment-${Date.now()}`
+    let name = base
+    let i = 1
+    while (attachments.value[name]) {
+      name = `${base}-${i++}`
+    }
+    attachments.value[name] = dataUri
+    isDirty.value = true
+    return name
+  }
+  function getAttachment(name: string) {
+    return attachments.value[name] ?? null
+  }
+  function removeAttachment(name: string) {
+    if (attachments.value[name]) { delete attachments.value[name]; isDirty.value = true }
+  }
+
   const canUndo = computed(()=> historyIndex.value > 0)
   const canRedo = computed(()=> historyIndex.value < history.value.length - 1)
 
-  const exportObject = computed(()=>({ title: title.value, content: content.value, meta: { exportedAt: new Date().toISOString(), version: 'chainpaper-md-1' } }))
+  const exportObject = computed(()=>({ title: title.value, content: content.value, attachments: attachments.value, meta: { exportedAt: new Date().toISOString(), version: 'chainpaper-md-1' } }))
 
   async function exportJSON(){ const obj = exportObject.value; return { obj, str: stableStringify(obj) } }
   async function createHash(){ const { str } = await exportJSON(); const hashBytes = await digestSHA256(str); return toHex(hashBytes) }
@@ -74,7 +98,7 @@ export const useMarkdownDocStore = defineStore('markdownDoc', () => {
     }
   }
 
-  return { title, content, isDirty, user, canUndo, canRedo, setTitle, setContent, reset, markSaved, undo, redo, exportJSON, createHash, createProof, verifyProof }
+  return { title, content, isDirty, user, attachments, canUndo, canRedo, setTitle, setContent, reset, markSaved, undo, redo, exportJSON, createHash, createProof, verifyProof, addAttachment, getAttachment, removeAttachment }
 })
 
 export default useMarkdownDocStore
