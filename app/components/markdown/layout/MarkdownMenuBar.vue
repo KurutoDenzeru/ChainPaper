@@ -128,6 +128,11 @@
     :open="showSaveDialog"
     @update:open="showSaveDialog = $event"
   />
+
+  <MarkdownAboutDialog
+    :open="showAboutDialog"
+    @update:open="showAboutDialog = $event"
+  />
 </template>
 
 <script setup lang="ts">
@@ -137,7 +142,7 @@
     Edit3, Command, FileText, FolderOpen, Save, Download,
     Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
     Strikethrough, Heading, List, ListOrdered, Quote, Link, Image, Table,
-    Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, Keyboard, BookOpen
+    Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, Keyboard, BookOpen, Info
   } from 'lucide-vue-next'
   import {
     Menubar,
@@ -158,6 +163,7 @@
   import MarkdownAuthProofDialog from '../editor/MarkdownAuthProofDialog.vue'
   import MarkdownExportDialog from '../editor/MarkdownExportDialog.vue'
   import MarkdownSaveDialog from '../editor/MarkdownSaveDialog.vue'
+  import MarkdownAboutDialog from '../editor/MarkdownAboutDialog.vue'
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
   const store = useMarkdownDocStore()
@@ -193,6 +199,7 @@
     (e: 'word-count'): void
     (e: 'verify-authorship'): void
     (e: 'show-shortcuts'): void
+    (e: 'show-about'): void
     (e: 'toggle-preview'): void
   }>()
 
@@ -205,6 +212,7 @@
   const showAuthProofDialog = ref(false)
   const showExportDialog = ref(false)
   const showSaveDialog = ref(false)
+  const showAboutDialog = ref(false)
   const exportInitialFormat = ref<'markdown' | 'html' | 'json' | 'pdf' | null>(null)
 
   // Markdown-specific menu data
@@ -301,6 +309,8 @@
       items: [
         { type: 'item', label: 'Keyboard Shortcuts', emit: 'show-shortcuts', icon: Keyboard },
         { type: 'separator' },
+        { type: 'item', label: 'About ChainPaper', emit: 'show-about', icon: Info },
+        { type: 'separator' },
         { type: 'item', label: 'Markdown Guide', emit: 'show-documentation', icon: BookOpen }
       ]
     }
@@ -349,8 +359,8 @@
       return
     }
 
-    if (item.emit === 'show-documentation') {
-      window.open('https://www.markdownguide.org/', '_blank')
+    if (item.emit === 'show-about') {
+      showAboutDialog.value = true
       return
     }
 
