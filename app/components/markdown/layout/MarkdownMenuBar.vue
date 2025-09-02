@@ -130,7 +130,7 @@
     Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
     Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
     List, ListOrdered, Quote, Link, Image, Table, AlignLeft, AlignCenter, AlignRight, AlignJustify,
-    Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info
+    Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info, Indent, Outdent
   } from 'lucide-vue-next'
   import {
     Menubar,
@@ -185,6 +185,8 @@
     (e: 'toggle-bullet-list'): void
     (e: 'toggle-ordered-list'): void
     (e: 'toggle-blockquote'): void
+    (e: 'indent'): void
+    (e: 'unindent'): void
     (e: 'spell-check'): void
     (e: 'word-count'): void
     (e: 'verify-authorship'): void
@@ -242,9 +244,10 @@
         { type: 'item', label: 'Underline', emit: 'format-underline', icon: Underline, shortcut: { mac: ['Command'], key: 'U', pc: 'Ctrl' } },
         { type: 'item', label: 'Strikethrough', emit: 'format-strikethrough', icon: Strikethrough, shortcut: { mac: ['Command', 'Shift'], key: 'X', pc: 'Ctrl' } },
         { type: 'separator' },
-        // Link moved from Insert -> Format
+        // Link, Code Block, and Blockquote grouped together
         { type: 'item', label: 'Link', emit: 'insert-link', icon: Link, shortcut: { mac: ['Command'], key: 'K', pc: 'Ctrl' } },
         { type: 'item', label: 'Code Block', emit: 'insert-code-block', icon: Code2, shortcut: { mac: ['Command', 'Shift'], key: 'C', pc: 'Ctrl' } },
+        { type: 'item', label: 'Blockquote', emit: 'toggle-blockquote', icon: Quote, shortcut: { mac: ['Command', 'Shift'], key: 'B', pc: 'Ctrl' } },
         { type: 'separator' },
         {
           type: 'sub', label: 'Heading', icon: Heading, items: [
@@ -268,7 +271,9 @@
         { type: 'separator' },
         { type: 'item', label: 'Bullet List', emit: 'toggle-bullet-list', icon: List },
         { type: 'item', label: 'Numbered List', emit: 'toggle-ordered-list', icon: ListOrdered },
-        { type: 'item', label: 'Blockquote', emit: 'toggle-blockquote', icon: Quote }
+        { type: 'separator' },
+        { type: 'item', label: 'Indent', emit: 'indent', icon: Indent, shortcut: { mac: ['Command'], key: ']', pc: 'Ctrl' } },
+        { type: 'item', label: 'Unindent', emit: 'unindent', icon: Outdent, shortcut: { mac: ['Command'], key: '[', pc: 'Ctrl' } }
       ]
     },
     {

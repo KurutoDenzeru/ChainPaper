@@ -65,10 +65,17 @@
         <!-- Headings (popover dropdown) -->
         <Popover>
           <PopoverTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
-              <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600" />
-              <ChevronDown class="w-3 h-3 text-gray-500" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
+                  <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600" />
+                  <ChevronDown class="w-3 h-3 text-gray-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Heading Styles</p>
+              </TooltipContent>
+            </Tooltip>
           </PopoverTrigger>
           <PopoverContent class="w-40 p-2">
             <div class="flex flex-col">
@@ -260,15 +267,46 @@
           </PopoverContent>
         </Popover>
 
+        <!-- Code Block -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-code-block')">
+              <Code2 class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Code Block</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <!-- Blockquote -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('toggle-blockquote')">
+              <Quote class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Blockquote</p>
+          </TooltipContent>
+        </Tooltip>
+
         <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
         <!-- Alignment (popover with chevron inside trigger) -->
         <Popover>
           <PopoverTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
-              <component :is="alignmentIcon" class="w-4 h-4" />
-              <ChevronDown class="w-3 h-3 text-gray-500" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
+                  <component :is="alignmentIcon" class="w-4 h-4" />
+                  <ChevronDown class="w-3 h-3 text-gray-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Text Alignment</p>
+              </TooltipContent>
+            </Tooltip>
           </PopoverTrigger>
           <PopoverContent class="w-36 p-2">
             <div class="flex flex-col">
@@ -314,6 +352,28 @@
           </TooltipContent>
         </Tooltip>
 
+        <!-- Indent/Unindent -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('unindent')">
+              <Outdent class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Unindent</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('indent')">
+              <Indent class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Indent</p>
+          </TooltipContent>
+        </Tooltip>
+
         <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
         <!-- Insert Tools -->
@@ -335,16 +395,6 @@
           </TooltipTrigger>
           <TooltipContent>
             <p>Insert Image</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-code-block')">
-              <Code2 class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Insert Code Block</p>
           </TooltipContent>
         </Tooltip>
         <Tooltip>
@@ -578,7 +628,7 @@
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
   import TableInserter from '@/components/editor/TableInserter.vue'
-  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText } from 'lucide-vue-next'
+  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent } from 'lucide-vue-next'
 
   interface ActiveState { bold: boolean; italic: boolean; underline: boolean; strike: boolean; bullet: boolean; ordered: boolean }
   const props = defineProps<{
@@ -597,7 +647,8 @@
   const emit = defineEmits([
     'toggle-find', 'toggle-menubar',
     'format-bold', 'format-italic', 'format-underline', 'format-strikethrough',
-    'toggle-bullet-list', 'toggle-ordered-list',
+    'toggle-bullet-list', 'toggle-ordered-list', 'toggle-blockquote',
+    'indent', 'unindent',
     'insert-link', 'insert-image', 'insert-table', 'insert-code-block',
     'set-heading', 'set-alignment', 'undo', 'redo', 'set-zoom',
     'set-text-color', 'set-highlight', 'update:mode'

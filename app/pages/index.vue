@@ -6,13 +6,15 @@
           @set-heading="handleSetHeading" @insert-code-block="insertCodeBlockBlock" @set-alignment="setAlignmentComment"
           @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
           @format-strikethrough="applyStrike" @toggle-bullet-list="applyBulletList"
-          @toggle-ordered-list="applyOrderedList" @undo="onUndo" @redo="onRedo" />
+          @toggle-ordered-list="applyOrderedList" @toggle-blockquote="applyBlockquote"
+          @indent="applyIndent" @unindent="applyUnindent" @undo="onUndo" @redo="onRedo" />
       </div>
       <div class="mt-2 pointer-events-auto">
         <MarkdownToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
           @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
           @format-strikethrough="applyStrike" @toggle-bullet-list="applyBulletList"
-          @toggle-ordered-list="applyOrderedList" @insert-link="insertLink" @insert-image="insertImage"
+          @toggle-ordered-list="applyOrderedList" @toggle-blockquote="applyBlockquote"
+          @indent="applyIndent" @unindent="applyUnindent" @insert-link="insertLink" @insert-image="insertImage"
           @insert-code-block="insertCodeBlockBlock" @insert-table="insertTable" @set-heading="handleSetHeading"
           @set-alignment="setAlignmentComment" @set-zoom="setZoom" @set-text-color="applyColor"
           @set-highlight="applyHighlight" @update:mode="v => mode = v" />
@@ -243,6 +245,72 @@
   function applyStrike() { applyAround('~~')() }
   function applyBulletList() { toggleList('bullet')() }
   function applyOrderedList() { toggleList('ordered')() }
+  
+  function applyBlockquote() {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea()
+    if (!ta) return
+    const { start, end, value } = getSelection(ta)
+    // expand to full lines
+    const lineStart = value.lastIndexOf('\n', start - 1) + 1
+    const lineEnd = value.indexOf('\n', end)
+    const actualEnd = lineEnd === -1 ? value.length : lineEnd
+    const segment = value.slice(lineStart, actualEnd)
+    const lines = segment.split(/\n/)
+    
+    const prefix = '> '
+    const allHave = lines.every(l => l.trim() === '' || l.startsWith(prefix))
+    const updated = lines.map(l => {
+      if (l.trim() === '') return l
+      if (allHave) {
+        // Remove blockquote formatting
+        return l.replace(/^> /, '')
+      } else {
+        // Add blockquote formatting
+        return l.startsWith(prefix) ? l : prefix + l
+      }
+    }).join('\n')
+    replaceRange(ta, lineStart, actualEnd, updated)
+  }
+
+  function applyIndent() {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea()
+    if (!ta) return
+    const { start, end, value } = getSelection(ta)
+    // expand to full lines
+    const lineStart = value.lastIndexOf('\n', start - 1) + 1
+    const lineEnd = value.indexOf('\n', end)
+    const actualEnd = lineEnd === -1 ? value.length : lineEnd
+    const segment = value.slice(lineStart, actualEnd)
+    const lines = segment.split(/\n/)
+    
+    const updated = lines.map(l => {
+      if (l.trim() === '') return l
+      return '  ' + l // Add 2 spaces for indentation
+    }).join('\n')
+    replaceRange(ta, lineStart, actualEnd, updated)
+  }
+
+  function applyUnindent() {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea()
+    if (!ta) return
+    const { start, end, value } = getSelection(ta)
+    // expand to full lines
+    const lineStart = value.lastIndexOf('\n', start - 1) + 1
+    const lineEnd = value.indexOf('\n', end)
+    const actualEnd = lineEnd === -1 ? value.length : lineEnd
+    const segment = value.slice(lineStart, actualEnd)
+    const lines = segment.split(/\n/)
+    
+    const updated = lines.map(l => {
+      if (l.trim() === '') return l
+      // Remove up to 2 spaces from the beginning
+      return l.replace(/^  /, '') || l.replace(/^ /, '')
+    }).join('\n')
+    replaceRange(ta, lineStart, actualEnd, updated)
+  }
 
   function toggleList(type: 'bullet' | 'ordered') {
     return () => {
