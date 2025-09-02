@@ -124,24 +124,30 @@
 }
 
 /* Table styling for markdown rendered content */
-.table-bordered table {
-  @apply border-collapse border border-gray-300;
+.table-bordered table,
+table.table-bordered {
+  @apply border-collapse border border-gray-300 w-full;
 }
 
 .table-bordered table th,
-.table-bordered table td {
+.table-bordered table td,
+table.table-bordered th,
+table.table-bordered td {
   @apply border border-gray-300 px-3 py-2;
 }
 
-.table-bordered table th {
+.table-bordered table th,
+table.table-bordered th {
   @apply bg-gray-50 font-semibold text-gray-900;
 }
 
-.table-striped table tbody tr:nth-child(even) {
+.table-striped table tbody tr:nth-child(even),
+table.table-striped tbody tr:nth-child(even) {
   @apply bg-gray-50;
 }
 
-.table-striped table tbody tr:nth-child(odd) {
+.table-striped table tbody tr:nth-child(odd),
+table.table-striped tbody tr:nth-child(odd) {
   @apply bg-white;
 }
 
@@ -165,4 +171,27 @@
 
 .prose table tbody tr:hover {
   @apply bg-gray-50;
+}
+
+/* Styling for HTML tables within content */
+.prose .table-bordered,
+.prose .table-striped {
+  @apply mb-4;
+}
+
+/* Override prose table styles for custom tables */
+.prose .table-bordered table th,
+.prose .table-striped table th {
+  @apply border border-gray-300 bg-gray-50 font-semibold text-gray-900;
+}
+
+.prose .table-bordered table td,
+.prose .table-striped table td {
+  @apply border border-gray-300;
+}
+
+/* Ensure proper table rendering in styled wrappers */
+.prose .table-bordered table tbody tr:hover,
+.prose .table-striped table tbody tr:hover {
+  @apply bg-gray-100;
 }

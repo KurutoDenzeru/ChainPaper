@@ -18,23 +18,19 @@
             <Grid3x3 class="w-4 h-4 text-gray-600" />
             <span class="text-sm font-medium text-gray-900">Quick Selection</span>
           </div>
-          
+
           <div class="flex flex-col items-center space-y-3">
             <!-- Grid selector -->
             <div class="grid gap-1 p-3 border rounded-lg bg-gray-50/50"
-              :style="{ gridTemplateColumns: `repeat(${maxCols}, 1fr)` }" 
-              @mouseleave="resetSelection">
-              <div v-for="(cell, index) in gridCells" :key="index" 
-                :class="[
-                  'w-5 h-5 border border-gray-300 cursor-pointer transition-all duration-150 rounded-sm',
-                  {
-                    'bg-blue-500 border-blue-600 shadow-sm': cell.row <= selectedRows && cell.col <= selectedCols,
-                    'bg-white hover:bg-blue-100 hover:border-blue-300': !(cell.row <= selectedRows && cell.col <= selectedCols)
-                  }
-                ]" 
-                @mouseenter="updateSelection(cell.row, cell.col)" 
-                @click="insertTable(selectedRows, selectedCols)" 
-              />
+              :style="{ gridTemplateColumns: `repeat(${maxCols}, 1fr)` }" @mouseleave="resetSelection">
+              <div v-for="(cell, index) in gridCells" :key="index" :class="[
+                'w-5 h-5 border border-gray-300 cursor-pointer transition-all duration-150 rounded-sm',
+                {
+                  'bg-blue-500 border-blue-600 shadow-sm': cell.row <= selectedRows && cell.col <= selectedCols,
+                  'bg-white hover:bg-blue-100 hover:border-blue-300': !(cell.row <= selectedRows && cell.col <= selectedCols)
+                }
+              ]" @mouseenter="updateSelection(cell.row, cell.col)"
+                @click="insertTable(selectedRows, selectedCols)" />
             </div>
 
             <!-- Status text -->
@@ -68,28 +64,14 @@
                 <Grid class="w-4 h-4" />
                 Rows
               </label>
-              <Input 
-                v-model.number="customRows" 
-                type="number" 
-                min="1" 
-                max="50"
-                class="text-center"
-                placeholder="3" 
-              />
+              <Input v-model.number="customRows" type="number" min="1" max="50" class="text-center" placeholder="3" />
             </div>
             <div class="space-y-2">
               <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
                 <Grid class="w-4 h-4" />
                 Columns
               </label>
-              <Input 
-                v-model.number="customCols" 
-                type="number" 
-                min="1" 
-                max="20"
-                class="text-center"
-                placeholder="3" 
-              />
+              <Input v-model.number="customCols" type="number" min="1" max="20" class="text-center" placeholder="3" />
             </div>
           </div>
         </div>
@@ -103,11 +85,8 @@
 
           <div class="space-y-3">
             <div class="flex items-center space-x-3">
-              <Checkbox 
-                id="include-header" 
-                v-model:checked="includeHeader"
-                class="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-              />
+              <Checkbox id="include-header" v-model:checked="includeHeader"
+                class="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" />
               <label for="include-header" class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                 <Sheet class="w-4 h-4" />
                 Include header row
@@ -115,11 +94,8 @@
             </div>
 
             <div class="flex items-center space-x-3">
-              <Checkbox 
-                id="table-borders" 
-                v-model:checked="tableBorders"
-                class="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-              />
+              <Checkbox id="table-borders" v-model:checked="tableBorders"
+                class="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" />
               <label for="table-borders" class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                 <Square class="w-4 h-4" />
                 Show table borders
@@ -127,11 +103,8 @@
             </div>
 
             <div class="flex items-center space-x-3">
-              <Checkbox 
-                id="table-striped" 
-                v-model:checked="tableStriped"
-                class="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
-              />
+              <Checkbox id="table-striped" v-model:checked="tableStriped"
+                class="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" />
               <label for="table-striped" class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
                 <Palette class="w-4 h-4" />
                 Alternating row colors
@@ -146,9 +119,11 @@
             <Eye class="w-4 h-4 text-gray-600" />
             <span class="text-sm font-medium text-gray-900">Preview</span>
           </div>
-          
+
           <div class="p-3 bg-gray-50 rounded-lg border">
-            <div class="text-xs text-gray-500 mb-2">Markdown output:</div>
+            <div class="text-xs text-gray-500 mb-2">
+              Markdown output{{ (tableBorders || tableStriped) ? ' with CSS styling' : '' }}:
+            </div>
             <div class="font-mono text-xs text-gray-700 bg-white p-2 rounded border overflow-x-auto">
               {{ previewMarkdown }}
             </div>
@@ -171,149 +146,158 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription,
-  DialogFooter 
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { 
-  Table, 
-  Grid3x3, 
-  Settings, 
-  Sliders,
-  Palette,
-  Eye,
-  X,
-  Plus,
-  Grid,
-  Sheet,
-  Square
-} from 'lucide-vue-next'
+  import { ref, computed } from 'vue'
+  import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter
+  } from '@/components/ui/dialog'
+  import { Button } from '@/components/ui/button'
+  import { Input } from '@/components/ui/input'
+  import { Checkbox } from '@/components/ui/checkbox'
+  import {
+    Table,
+    Grid3x3,
+    Settings,
+    Sliders,
+    Palette,
+    Eye,
+    X,
+    Plus,
+    Grid,
+    Sheet,
+    Square
+  } from 'lucide-vue-next'
 
-const props = defineProps<{
-  open: boolean
-}>()
+  const props = defineProps<{
+    open: boolean
+  }>()
 
-const emit = defineEmits<{
-  (e: 'update:open', value: boolean): void
-  (e: 'insert-table', rows: number, cols: number, options: TableOptions): void
-}>()
+  const emit = defineEmits<{
+    (e: 'update:open', value: boolean): void
+    (e: 'insert-table', rows: number, cols: number, options: TableOptions): void
+  }>()
 
-interface TableOptions {
-  header: boolean
-  borders: boolean
-  striped: boolean
-}
-
-// Grid configuration
-const maxRows = 8
-const maxCols = 8
-
-// Selection state
-const selectedRows = ref(3)
-const selectedCols = ref(3)
-
-// Custom input state
-const customRows = ref(3)
-const customCols = ref(3)
-
-// Table options
-const includeHeader = ref(true)
-const tableBorders = ref(true)
-const tableStriped = ref(false)
-
-// Generate grid cells
-const gridCells = computed(() => {
-  const cells = []
-  for (let row = 1; row <= maxRows; row++) {
-    for (let col = 1; col <= maxCols; col++) {
-      cells.push({ row, col })
-    }
+  interface TableOptions {
+    header: boolean
+    borders: boolean
+    striped: boolean
   }
-  return cells
-})
 
-// Generate preview markdown
-const previewMarkdown = computed(() => {
-  const rows = customRows.value || selectedRows.value
-  const cols = customCols.value || selectedCols.value
-  
-  let markdown = ''
-  
-  // Header row if enabled
-  if (includeHeader.value) {
-    markdown += '|'
-    for (let i = 1; i <= cols; i++) {
-      markdown += ` Header ${i} |`
+  // Grid configuration
+  const maxRows = 8
+  const maxCols = 8
+
+  // Selection state
+  const selectedRows = ref(3)
+  const selectedCols = ref(3)
+
+  // Custom input state
+  const customRows = ref(3)
+  const customCols = ref(3)
+
+  // Table options
+  const includeHeader = ref(true)
+  const tableBorders = ref(true)
+  const tableStriped = ref(false)
+
+  // Generate grid cells
+  const gridCells = computed(() => {
+    const cells = []
+    for (let row = 1; row <= maxRows; row++) {
+      for (let col = 1; col <= maxCols; col++) {
+        cells.push({ row, col })
+      }
     }
-    markdown += '\n|'
-    for (let i = 1; i <= cols; i++) {
-      markdown += ' --- |'
-    }
-    markdown += '\n'
-    
-    // Data rows (one less since header takes one)
-    for (let r = 1; r < rows; r++) {
+    return cells
+  })
+
+  // Generate preview markdown
+  const previewMarkdown = computed(() => {
+    const rows = customRows.value || selectedRows.value
+    const cols = customCols.value || selectedCols.value
+
+    // Always generate Markdown table syntax
+    let markdown = ''
+
+    // Header row if enabled
+    if (includeHeader.value) {
       markdown += '|'
-      for (let c = 1; c <= cols; c++) {
-        markdown += ` Cell ${r}.${c} |`
+      for (let i = 1; i <= cols; i++) {
+        markdown += ` Header ${i} |`
+      }
+      markdown += '\n|'
+      for (let i = 1; i <= cols; i++) {
+        markdown += ' --- |'
       }
       markdown += '\n'
-    }
-  } else {
-    // All data rows
-    for (let r = 1; r <= rows; r++) {
-      markdown += '|'
-      for (let c = 1; c <= cols; c++) {
-        markdown += ` Cell ${r}.${c} |`
+
+      // Data rows (one less since header takes one)
+      for (let r = 1; r < rows; r++) {
+        markdown += '|'
+        for (let c = 1; c <= cols; c++) {
+          markdown += ` Cell ${r}.${c} |`
+        }
+        markdown += '\n'
       }
-      markdown += '\n'
+    } else {
+      // All data rows
+      for (let r = 1; r <= rows; r++) {
+        markdown += '|'
+        for (let c = 1; c <= cols; c++) {
+          markdown += ` Cell ${r}.${c} |`
+        }
+        markdown += '\n'
+      }
     }
-  }
-  
-  return markdown.trim()
-})
 
-function updateSelection(row: number, col: number) {
-  selectedRows.value = row
-  selectedCols.value = col
-  // Update custom inputs to match selection
-  customRows.value = row
-  customCols.value = col
-}
+    // Add CSS wrapper if styling is needed
+    if (tableBorders.value || tableStriped.value) {
+      const classes = []
+      if (tableBorders.value) classes.push('table-bordered')
+      if (tableStriped.value) classes.push('table-striped')
+      return `<div class="${classes.join(' ')}">\n\n${markdown.trim()}\n\n</div>`
+    }
 
-function resetSelection() {
-  selectedRows.value = 3
-  selectedCols.value = 3
-}
+    return markdown.trim()
+  })
 
-function insertTable(rows: number, cols: number) {
-  const validRows = Math.max(1, Math.min(50, rows))
-  const validCols = Math.max(1, Math.min(20, cols))
-
-  const options: TableOptions = {
-    header: includeHeader.value,
-    borders: tableBorders.value,
-    striped: tableStriped.value
+  function updateSelection(row: number, col: number) {
+    selectedRows.value = row
+    selectedCols.value = col
+    // Update custom inputs to match selection
+    customRows.value = row
+    customCols.value = col
   }
 
-  emit('insert-table', validRows, validCols, options)
-  emit('update:open', false)
+  function resetSelection() {
+    selectedRows.value = 3
+    selectedCols.value = 3
+  }
 
-  // Reset to defaults
-  resetSelection()
-  customRows.value = 3
-  customCols.value = 3
-}
+  function insertTable(rows: number, cols: number) {
+    const validRows = Math.max(1, Math.min(50, rows))
+    const validCols = Math.max(1, Math.min(20, cols))
 
-function insertCustomTable() {
-  insertTable(customRows.value, customCols.value)
-}
+    const options: TableOptions = {
+      header: includeHeader.value,
+      borders: tableBorders.value,
+      striped: tableStriped.value
+    }
+
+    emit('insert-table', validRows, validCols, options)
+    emit('update:open', false)
+
+    // Reset to defaults
+    resetSelection()
+    customRows.value = 3
+    customCols.value = 3
+  }
+
+  function insertCustomTable() {
+    insertTable(customRows.value, customCols.value)
+  }
 </script>

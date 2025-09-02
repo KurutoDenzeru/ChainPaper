@@ -3,9 +3,9 @@
     <div class="fixed inset-x-1 top-1 z-50 pointer-events-none">
       <div class="pointer-events-auto">
         <MarkdownMenuBar @word-count="showWordDialog = true" @insert-link="insertLink" @insert-image="insertImage"
-          @insert-table="insertTable" @set-heading="handleSetHeading" @insert-code-block="insertCodeBlockBlock" @set-alignment="setAlignmentComment"
-          @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
-          @format-strikethrough="applyStrike" @toggle-bullet-list="applyBulletList"
+          @insert-table="insertTable" @set-heading="handleSetHeading" @insert-code-block="insertCodeBlockBlock"
+          @set-alignment="setAlignmentComment" @format-bold="applyBold" @format-italic="applyItalic"
+          @format-underline="applyUnderline" @format-strikethrough="applyStrike" @toggle-bullet-list="applyBulletList"
           @toggle-ordered-list="applyOrderedList" @toggle-blockquote="applyBlockquote" @indent="applyIndent"
           @unindent="applyUnindent" @undo="onUndo" @redo="onRedo" />
       </div>
@@ -431,12 +431,12 @@
   function insertTable(rows: number = 2, cols: number = 2, options: any = { header: true, borders: true, striped: false }) {
     if (mode.value !== 'source') return // only work in source mode
     const ta = getActiveTextarea(); if (!ta) return
-    
+
     // Handle both old and new call signatures
     let header = true
-    let borders = true 
+    let borders = true
     let striped = false
-    
+
     if (typeof options === 'boolean') {
       // Old signature: insertTable(rows, cols, header)
       header = options
@@ -446,23 +446,24 @@
       borders = options.borders !== undefined ? options.borders : true
       striped = options.striped !== undefined ? options.striped : false
     }
-    
+
+    // Always generate Markdown table syntax
     const headerRow = '|' + Array(cols).fill(' Header ').join('|') + '|\n'
     const sepRow = '|' + Array(cols).fill(' --- ').join('|') + '|\n'
     const body = Array(rows).fill('|' + Array(cols).fill(' Cell ').join('|') + '|\n').join('')
-    
-    let table = (header ? headerRow + sepRow : '') + body + '\n'
-    
-    // Add CSS classes for styling if options are specified
+
+    let table = (header ? headerRow + sepRow : '') + body
+
+    // Add CSS wrapper only if styling is needed
     if (borders || striped) {
       const classes = []
       if (borders) classes.push('table-bordered')
       if (striped) classes.push('table-striped')
-      if (classes.length > 0) {
-        table = `<div class="${classes.join(' ')}">\n\n${table}\n</div>\n`
-      }
+      table = `<div class="${classes.join(' ')}">\n\n${table}\n</div>\n`
+    } else {
+      table += '\n'
     }
-    
+
     const { start, end } = getSelection(ta)
     replaceRange(ta, start, end, table)
   }

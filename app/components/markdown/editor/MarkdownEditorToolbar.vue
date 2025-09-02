@@ -607,11 +607,8 @@
   </TooltipProvider>
 
   <!-- Table Insert Dialog -->
-  <TableInsertDialog 
-    :open="showTableDialog" 
-    @update:open="showTableDialog = $event"
-    @insert-table="handleTableInsert" 
-  />
+  <TableInsertDialog :open="showTableDialog" @update:open="showTableDialog = $event"
+    @insert-table="handleTableInsert" />
 </template>
 
 <script setup lang="ts">
@@ -724,6 +721,6 @@
 
   // Table insertion handler
   function handleTableInsert(rows: number, cols: number, options: any) {
-    emit('insert-table', rows, cols, options.header)
+    emit('insert-table', rows, cols, options)
   }
 </script>

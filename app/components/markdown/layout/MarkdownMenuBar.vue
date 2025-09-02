@@ -58,7 +58,8 @@
 
                       <!-- For table item, trigger dialog instead of hover -->
                       <template v-if="item.emit === 'insert-table'">
-                        <button class="text-sm text-gray-900 hover:bg-gray-100 rounded" @click="showTableDialog = true">{{ item.label }}</button>
+                        <button class="text-sm text-gray-900 hover:bg-gray-100 rounded"
+                          @click="showTableDialog = true">{{ item.label }}</button>
                       </template>
                       <template v-else>
                         <span>{{ item.label }}</span>
@@ -120,11 +121,8 @@
   <MarkdownGuideDialog :open="showGuideDialog" @update:open="showGuideDialog = $event" />
 
   <!-- Table Insert Dialog -->
-  <TableInsertDialog 
-    :open="showTableDialog" 
-    @update:open="showTableDialog = $event"
-    @insert-table="handleTableInsert" 
-  />
+  <TableInsertDialog :open="showTableDialog" @update:open="showTableDialog = $event"
+    @insert-table="handleTableInsert" />
 </template>
 
 <script setup lang="ts">
@@ -386,6 +384,11 @@
       return
     }
 
+    if (item.emit === 'insert-table') {
+      showTableDialog.value = true
+      return
+    }
+
     // Special handling for zoom menu
     if (item.emit === 'set-zoom' && item.payload !== undefined) {
       emit('set-zoom', item.payload)
@@ -478,6 +481,6 @@
 
   // Table insertion handler
   function handleTableInsert(rows: number, cols: number, options: any) {
-    emit('insert-table', rows, cols, options.header)
+    emit('insert-table', rows, cols, options)
   }
 </script>
