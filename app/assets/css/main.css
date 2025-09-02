@@ -122,3 +122,47 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Table styling for markdown rendered content */
+.table-bordered table {
+  @apply border-collapse border border-gray-300;
+}
+
+.table-bordered table th,
+.table-bordered table td {
+  @apply border border-gray-300 px-3 py-2;
+}
+
+.table-bordered table th {
+  @apply bg-gray-50 font-semibold text-gray-900;
+}
+
+.table-striped table tbody tr:nth-child(even) {
+  @apply bg-gray-50;
+}
+
+.table-striped table tbody tr:nth-child(odd) {
+  @apply bg-white;
+}
+
+/* Enhanced table styling in prose content */
+.prose table {
+  @apply w-full border-collapse;
+}
+
+.prose table th,
+.prose table td {
+  @apply px-3 py-2 text-left;
+}
+
+.prose table th {
+  @apply bg-gray-50 font-semibold text-gray-900 border-b-2 border-gray-200;
+}
+
+.prose table td {
+  @apply border-b border-gray-200;
+}
+
+.prose table tbody tr:hover {
+  @apply bg-gray-50;
+}

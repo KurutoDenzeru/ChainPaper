@@ -217,8 +217,8 @@ const maxRows = 8
 const maxCols = 8
 
 // Selection state
-const selectedRows = ref(1)
-const selectedCols = ref(1)
+const selectedRows = ref(3)
+const selectedCols = ref(3)
 
 // Custom input state
 const customRows = ref(3)
@@ -290,8 +290,8 @@ function updateSelection(row: number, col: number) {
 }
 
 function resetSelection() {
-  selectedRows.value = 1
-  selectedCols.value = 1
+  selectedRows.value = 3
+  selectedCols.value = 3
 }
 
 function insertTable(rows: number, cols: number) {
