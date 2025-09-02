@@ -133,7 +133,8 @@
     Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
     Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
     List, ListOrdered, Quote, Link, Image, Table, AlignLeft, AlignCenter, AlignRight, AlignJustify,
-    Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info, Indent, Outdent
+    Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info, Indent, Outdent,
+    Superscript, Subscript, Calculator, Sigma
   } from 'lucide-vue-next'
   import {
     Menubar,
@@ -180,10 +181,14 @@
     (e: 'insert-image'): void
     (e: 'insert-link'): void
     (e: 'insert-code-block'): void
+    (e: 'insert-math'): void
+    (e: 'insert-mathblock'): void
     (e: 'format-bold'): void
     (e: 'format-italic'): void
     (e: 'format-underline'): void
     (e: 'format-strikethrough'): void
+    (e: 'format-superscript'): void
+    (e: 'format-subscript'): void
     (e: 'set-heading', level: number): void
     (e: 'set-alignment', alignment: string): void
     (e: 'toggle-bullet-list'): void
@@ -248,6 +253,8 @@
         { type: 'item', label: 'Italic', emit: 'format-italic', icon: Italic, shortcut: { mac: ['Command'], key: 'I', pc: 'Ctrl' } },
         { type: 'item', label: 'Underline', emit: 'format-underline', icon: Underline, shortcut: { mac: ['Command'], key: 'U', pc: 'Ctrl' } },
         { type: 'item', label: 'Strikethrough', emit: 'format-strikethrough', icon: Strikethrough, shortcut: { mac: ['Command', 'Shift'], key: 'X', pc: 'Ctrl' } },
+        { type: 'item', label: 'Superscript', emit: 'format-superscript', icon: Superscript },
+        { type: 'item', label: 'Subscript', emit: 'format-subscript', icon: Subscript },
         { type: 'separator' },
         // Link, Code Block, and Blockquote grouped together
         { type: 'item', label: 'Link', emit: 'insert-link', icon: Link, shortcut: { mac: ['Command'], key: 'K', pc: 'Ctrl' } },
@@ -286,6 +293,9 @@
       items: [
         { type: 'item', label: 'Image', emit: 'insert-image', icon: Image },
         { type: 'item', label: 'Table', emit: 'insert-table', icon: Table },
+        { type: 'separator' },
+        { type: 'item', label: 'Math', emit: 'insert-math', icon: Calculator },
+        { type: 'item', label: 'Math Block', emit: 'insert-mathblock', icon: Sigma },
       ]
     },
     {

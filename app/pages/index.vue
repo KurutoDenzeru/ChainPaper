@@ -4,18 +4,23 @@
       <div class="pointer-events-auto">
         <MarkdownMenuBar @word-count="showWordDialog = true" @insert-link="insertLink" @insert-image="insertImage"
           @insert-table="insertTable" @set-heading="handleSetHeading" @insert-code-block="insertCodeBlockBlock"
+          @insert-math="insertMath" @insert-mathblock="insertMathblock"
           @set-alignment="setAlignmentComment" @format-bold="applyBold" @format-italic="applyItalic"
-          @format-underline="applyUnderline" @format-strikethrough="applyStrike" @toggle-bullet-list="applyBulletList"
+          @format-underline="applyUnderline" @format-strikethrough="applyStrike" 
+          @format-superscript="applySuperscript" @format-subscript="applySubscript"
+          @toggle-bullet-list="applyBulletList"
           @toggle-ordered-list="applyOrderedList" @toggle-blockquote="applyBlockquote" @indent="applyIndent"
           @unindent="applyUnindent" @undo="onUndo" @redo="onRedo" />
       </div>
       <div class="mt-2 pointer-events-auto">
         <MarkdownToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
           @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
-          @format-strikethrough="applyStrike" @toggle-bullet-list="applyBulletList"
+          @format-strikethrough="applyStrike" @format-superscript="applySuperscript" @format-subscript="applySubscript"
+          @toggle-bullet-list="applyBulletList"
           @toggle-ordered-list="applyOrderedList" @toggle-blockquote="applyBlockquote" @indent="applyIndent"
           @unindent="applyUnindent" @insert-link="insertLink" @insert-image="insertImage"
-          @insert-code-block="insertCodeBlockBlock" @insert-table="insertTable" @set-heading="handleSetHeading"
+          @insert-code-block="insertCodeBlockBlock" @insert-math="insertMath" @insert-mathblock="insertMathblock"
+          @insert-table="insertTable" @set-heading="handleSetHeading"
           @set-alignment="setAlignmentComment" @set-zoom="setZoom" @set-text-color="applyColor"
           @set-highlight="applyHighlight" @update:mode="v => mode = v" />
       </div>
@@ -243,6 +248,14 @@
     surroundWithHtml('<u>', '</u>')
   }
   function applyStrike() { applyAround('~~')() }
+  function applySuperscript() {
+    // Use HTML tags for superscript
+    surroundWithHtml('<sup>', '</sup>')
+  }
+  function applySubscript() {
+    // Use HTML tags for subscript
+    surroundWithHtml('<sub>', '</sub>')
+  }
   function applyBulletList() { toggleList('bullet')() }
   function applyOrderedList() { toggleList('ordered')() }
 
@@ -424,6 +437,42 @@
     } else {
       // If no selection, insert default template
       snippet = "```ts\n// code\n```\n"
+    }
+
+    replaceRange(ta, start, end, snippet)
+  }
+
+  function insertMath() {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea(); if (!ta) return
+    const { start, end, value } = getSelection(ta)
+    const selected = value.slice(start, end)
+
+    let snippet
+    if (selected.trim()) {
+      // If there's selected text, wrap it in inline math
+      snippet = `$${selected}$`
+    } else {
+      // If no selection, insert default template
+      snippet = "$x^2 + y^2 = z^2$"
+    }
+
+    replaceRange(ta, start, end, snippet)
+  }
+
+  function insertMathblock() {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea(); if (!ta) return
+    const { start, end, value } = getSelection(ta)
+    const selected = value.slice(start, end)
+
+    let snippet
+    if (selected.trim()) {
+      // If there's selected text, wrap it in a math block
+      snippet = `$$\n${selected}\n$$\n`
+    } else {
+      // If no selection, insert default template
+      snippet = "$$\n\\sum_{i=1}^{n} x_i = x_1 + x_2 + \\cdots + x_n\n$$\n"
     }
 
     replaceRange(ta, start, end, snippet)

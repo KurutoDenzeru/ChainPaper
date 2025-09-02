@@ -285,6 +285,30 @@
           </TooltipContent>
         </Tooltip>
 
+        <!-- Superscript -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-superscript')">
+              <Superscript class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Superscript</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <!-- Subscript -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-subscript')">
+              <Subscript class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Subscript</p>
+          </TooltipContent>
+        </Tooltip>
+
         <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
         <!-- Alignment (popover with chevron inside trigger) -->
@@ -313,6 +337,32 @@
             </div>
           </PopoverContent>
         </Popover>
+
+        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+
+        <!-- Math -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-math')">
+              <Calculator class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Insert Math</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <!-- Mathblock -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-mathblock')">
+              <Sigma class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Insert Math Block</p>
+          </TooltipContent>
+        </Tooltip>
 
         <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
@@ -619,7 +669,7 @@
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
   import TableInserter from '@/components/editor/TableInserter.vue'
   import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
-  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent } from 'lucide-vue-next'
+  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Calculator, Sigma } from 'lucide-vue-next'
 
   interface ActiveState { bold: boolean; italic: boolean; underline: boolean; strike: boolean; bullet: boolean; ordered: boolean }
   const props = defineProps<{
@@ -638,9 +688,11 @@
   const emit = defineEmits([
     'toggle-find', 'toggle-menubar',
     'format-bold', 'format-italic', 'format-underline', 'format-strikethrough',
+    'format-superscript', 'format-subscript',
     'toggle-bullet-list', 'toggle-ordered-list', 'toggle-blockquote',
     'indent', 'unindent',
     'insert-link', 'insert-image', 'insert-table', 'insert-code-block',
+    'insert-math', 'insert-mathblock',
     'set-heading', 'set-alignment', 'undo', 'redo', 'set-zoom',
     'set-text-color', 'set-highlight', 'update:mode'
   ])
