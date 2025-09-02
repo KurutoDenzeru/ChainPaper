@@ -129,7 +129,7 @@
     Edit3, Command, FileText, FolderOpen, Save, Download,
     Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
     Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
-    List, ListOrdered, Quote, Link, Image, Table,
+    List, ListOrdered, Quote, Link, Image, Table, AlignLeft, AlignCenter, AlignRight, AlignJustify,
     Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info
   } from 'lucide-vue-next'
   import {
@@ -181,6 +181,7 @@
     (e: 'format-underline'): void
     (e: 'format-strikethrough'): void
     (e: 'set-heading', level: number): void
+    (e: 'set-alignment', alignment: string): void
     (e: 'toggle-bullet-list'): void
     (e: 'toggle-ordered-list'): void
     (e: 'toggle-blockquote'): void
@@ -243,6 +244,7 @@
         { type: 'separator' },
         // Link moved from Insert -> Format
         { type: 'item', label: 'Link', emit: 'insert-link', icon: Link, shortcut: { mac: ['Command'], key: 'K', pc: 'Ctrl' } },
+        { type: 'item', label: 'Code Block', emit: 'insert-code-block', icon: Code2, shortcut: { mac: ['Command', 'Shift'], key: 'C', pc: 'Ctrl' } },
         { type: 'separator' },
         {
           type: 'sub', label: 'Heading', icon: Heading, items: [
@@ -252,6 +254,15 @@
             { type: 'item', label: 'Heading 4', emit: 'set-heading', payload: 4, icon: Heading4, shortcut: { mac: ['Command'], key: '4', pc: 'Ctrl' } },
             { type: 'item', label: 'Heading 5', emit: 'set-heading', payload: 5, icon: Heading5, shortcut: { mac: ['Command'], key: '5', pc: 'Ctrl' } },
             { type: 'item', label: 'Heading 6', emit: 'set-heading', payload: 6, icon: Heading6, shortcut: { mac: ['Command'], key: '6', pc: 'Ctrl' } }
+          ]
+        },
+        { type: 'separator' },
+        {
+          type: 'sub', label: 'Alignment', icon: AlignLeft, items: [
+            { type: 'item', label: 'Align Left', emit: 'set-alignment', payload: 'left', icon: AlignLeft },
+            { type: 'item', label: 'Align Center', emit: 'set-alignment', payload: 'center', icon: AlignCenter },
+            { type: 'item', label: 'Align Right', emit: 'set-alignment', payload: 'right', icon: AlignRight },
+            { type: 'item', label: 'Align Justify', emit: 'set-alignment', payload: 'justify', icon: AlignJustify }
           ]
         },
         { type: 'separator' },
@@ -265,7 +276,6 @@
       items: [
         { type: 'item', label: 'Image', emit: 'insert-image', icon: Image },
         { type: 'item', label: 'Table', emit: 'insert-table', icon: Table },
-        { type: 'item', label: 'Code Block', emit: 'insert-code-block', icon: Code2 },
       ]
     },
     {
@@ -367,6 +377,12 @@
     // Special handling for zoom menu
     if (item.emit === 'set-zoom' && item.payload !== undefined) {
       emit('set-zoom', item.payload)
+      return
+    }
+
+    // Special handling for alignment menu
+    if (item.emit === 'set-alignment' && item.payload !== undefined) {
+      emit('set-alignment', item.payload)
       return
     }
 

@@ -3,7 +3,10 @@
     <div class="fixed inset-x-1 top-1 z-50 pointer-events-none">
       <div class="pointer-events-auto">
         <MarkdownMenuBar @word-count="showWordDialog = true" @insert-link="insertLink" @insert-image="insertImage"
-          @set-heading="handleSetHeading" />
+          @set-heading="handleSetHeading" @insert-code-block="insertCodeBlockBlock" @set-alignment="setAlignmentComment"
+          @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
+          @format-strikethrough="applyStrike" @toggle-bullet-list="applyBulletList"
+          @toggle-ordered-list="applyOrderedList" @undo="onUndo" @redo="onRedo" />
       </div>
       <div class="mt-2 pointer-events-auto">
         <MarkdownToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
@@ -272,12 +275,21 @@
   }
 
   function setAlignmentComment(alignment: string) {
-    // No native markdown alignment; insert an HTML comment marker
+    // Insert alignment comment that will properly wrap the selected content
     if (mode.value !== 'source') return // only work in source mode
     const ta = getActiveTextarea(); if (!ta) return
-    const marker = `<!-- align:${alignment} -->\n`
-    const { start, end } = getSelection(ta)
-    replaceRange(ta, start, end, marker)
+    const { start, end, value } = getSelection(ta)
+    const selected = value.slice(start, end)
+
+    if (selected.trim()) {
+      // If there's selected text, wrap it with alignment comments
+      const wrapped = `<!-- align:${alignment} -->\n${selected}\n<!-- /align -->`
+      replaceRange(ta, start, end, wrapped)
+    } else {
+      // If no selection, just insert the start comment
+      const marker = `<!-- align:${alignment} -->\n`
+      replaceRange(ta, start, end, marker)
+    }
   }
 
   // selection used for pre-filling link text in dialog
@@ -306,8 +318,18 @@
   function insertCodeBlockBlock() {
     if (mode.value !== 'source') return // only work in source mode
     const ta = getActiveTextarea(); if (!ta) return
-    const { start, end } = getSelection(ta)
-    const snippet = "```ts\n// code\n```\n"
+    const { start, end, value } = getSelection(ta)
+    const selected = value.slice(start, end)
+
+    let snippet
+    if (selected.trim()) {
+      // If there's selected text, wrap it in a code block
+      snippet = `\`\`\`\n${selected}\n\`\`\`\n`
+    } else {
+      // If no selection, insert default template
+      snippet = "```ts\n// code\n```\n"
+    }
+
     replaceRange(ta, start, end, snippet)
   }
   function insertTable(rows: number = 2, cols: number = 2, header: boolean = true) {
@@ -358,7 +380,7 @@
     const md = new MarkdownIt({
       html: true,
       linkify: true,
-      breaks: true,
+      breaks: false, // Changed to false for proper list rendering
       typographer: true
     })
 
@@ -381,7 +403,7 @@
 
     try {
       // Expand attachment shorthand ![[name]] into markdown image syntax with the stored data URI.
-      const contentWithAttachments = (content.value || '').replace(/!\[\[([^\]]+)\]\]/g, (m: string, name: string) => {
+      let processedContent = (content.value || '').replace(/!\[\[([^\]]+)\]\]/g, (m: string, name: string) => {
         try {
           const data = getAttachment(name)
           return data ? `![](${data})` : m
@@ -389,7 +411,16 @@
           return m
         }
       })
-      return md.render(contentWithAttachments)
+
+      // Process alignment comments to wrap content in divs with proper alignment classes
+      processedContent = processedContent.replace(/<!-- align:(left|center|right|justify) -->\s*\n?([\s\S]*?)(?:\n?\s*<!-- \/align -->|$)/g, (match, alignment, content) => {
+        const alignClass = alignment === 'center' ? 'text-center' :
+          alignment === 'right' ? 'text-right' :
+            alignment === 'justify' ? 'text-justify' : 'text-left'
+        return `<div class="${alignClass}">\n\n${content.trim()}\n\n</div>`
+      })
+
+      return md.render(processedContent)
     } catch {
       return '<pre class="text-red-600">Render error</pre>'
     }
@@ -531,6 +562,23 @@
       border: none;
       border-top: 1px solid #d1d5db;
       margin: 2rem 0;
+    }
+
+    /* Alignment classes */
+    .text-left {
+      text-align: left;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .text-justify {
+      text-align: justify;
     }
   }
 </style>
