@@ -28,7 +28,7 @@
             <div class="w-full h-full">
               <textarea v-if="mode === 'source'" ref="textareaEl" v-model="content"
                 class="w-full h-full outline-none resize-none font-mono text-sm p-6" placeholder="Write Markdown..."
-                @input="recount" />
+                @input="recount" @keydown="handleKeydown" />
               <div v-else
                 class="prose prose-gray max-w-none overflow-auto h-full p-6 prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg prose-h6:text-base"
                 v-html="renderedHtml" />
@@ -241,10 +241,10 @@
     surroundWithHtml('<u>', '</u>')
   }
   function applyStrike() { applyAround('~~')() }
-  function applyBulletList() { toggleList('- ')() }
-  function applyOrderedList() { toggleList('1. ')() }
+  function applyBulletList() { toggleList('bullet')() }
+  function applyOrderedList() { toggleList('ordered')() }
 
-  function toggleList(prefix: string) {
+  function toggleList(type: 'bullet' | 'ordered') {
     return () => {
       if (mode.value !== 'source') return // only work in source mode
       const ta = getActiveTextarea()
@@ -256,9 +256,37 @@
       const actualEnd = lineEnd === -1 ? value.length : lineEnd
       const segment = value.slice(lineStart, actualEnd)
       const lines = segment.split(/\n/)
-      const allHave = lines.every(l => l.startsWith(prefix))
-      const updated = lines.map(l => allHave ? l.replace(/^\Q"+prefix+"\E/, '').replace(new RegExp('^' + prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), '') : (l.startsWith(prefix) ? l : prefix + l)).join('\n')
-      replaceRange(ta, lineStart, actualEnd, updated)
+
+      if (type === 'bullet') {
+        const prefix = '- '
+        const allHave = lines.every(l => l.trim() === '' || l.startsWith(prefix))
+        const updated = lines.map(l => {
+          if (l.trim() === '') return l
+          if (allHave) {
+            // Remove bullet formatting
+            return l.replace(/^- /, '')
+          } else {
+            // Add bullet formatting
+            return l.startsWith(prefix) ? l : prefix + l
+          }
+        }).join('\n')
+        replaceRange(ta, lineStart, actualEnd, updated)
+      } else if (type === 'ordered') {
+        const numberRegex = /^\d+\.\s/
+        const allHave = lines.every(l => l.trim() === '' || numberRegex.test(l))
+        const updated = lines.map((l, index) => {
+          if (l.trim() === '') return l
+          if (allHave) {
+            // Remove numbered formatting
+            return l.replace(numberRegex, '')
+          } else {
+            // Add numbered formatting with correct sequential numbers
+            const content = l.replace(numberRegex, '')
+            return `${index + 1}. ${content}`
+          }
+        }).join('\n')
+        replaceRange(ta, lineStart, actualEnd, updated)
+      }
     }
   }
 
@@ -430,6 +458,70 @@
     mode.value = mode.value === 'source' ? 'reader' : 'source'
   }
 
+  // Handle auto-continuation of lists when Enter is pressed
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key !== 'Enter' || mode.value !== 'source') return
+
+    const ta = event.target as HTMLTextAreaElement
+    if (!ta) return
+
+    const { start, value } = getSelection(ta)
+    const lineStart = value.lastIndexOf('\n', start - 1) + 1
+    const currentLine = value.slice(lineStart, start)
+
+    // Check if current line is a bullet list item
+    const bulletMatch = currentLine.match(/^(\s*)-\s(.*)$/)
+    if (bulletMatch && bulletMatch.length >= 4) {
+      const indent = bulletMatch[1] || ''
+      const content = bulletMatch[2] || ''
+
+      if (content.trim() === '') {
+        // Empty list item - exit list mode
+        event.preventDefault()
+        const newContent = value.slice(0, lineStart) + indent + value.slice(start)
+        store.setContent(newContent)
+        nextTick(() => {
+          ta.focus()
+          ta.selectionStart = ta.selectionEnd = lineStart + indent.length
+        })
+        return
+      }
+
+      // Continue bullet list
+      event.preventDefault()
+      const newListItem = `\n${indent}- `
+      replaceRange(ta, start, start, newListItem)
+      return
+    }
+
+    // Check if current line is a numbered list item
+    const numberedMatch = currentLine.match(/^(\s*)(\d+)\.\s(.*)$/)
+    if (numberedMatch && numberedMatch.length >= 4) {
+      const indent = numberedMatch[1] || ''
+      const currentNum = numberedMatch[2] || '1'
+      const content = numberedMatch[3] || ''
+
+      if (content.trim() === '') {
+        // Empty list item - exit list mode
+        event.preventDefault()
+        const newContent = value.slice(0, lineStart) + indent + value.slice(start)
+        store.setContent(newContent)
+        nextTick(() => {
+          ta.focus()
+          ta.selectionStart = ta.selectionEnd = lineStart + indent.length
+        })
+        return
+      }
+
+      // Continue numbered list with next number
+      event.preventDefault()
+      const nextNum = parseInt(currentNum) + 1
+      const newListItem = `\n${indent}${nextNum}. `
+      replaceRange(ta, start, start, newListItem)
+      return
+    }
+  }
+
   onMounted(() => { textareaEl.value = document.querySelector('textarea') })
 
   // Link dialog state
@@ -534,6 +626,26 @@
     ol {
       margin: 1rem 0;
       padding-left: 1.5rem;
+    }
+
+    /* Ensure list items display properly */
+    ul li {
+      list-style-type: disc;
+      margin-bottom: 0.25rem;
+    }
+
+    ol li {
+      list-style-type: decimal;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Nested lists */
+    ul ul li {
+      list-style-type: circle;
+    }
+
+    ul ul ul li {
+      list-style-type: square;
     }
 
     blockquote {
