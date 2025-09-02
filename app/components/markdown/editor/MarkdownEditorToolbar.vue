@@ -65,17 +65,11 @@
         <!-- Headings (popover dropdown) -->
         <Popover>
           <PopoverTrigger as-child>
-            <Tooltip>
-              <TooltipTrigger as-child>
-                <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
-                  <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600" />
-                  <ChevronDown class="w-3 h-3 text-gray-500" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Heading Styles</p>
-              </TooltipContent>
-            </Tooltip>
+            <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16"
+              title="Heading Styles">
+              <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600" />
+              <ChevronDown class="w-3 h-3 text-gray-500" />
+            </Button>
           </PopoverTrigger>
           <PopoverContent class="w-40 p-2">
             <div class="flex flex-col">
@@ -296,17 +290,11 @@
         <!-- Alignment (popover with chevron inside trigger) -->
         <Popover>
           <PopoverTrigger as-child>
-            <Tooltip>
-              <TooltipTrigger as-child>
-                <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
-                  <component :is="alignmentIcon" class="w-4 h-4" />
-                  <ChevronDown class="w-3 h-3 text-gray-500" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Text Alignment</p>
-              </TooltipContent>
-            </Tooltip>
+            <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16"
+              title="Text Alignment">
+              <component :is="alignmentIcon" class="w-4 h-4" />
+              <ChevronDown class="w-3 h-3 text-gray-500" />
+            </Button>
           </PopoverTrigger>
           <PopoverContent class="w-36 p-2">
             <div class="flex flex-col">

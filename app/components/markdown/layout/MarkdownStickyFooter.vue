@@ -1,49 +1,78 @@
 <template>
   <div class="fixed inset-x-0 bottom-1 z-50 pointer-events-none">
     <div class="w-full mx-auto pointer-events-auto px-4">
-      <div
-        class="flex items-center justify-between bg-white border border-gray-200 rounded-lg shadow-sm h-12 px-4 md:h-10">
-        <!-- Left: Mode toggle + Word Count / Character Count -->
-        <div class="flex items-center gap-4 text-xs text-gray-600">
-          <!-- Mode label + toggle (far left) -->
+      <TooltipProvider>
+        <div
+          class="flex items-center justify-between bg-white border border-gray-200 rounded-lg shadow-sm h-12 px-4 md:h-10">
+          <!-- Left: Mode toggle + Word Count / Character Count -->
+          <div class="flex items-center gap-4 text-xs text-gray-600">
+            <!-- Mode label + toggle (far left) -->
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-medium">Mode:</span>
+              <Tooltip>
+                <TooltipTrigger as-child>
+                  <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="toggleMode">
+                    <BookOpen v-if="mode === 'source'" class="w-4 h-4" />
+                    <Edit v-else class="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{{ mode === 'source' ? 'Switch to Reader View' : 'Switch to Source View' }}</p>
+                </TooltipContent>
+              </Tooltip>
+              <div class="h-6 w-px bg-gray-300 mx-1"></div>
+            </div>
+
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer"
+                  @click="showWordCountDialog = true">
+                  <span class="font-medium">Words</span>
+                  <span class="text-gray-800">{{ wordCount || 0 }}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Click to view detailed word count statistics</p>
+              </TooltipContent>
+            </Tooltip>
+            <MarkdownWordCountDialog :open="showWordCountDialog" :stats="{ words: wordCount, characters: characterCount }" @update:open="v => showWordCountDialog = v" />
+            <div class="hidden sm:flex items-center gap-2">•</div>
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <div class="hidden sm:flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer"
+                  @click="showWordCountDialog = true">
+                  <span class="font-medium">Characters</span>
+                  <span class="text-gray-800">{{ characterCount || 0 }}</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Click to view detailed character count statistics</p>
+              </TooltipContent>
+            </Tooltip>
+            <div class="hidden md:flex items-center gap-2">•</div>
+            <!-- duplicate mode display removed; use far-left control -->
+          </div>
+
+          <!-- Middle: spacer -->
+          <div class="flex-1"></div>
+
+          <!-- Right: Mode toggle and Zoom controls -->
           <div class="flex items-center gap-2">
-            <span class="text-xs font-medium">Mode:</span>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="toggleMode"
-              :title="mode === 'source' ? 'Switch to Reader' : 'Switch to Source'">
-              <BookOpen v-if="mode === 'source'" class="w-4 h-4" />
-              <Edit v-else class="w-4 h-4" />
-            </Button>
-            <div class="h-6 w-px bg-gray-300 mx-1"></div>
-          </div>
+            <!-- right-side duplicate mode toggles removed; use far-left control -->
 
-          <div class="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer"
-            @click="showWordCountDialog = true">
-            <span class="font-medium">Words</span>
-            <span class="text-gray-800">{{ wordCount || 0 }}</span>
-          </div>
-  <MarkdownWordCountDialog :open="showWordCountDialog" :stats="{ words: wordCount, characters: characterCount }" @update:open="v => showWordCountDialog = v" />
-          <div class="hidden sm:flex items-center gap-2">•</div>
-          <div class="hidden sm:flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
-            <span class="font-medium">Characters</span>
-            <span class="text-gray-800">{{ characterCount || 0 }}</span>
-          </div>
-          <div class="hidden md:flex items-center gap-2">•</div>
-          <!-- duplicate mode display removed; use far-left control -->
-        </div>
-
-        <!-- Middle: spacer -->
-        <div class="flex-1"></div>
-
-        <!-- Right: Mode toggle and Zoom controls -->
-        <div class="flex items-center gap-2">
-          <!-- right-side duplicate mode toggles removed; use far-left control -->
-
-          <!-- Zoom controls -->
-          <Button type="button" @click="changeZoom(-25)"
-            class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
-            aria-label="Zoom out">
-            <Minus class="w-4 h-4 text-gray-600" />
-          </Button>
+            <!-- Zoom controls -->
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <Button type="button" @click="changeZoom(-25)"
+                  class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
+                  aria-label="Zoom out">
+                  <Minus class="w-4 h-4 text-gray-600" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Zoom out (decrease by 25%)</p>
+              </TooltipContent>
+            </Tooltip>
 
           <Popover>
             <PopoverTrigger as-child>
@@ -66,13 +95,21 @@
             </PopoverContent>
           </Popover>
 
-          <Button type="button" @click="changeZoom(25)"
-            class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
-            aria-label="Zoom in">
-            <Plus class="w-4 h-4 text-gray-600" />
-          </Button>
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <Button type="button" @click="changeZoom(25)"
+                  class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
+                  aria-label="Zoom in">
+                  <Plus class="w-4 h-4 text-gray-600" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Zoom in (increase by 25%)</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
-      </div>
+      </TooltipProvider>
     </div>
   </div>
 </template>
@@ -85,6 +122,7 @@
   import { Button } from '@/components/ui/button'
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   import { Input } from '@/components/ui/input'
+  import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 
   // props for markdown editor specific data
   const props = defineProps<{
