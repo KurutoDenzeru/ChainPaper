@@ -148,17 +148,33 @@
   let pluginsLoaded = ref(false)
   
   if (typeof window !== 'undefined') {
-    // Load all plugins together
+    // Load all plugins together with better error handling
     Promise.all([
       // @ts-ignore - shim declared, but resolver may still complain during dev
-      import('markdown-it').then(m => { MarkdownIt = (m as any).default || m }).catch(e => console.warn('Failed to load markdown-it:', e)),
+      import('markdown-it').then(m => { 
+        MarkdownIt = (m as any).default || m 
+        console.log('✓ Loaded markdown-it')
+      }).catch(e => console.warn('Failed to load markdown-it:', e)),
+      
       // @ts-ignore - plugin types not available
-      import('markdown-it-katex').then(k => { katexPlugin = k.default || k }).catch(e => console.warn('Failed to load katex plugin:', e)),
+      import('markdown-it-katex').then(k => { 
+        katexPlugin = k.default || k 
+        console.log('✓ Loaded katex plugin')
+      }).catch(e => console.warn('Failed to load katex plugin:', e)),
+      
+      // @ts-ignore - plugin types not available  
+      import('markdown-it-emoji').then(e => { 
+        emojiPlugin = e.default || e
+        console.log('✓ Loaded emoji plugin:', typeof emojiPlugin)
+      }).catch(e => console.warn('Failed to load emoji plugin:', e)),
+      
       // @ts-ignore - plugin types not available
-      import('markdown-it-emoji').then(e => { emojiPlugin = e.default || e }).catch(e => console.warn('Failed to load emoji plugin:', e)),
-      // @ts-ignore - plugin types not available
-      import('markdown-it-footnote').then(f => { footnotePlugin = f.default || f }).catch(e => console.warn('Failed to load footnote plugin:', e))
+      import('markdown-it-footnote').then(f => { 
+        footnotePlugin = f.default || f 
+        console.log('✓ Loaded footnote plugin')
+      }).catch(e => console.warn('Failed to load footnote plugin:', e))
     ]).then(() => {
+      console.log('All plugins loaded, setting pluginsLoaded to true')
       pluginsLoaded.value = true
     }).catch(e => {
       console.warn('Some plugins failed to load:', e)
@@ -664,7 +680,7 @@
     })
 
     // Add KaTeX support for math rendering if available
-    if (katexPlugin) {
+    if (katexPlugin && typeof katexPlugin === 'function') {
       try {
         md.use(katexPlugin)
       } catch (e) {
@@ -673,7 +689,7 @@
     }
 
     // Add emoji support if available
-    if (emojiPlugin) {
+    if (emojiPlugin && typeof emojiPlugin === 'function') {
       try {
         md.use(emojiPlugin)
       } catch (e) {
@@ -682,7 +698,7 @@
     }
 
     // Add footnote support if available
-    if (footnotePlugin) {
+    if (footnotePlugin && typeof footnotePlugin === 'function') {
       try {
         md.use(footnotePlugin)
       } catch (e) {
@@ -716,6 +732,52 @@
         } catch (e) {
           return m
         }
+      })
+
+      // Add basic emoticon to emoji replacement
+      const emoticonMap: Record<string, string> = {
+        ':)': '😊',
+        ':-)': '😊',
+        ';)': '😉',
+        ';-)': '😉',
+        ':D': '😃',
+        ':-D': '😃',
+        ':P': '😛',
+        ':-P': '😛',
+        ':p': '😛',
+        ':-p': '😛',
+        ':(': '😢',
+        ':-(': '😢',
+        ':o': '😮',
+        ':-o': '😮',
+        ':O': '😮',
+        ':-O': '😮',
+        '8-)': '😎',
+        ':|': '😐',
+        ':-|': '😐',
+        ':*': '😘',
+        ':-*': '😘',
+        '<3': '❤️',
+        '</3': '💔',
+        ':heart:': '❤️',
+        ':thumbsup:': '👍',
+        ':thumbsdown:': '👎',
+        ':smile:': '😊',
+        ':wink:': '😉',
+        ':laughing:': '😂',
+        ':cry:': '😢',
+        ':angry:': '😠',
+        ':fire:': '🔥',
+        ':star:': '⭐',
+        ':check:': '✅',
+        ':x:': '❌'
+      }
+
+      // Replace emoticons with emojis (but preserve markdown emoji syntax like :smile:)
+      Object.entries(emoticonMap).forEach(([emoticon, emoji]) => {
+        const escapedEmoticon = emoticon.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const regex = new RegExp(`(^|\\s)${escapedEmoticon}(?=\\s|$)`, 'g')
+        processedContent = processedContent.replace(regex, `$1${emoji}`)
       })
 
       // Process alignment comments to wrap content in divs with proper alignment classes

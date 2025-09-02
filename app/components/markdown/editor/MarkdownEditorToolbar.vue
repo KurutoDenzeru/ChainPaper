@@ -703,7 +703,6 @@
   import { Input } from '@/components/ui/input'
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-  import TableInserter from '@/components/editor/TableInserter.vue'
   import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
   import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma, Smile, FileText as FootnoteIcon } from 'lucide-vue-next'
 

@@ -150,7 +150,6 @@
     MenubarTrigger,
   } from '@/components/ui/menubar'
   import { Input } from '@/components/ui/input'
-  import TableInserter from '@/components/editor/TableInserter.vue'
   import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
   import MarkdownWordCountDialog from '../editor/MarkdownWordCountDialog.vue'
   import MarkdownAuthProofDialog from '../editor/MarkdownAuthProofDialog.vue'
