@@ -387,11 +387,9 @@
         </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>
-            <TableInserter @insert-table="(r, c, h) => $emit('insert-table', r, c, h)">
-              <Button variant="ghost" size="sm" class="h-8 w-8 p-0">
-                <Table class="w-4 h-4" />
-              </Button>
-            </TableInserter>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showTableDialog = true">
+              <Table class="w-4 h-4" />
+            </Button>
           </TooltipTrigger>
           <TooltipContent>
             <p>Insert Table</p>
@@ -607,6 +605,13 @@
       </div>
     </div>
   </TooltipProvider>
+
+  <!-- Table Insert Dialog -->
+  <TableInsertDialog 
+    :open="showTableDialog" 
+    @update:open="showTableDialog = $event"
+    @insert-table="handleTableInsert" 
+  />
 </template>
 
 <script setup lang="ts">
@@ -616,6 +621,7 @@
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
   import TableInserter from '@/components/editor/TableInserter.vue'
+  import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
   import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent } from 'lucide-vue-next'
 
   interface ActiveState { bold: boolean; italic: boolean; underline: boolean; strike: boolean; bullet: boolean; ordered: boolean }
@@ -712,4 +718,12 @@
   const highlightColors = ['#FEF3C7', '#FFEDD5', '#FFE4E6', '#F3E8FF', '#E0F2FE', '#DCFCE7', '#FEE2E2', '#E2E8F0', '#D1FAE5', '#FDE68A', '#FBCFE8', '#C7D2FE', '#E9D5FF', '#F5F3FF', '#FAE8FF', '#F1F5F9']
   const currentTextColor = computed(() => props.textColor || '#111827')
   const currentHighlight = computed(() => props.highlight || '#FDE68A')
+
+  // Dialog states
+  const showTableDialog = ref(false)
+
+  // Table insertion handler
+  function handleTableInsert(rows: number, cols: number, options: any) {
+    emit('insert-table', rows, cols, options.header)
+  }
 </script>

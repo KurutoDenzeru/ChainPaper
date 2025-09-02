@@ -56,11 +56,9 @@
                     <div class="flex items-center gap-2">
                       <component :is="getIcon(item)" class="w-4 h-4 text-gray-600" v-if="getIcon(item)" />
 
-                      <!-- For table item wrap the label with TableInserter so hovering the label opens the grid -->
+                      <!-- For table item, trigger dialog instead of hover -->
                       <template v-if="item.emit === 'insert-table'">
-                        <TableInserter @insertTable="(r, c, h) => $emit('insert-table', r, c, h)">
-                          <button class="text-sm text-gray-900 hover:bg-gray-100 rounded">{{ item.label }}</button>
-                        </TableInserter>
+                        <button class="text-sm text-gray-900 hover:bg-gray-100 rounded" @click="showTableDialog = true">{{ item.label }}</button>
                       </template>
                       <template v-else>
                         <span>{{ item.label }}</span>
@@ -120,6 +118,13 @@
   <MarkdownAboutDialog :open="showAboutDialog" @update:open="showAboutDialog = $event" />
 
   <MarkdownGuideDialog :open="showGuideDialog" @update:open="showGuideDialog = $event" />
+
+  <!-- Table Insert Dialog -->
+  <TableInsertDialog 
+    :open="showTableDialog" 
+    @update:open="showTableDialog = $event"
+    @insert-table="handleTableInsert" 
+  />
 </template>
 
 <script setup lang="ts">
@@ -147,6 +152,7 @@
   } from '@/components/ui/menubar'
   import { Input } from '@/components/ui/input'
   import TableInserter from '@/components/editor/TableInserter.vue'
+  import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
   import MarkdownWordCountDialog from '../editor/MarkdownWordCountDialog.vue'
   import MarkdownAuthProofDialog from '../editor/MarkdownAuthProofDialog.vue'
   import MarkdownExportDialog from '../editor/MarkdownExportDialog.vue'
@@ -207,6 +213,7 @@
   const showSaveDialog = ref(false)
   const showAboutDialog = ref(false)
   const showGuideDialog = ref(false)
+  const showTableDialog = ref(false)
   const exportInitialFormat = ref<'markdown' | 'html' | 'json' | 'pdf' | null>(null)
 
   // Markdown-specific menu data
@@ -467,5 +474,10 @@
   function onExportDialogUpdate(v: boolean) {
     showExportDialog.value = v
     if (!v) exportInitialFormat.value = null
+  }
+
+  // Table insertion handler
+  function handleTableInsert(rows: number, cols: number, options: any) {
+    emit('insert-table', rows, cols, options.header)
   }
 </script>
