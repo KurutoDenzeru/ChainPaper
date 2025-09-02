@@ -2,11 +2,24 @@
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
     <DialogContent class="max-w-md">
       <DialogHeader>
-        <DialogTitle>😀 Insert Emoji</DialogTitle>
+        <DialogTitle class="flex items-center gap-2">
+          <Smile class="h-5 w-5" />
+          Insert Emoji
+        </DialogTitle>
         <DialogDescription>
           Choose an emoji to insert into your document
         </DialogDescription>
       </DialogHeader>
+
+      <!-- Search Input -->
+      <div class="relative mb-4">
+        <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          v-model="searchQuery"
+          placeholder="Search emojis..."
+          class="pl-10"
+        />
+      </div>
 
       <div class="mt-4">
         <TooltipProvider>
@@ -96,7 +109,7 @@
 
             <TabsContent value="recent" class="mt-4">
               <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in recentEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
+                <button v-for="emoji in filteredRecentEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
                   class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
                   <Tooltip>
                     <TooltipTrigger as-child>
@@ -108,14 +121,15 @@
                   </Tooltip>
                 </button>
               </div>
-              <div v-if="recentEmojis.length === 0" class="text-center text-gray-500 py-8">
-                No recently used emojis
+              <div v-if="filteredRecentEmojis.length === 0" class="text-center text-gray-500 py-8">
+                <p v-if="!searchQuery.trim()">No recently used emojis</p>
+                <p v-else>No emojis found matching "{{ searchQuery }}"</p>
               </div>
             </TabsContent>
 
             <TabsContent value="smileys" class="mt-4">
               <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in smileyEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
+                <button v-for="emoji in filteredSmileyEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
                   class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
                   <Tooltip>
                     <TooltipTrigger as-child>
@@ -126,12 +140,15 @@
                     </TooltipContent>
                   </Tooltip>
                 </button>
+              </div>
+              <div v-if="filteredSmileyEmojis.length === 0" class="text-center text-gray-500 py-8">
+                No emojis found matching "{{ searchQuery }}"
               </div>
             </TabsContent>
 
             <TabsContent value="animals" class="mt-4">
               <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in animalEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
+                <button v-for="emoji in filteredAnimalEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
                   class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
                   <Tooltip>
                     <TooltipTrigger as-child>
@@ -142,12 +159,15 @@
                     </TooltipContent>
                   </Tooltip>
                 </button>
+              </div>
+              <div v-if="filteredAnimalEmojis.length === 0" class="text-center text-gray-500 py-8">
+                No emojis found matching "{{ searchQuery }}"
               </div>
             </TabsContent>
 
             <TabsContent value="food" class="mt-4">
               <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in foodEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
+                <button v-for="emoji in filteredFoodEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
                   class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
                   <Tooltip>
                     <TooltipTrigger as-child>
@@ -158,12 +178,15 @@
                     </TooltipContent>
                   </Tooltip>
                 </button>
+              </div>
+              <div v-if="filteredFoodEmojis.length === 0" class="text-center text-gray-500 py-8">
+                No emojis found matching "{{ searchQuery }}"
               </div>
             </TabsContent>
 
             <TabsContent value="activities" class="mt-4">
               <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in activityEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
+                <button v-for="emoji in filteredActivityEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
                   class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
                   <Tooltip>
                     <TooltipTrigger as-child>
@@ -174,12 +197,15 @@
                     </TooltipContent>
                   </Tooltip>
                 </button>
+              </div>
+              <div v-if="filteredActivityEmojis.length === 0" class="text-center text-gray-500 py-8">
+                No emojis found matching "{{ searchQuery }}"
               </div>
             </TabsContent>
 
             <TabsContent value="objects" class="mt-4">
               <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in objectEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
+                <button v-for="emoji in filteredObjectEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
                   class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
                   <Tooltip>
                     <TooltipTrigger as-child>
@@ -190,12 +216,15 @@
                     </TooltipContent>
                   </Tooltip>
                 </button>
+              </div>
+              <div v-if="filteredObjectEmojis.length === 0" class="text-center text-gray-500 py-8">
+                No emojis found matching "{{ searchQuery }}"
               </div>
             </TabsContent>
             
             <TabsContent value="travel" class="mt-4">
               <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in travelEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
+                <button v-for="emoji in filteredTravelEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
                   class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
                   <Tooltip>
                     <TooltipTrigger as-child>
@@ -207,11 +236,14 @@
                   </Tooltip>
                 </button>
               </div>
+              <div v-if="filteredTravelEmojis.length === 0" class="text-center text-gray-500 py-8">
+                No emojis found matching "{{ searchQuery }}"
+              </div>
             </TabsContent>
             
             <TabsContent value="flags" class="mt-4">
               <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in flagEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
+                <button v-for="emoji in filteredFlagEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
                   class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
                   <Tooltip>
                     <TooltipTrigger as-child>
@@ -222,6 +254,9 @@
                     </TooltipContent>
                   </Tooltip>
                 </button>
+              </div>
+              <div v-if="filteredFlagEmojis.length === 0" class="text-center text-gray-500 py-8">
+                No emojis found matching "{{ searchQuery }}"
               </div>
             </TabsContent>
           </Tabs>
@@ -238,11 +273,13 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
   import { Button } from '@/components/ui/button'
+  import { Input } from '@/components/ui/input'
   import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+  import { Smile, Search } from 'lucide-vue-next'
 
   interface Emoji {
     char: string
@@ -261,6 +298,7 @@
 
   const activeTab = ref('recent')
   const recentEmojis = ref<Emoji[]>([])
+  const searchQuery = ref('')
 
   // Check if emoji is supported on the current OS
   function isEmojiSupported(emoji: string): boolean {
@@ -988,6 +1026,79 @@
     { char: '🇾🇹', name: 'Mayotte Flag', shortcode: ':mayotte:' },
     { char: '🇿🇲', name: 'Zambia Flag', shortcode: ':zambia:' },
   ])
+
+  // Filtered emoji lists based on search query
+  const filteredRecentEmojis = computed(() => {
+    if (!searchQuery.value.trim()) return recentEmojis.value
+    const query = searchQuery.value.toLowerCase()
+    return recentEmojis.value.filter(emoji => 
+      emoji.name.toLowerCase().includes(query) || 
+      emoji.shortcode.toLowerCase().includes(query)
+    )
+  })
+
+  const filteredSmileyEmojis = computed(() => {
+    if (!searchQuery.value.trim()) return smileyEmojis.value
+    const query = searchQuery.value.toLowerCase()
+    return smileyEmojis.value.filter(emoji => 
+      emoji.name.toLowerCase().includes(query) || 
+      emoji.shortcode.toLowerCase().includes(query)
+    )
+  })
+
+  const filteredAnimalEmojis = computed(() => {
+    if (!searchQuery.value.trim()) return animalEmojis.value
+    const query = searchQuery.value.toLowerCase()
+    return animalEmojis.value.filter(emoji => 
+      emoji.name.toLowerCase().includes(query) || 
+      emoji.shortcode.toLowerCase().includes(query)
+    )
+  })
+
+  const filteredFoodEmojis = computed(() => {
+    if (!searchQuery.value.trim()) return foodEmojis.value
+    const query = searchQuery.value.toLowerCase()
+    return foodEmojis.value.filter(emoji => 
+      emoji.name.toLowerCase().includes(query) || 
+      emoji.shortcode.toLowerCase().includes(query)
+    )
+  })
+
+  const filteredActivityEmojis = computed(() => {
+    if (!searchQuery.value.trim()) return activityEmojis.value
+    const query = searchQuery.value.toLowerCase()
+    return activityEmojis.value.filter(emoji => 
+      emoji.name.toLowerCase().includes(query) || 
+      emoji.shortcode.toLowerCase().includes(query)
+    )
+  })
+
+  const filteredTravelEmojis = computed(() => {
+    if (!searchQuery.value.trim()) return travelEmojis.value
+    const query = searchQuery.value.toLowerCase()
+    return travelEmojis.value.filter(emoji => 
+      emoji.name.toLowerCase().includes(query) || 
+      emoji.shortcode.toLowerCase().includes(query)
+    )
+  })
+
+  const filteredObjectEmojis = computed(() => {
+    if (!searchQuery.value.trim()) return objectEmojis.value
+    const query = searchQuery.value.toLowerCase()
+    return objectEmojis.value.filter(emoji => 
+      emoji.name.toLowerCase().includes(query) || 
+      emoji.shortcode.toLowerCase().includes(query)
+    )
+  })
+
+  const filteredFlagEmojis = computed(() => {
+    if (!searchQuery.value.trim()) return flagEmojis.value
+    const query = searchQuery.value.toLowerCase()
+    return flagEmojis.value.filter(emoji => 
+      emoji.name.toLowerCase().includes(query) || 
+      emoji.shortcode.toLowerCase().includes(query)
+    )
+  })
 
   // Load recent emojis from localStorage
   onMounted(() => {
