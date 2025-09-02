@@ -5,6 +5,7 @@
         <MarkdownMenuBar @word-count="showWordDialog = true" @insert-link="insertLink" @insert-image="insertImage"
           @insert-table="insertTable" @set-heading="handleSetHeading" @insert-code-block="insertCodeBlockBlock"
           @insert-math="insertMath" @insert-mathblock="insertMathblock"
+          @insert-horizontal-line="insertHorizontalLine" @insert-footnote="insertFootnote" @insert-emoji="insertEmoji"
           @set-alignment="setAlignmentComment" @format-bold="applyBold" @format-italic="applyItalic"
           @format-underline="applyUnderline" @format-strikethrough="applyStrike" 
           @format-superscript="applySuperscript" @format-subscript="applySubscript"
@@ -20,6 +21,7 @@
           @toggle-ordered-list="applyOrderedList" @toggle-blockquote="applyBlockquote" @indent="applyIndent"
           @unindent="applyUnindent" @insert-link="insertLink" @insert-image="insertImage"
           @insert-code-block="insertCodeBlockBlock" @insert-math="insertMath" @insert-mathblock="insertMathblock"
+          @insert-horizontal-line="insertHorizontalLine" @insert-footnote="insertFootnote" @insert-emoji="insertEmoji"
           @insert-table="insertTable" @set-heading="handleSetHeading"
           @set-alignment="setAlignmentComment" @set-zoom="setZoom" @set-text-color="applyColor"
           @set-highlight="applyHighlight" @update:mode="v => mode = v" />
@@ -141,11 +143,27 @@
   // lazy load markdown-it to avoid SSR type resolution issues
   let MarkdownIt: any
   let katexPlugin: any
+  let emojiPlugin: any
+  let footnotePlugin: any
+  let pluginsLoaded = ref(false)
+  
   if (typeof window !== 'undefined') {
-    // @ts-ignore - shim declared, but resolver may still complain during dev
-    import('markdown-it').then(m => { MarkdownIt = (m as any).default || m })
-    // @ts-ignore - plugin types not available
-    import('markdown-it-katex').then(k => { katexPlugin = k.default || k })
+    // Load all plugins together
+    Promise.all([
+      // @ts-ignore - shim declared, but resolver may still complain during dev
+      import('markdown-it').then(m => { MarkdownIt = (m as any).default || m }).catch(e => console.warn('Failed to load markdown-it:', e)),
+      // @ts-ignore - plugin types not available
+      import('markdown-it-katex').then(k => { katexPlugin = k.default || k }).catch(e => console.warn('Failed to load katex plugin:', e)),
+      // @ts-ignore - plugin types not available
+      import('markdown-it-emoji').then(e => { emojiPlugin = e.default || e }).catch(e => console.warn('Failed to load emoji plugin:', e)),
+      // @ts-ignore - plugin types not available
+      import('markdown-it-footnote').then(f => { footnotePlugin = f.default || f }).catch(e => console.warn('Failed to load footnote plugin:', e))
+    ]).then(() => {
+      pluginsLoaded.value = true
+    }).catch(e => {
+      console.warn('Some plugins failed to load:', e)
+      pluginsLoaded.value = true // Still allow rendering with available plugins
+    })
   }
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
@@ -480,6 +498,90 @@
 
     replaceRange(ta, start, end, snippet)
   }
+
+  function insertHorizontalLine() {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea(); if (!ta) return
+    const { start, end } = getSelection(ta)
+    
+    // Insert horizontal line with proper spacing
+    const snippet = "\n---\n"
+    replaceRange(ta, start, end, snippet)
+  }
+
+  function insertFootnote() {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea(); if (!ta) return
+    const { start, end, value } = getSelection(ta)
+    const selected = value.slice(start, end)
+    
+    // Generate a unique footnote ID
+    const footnoteId = Date.now()
+    
+    let snippet
+    if (selected.trim()) {
+      // If there's selected text, make it the footnote reference
+      snippet = `${selected}[^${footnoteId}]\n\n[^${footnoteId}]: Add footnote text here`
+    } else {
+      // If no selection, insert template
+      snippet = `text[^${footnoteId}]\n\n[^${footnoteId}]: Add footnote text here`
+    }
+    
+    replaceRange(ta, start, end, snippet)
+  }
+
+  function insertEmoji() {
+    // Try to open the OS emoji picker
+    if (typeof window !== 'undefined') {
+      const userAgent = navigator.userAgent.toLowerCase()
+      const isMac = /mac|iphone|ipad|ipod/.test(userAgent)
+      const isWindows = /win/.test(userAgent)
+      const isMobile = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/.test(userAgent)
+      
+      if (isMobile) {
+        // On mobile, focus the textarea to potentially open emoji keyboard
+        const ta = getActiveTextarea()
+        if (ta) {
+          ta.focus()
+          // Some mobile browsers support this
+          if ('showPicker' in HTMLInputElement.prototype) {
+            try {
+              ;(ta as any).showPicker?.()
+            } catch (e) {
+              // Fallback to inserting emoji syntax
+              insertEmojiSyntax()
+            }
+          } else {
+            insertEmojiSyntax()
+          }
+        }
+      } else if (isMac) {
+        // On Mac, show instruction and insert common emoji
+        alert('Press Cmd + Ctrl + Space to open emoji picker')
+        insertEmojiSyntax()
+      } else if (isWindows) {
+        // On Windows, show instruction and insert common emoji
+        alert('Press Win + . (period) to open emoji picker')
+        insertEmojiSyntax()
+      } else {
+        // Fallback for other systems
+        insertEmojiSyntax()
+      }
+    }
+  }
+  
+  function insertEmojiSyntax() {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea()
+    if (!ta) return
+    
+    const { start, end } = getSelection(ta)
+    
+    // Insert a common emoji syntax
+    const snippet = ":smile:"
+    replaceRange(ta, start, end, snippet)
+  }
+
   function insertTable(rows: number = 2, cols: number = 2, options: any = { header: true, borders: true, striped: false }) {
     if (mode.value !== 'source') return // only work in source mode
     const ta = getActiveTextarea(); if (!ta) return
@@ -551,7 +653,7 @@
   // markdown renderer
   const renderedHtml = computed(() => {
     if (mode.value !== 'reader') return ''
-    if (!MarkdownIt) return '<p class="text-gray-400 text-sm">Loading renderer...</p>'
+    if (!MarkdownIt || !pluginsLoaded.value) return '<p class="text-gray-400 text-sm">Loading renderer...</p>'
 
     // Configure markdown-it with proper options
     const md = new MarkdownIt({
@@ -563,7 +665,29 @@
 
     // Add KaTeX support for math rendering if available
     if (katexPlugin) {
-      md.use(katexPlugin)
+      try {
+        md.use(katexPlugin)
+      } catch (e) {
+        console.warn('Failed to load KaTeX plugin:', e)
+      }
+    }
+
+    // Add emoji support if available
+    if (emojiPlugin) {
+      try {
+        md.use(emojiPlugin)
+      } catch (e) {
+        console.warn('Failed to load emoji plugin:', e)
+      }
+    }
+
+    // Add footnote support if available
+    if (footnotePlugin) {
+      try {
+        md.use(footnotePlugin)
+      } catch (e) {
+        console.warn('Failed to load footnote plugin:', e)
+      }
     }
 
     // Render convention: treat strong markup created with double-underscore (__text__) as underline

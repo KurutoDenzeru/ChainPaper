@@ -364,6 +364,42 @@
           </TooltipContent>
         </Tooltip>
 
+        <!-- Horizontal Line -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-horizontal-line')">
+              <Minus class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Insert Horizontal Line</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <!-- Footnote -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-footnote')">
+              <FileText class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Insert Footnote</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <!-- Emoji -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-emoji')">
+              <Smile class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Insert Emoji</p>
+          </TooltipContent>
+        </Tooltip>
+
         <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
         <!-- Lists -->
@@ -669,7 +705,7 @@
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
   import TableInserter from '@/components/editor/TableInserter.vue'
   import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
-  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma } from 'lucide-vue-next'
+  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma, Smile, FileText as FootnoteIcon } from 'lucide-vue-next'
 
   interface ActiveState { bold: boolean; italic: boolean; underline: boolean; strike: boolean; bullet: boolean; ordered: boolean }
   const props = defineProps<{
@@ -692,7 +728,7 @@
     'toggle-bullet-list', 'toggle-ordered-list', 'toggle-blockquote',
     'indent', 'unindent',
     'insert-link', 'insert-image', 'insert-table', 'insert-code-block',
-    'insert-math', 'insert-mathblock',
+    'insert-math', 'insert-mathblock', 'insert-horizontal-line', 'insert-footnote', 'insert-emoji',
     'set-heading', 'set-alignment', 'undo', 'redo', 'set-zoom',
     'set-text-color', 'set-highlight', 'update:mode'
   ])
