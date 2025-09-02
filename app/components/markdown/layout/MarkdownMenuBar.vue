@@ -123,6 +123,10 @@
   <!-- Table Insert Dialog -->
   <TableInsertDialog :open="showTableDialog" @update:open="showTableDialog = $event"
     @insert-table="handleTableInsert" />
+
+  <!-- Emoji Insert Dialog -->
+  <EmojiInsertDialog :open="showEmojiDialog" @update:open="showEmojiDialog = $event"
+    @insert-emoji="handleEmojiInsert" />
 </template>
 
 <script setup lang="ts">
@@ -151,6 +155,7 @@
   } from '@/components/ui/menubar'
   import { Input } from '@/components/ui/input'
   import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
+  import EmojiInsertDialog from '@/components/editor/EmojiInsertDialog.vue'
   import MarkdownWordCountDialog from '../editor/MarkdownWordCountDialog.vue'
   import MarkdownAuthProofDialog from '../editor/MarkdownAuthProofDialog.vue'
   import MarkdownExportDialog from '../editor/MarkdownExportDialog.vue'
@@ -219,6 +224,7 @@
   const showAboutDialog = ref(false)
   const showGuideDialog = ref(false)
   const showTableDialog = ref(false)
+  const showEmojiDialog = ref(false)
   const exportInitialFormat = ref<'markdown' | 'html' | 'json' | 'pdf' | null>(null)
 
   // Markdown-specific menu data
@@ -405,6 +411,11 @@
       return
     }
 
+    if (item.emit === 'insert-emoji') {
+      showEmojiDialog.value = true
+      return
+    }
+
     // Special handling for zoom menu
     if (item.emit === 'set-zoom' && item.payload !== undefined) {
       emit('set-zoom', item.payload)
@@ -498,5 +509,10 @@
   // Table insertion handler
   function handleTableInsert(rows: number, cols: number, options: any) {
     emit('insert-table', rows, cols, options)
+  }
+
+  // Emoji insertion handler
+  function handleEmojiInsert(emoji: any) {
+    emit('insert-emoji' as any, emoji.char)
   }
 </script>

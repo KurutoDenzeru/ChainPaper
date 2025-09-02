@@ -391,7 +391,7 @@
         <!-- Emoji -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-emoji')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showEmojiDialog = true">
               <Smile class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -695,6 +695,10 @@
   <!-- Table Insert Dialog -->
   <TableInsertDialog :open="showTableDialog" @update:open="showTableDialog = $event"
     @insert-table="handleTableInsert" />
+
+  <!-- Emoji Insert Dialog -->
+  <EmojiInsertDialog :open="showEmojiDialog" @update:open="showEmojiDialog = $event"
+    @insert-emoji="handleEmojiInsert" />
 </template>
 
 <script setup lang="ts">
@@ -704,6 +708,7 @@
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
   import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
+  import EmojiInsertDialog from '@/components/editor/EmojiInsertDialog.vue'
   import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma, Smile, FileText as FootnoteIcon } from 'lucide-vue-next'
 
   interface ActiveState { bold: boolean; italic: boolean; underline: boolean; strike: boolean; bullet: boolean; ordered: boolean }
@@ -805,9 +810,15 @@
 
   // Dialog states
   const showTableDialog = ref(false)
+  const showEmojiDialog = ref(false)
 
   // Table insertion handler
   function handleTableInsert(rows: number, cols: number, options: any) {
     emit('insert-table', rows, cols, options)
+  }
+
+  // Emoji insertion handler
+  function handleEmojiInsert(emoji: any) {
+    emit('insert-emoji', emoji.char)
   }
 </script>

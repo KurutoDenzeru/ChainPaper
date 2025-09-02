@@ -546,8 +546,18 @@
     replaceRange(ta, start, end, snippet)
   }
 
-  function insertEmoji() {
-    // Try to open the OS emoji picker
+  function insertEmoji(emojiChar?: string) {
+    if (mode.value !== 'source') return // only work in source mode
+    const ta = getActiveTextarea(); if (!ta) return
+    const { start, end } = getSelection(ta)
+    
+    // If emoji character is provided, use it directly
+    if (emojiChar) {
+      replaceRange(ta, start, end, emojiChar)
+      return
+    }
+    
+    // Otherwise, try to open the OS emoji picker
     if (typeof window !== 'undefined') {
       const userAgent = navigator.userAgent.toLowerCase()
       const isMac = /mac|iphone|ipad|ipod/.test(userAgent)
@@ -556,7 +566,6 @@
       
       if (isMobile) {
         // On mobile, focus the textarea to potentially open emoji keyboard
-        const ta = getActiveTextarea()
         if (ta) {
           ta.focus()
           // Some mobile browsers support this
