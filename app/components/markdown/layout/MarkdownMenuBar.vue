@@ -134,7 +134,7 @@
     Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
     List, ListOrdered, Quote, Link, Image, Table, AlignLeft, AlignCenter, AlignRight, AlignJustify,
     Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info, Indent, Outdent,
-    Superscript, Subscript, Calculator, Sigma
+    Superscript, Subscript, Sigma, SquareSigma
   } from 'lucide-vue-next'
   import {
     Menubar,
@@ -294,8 +294,8 @@
         { type: 'item', label: 'Image', emit: 'insert-image', icon: Image },
         { type: 'item', label: 'Table', emit: 'insert-table', icon: Table },
         { type: 'separator' },
-        { type: 'item', label: 'Math', emit: 'insert-math', icon: Calculator },
-        { type: 'item', label: 'Math Block', emit: 'insert-mathblock', icon: Sigma },
+        { type: 'item', label: 'Math', emit: 'insert-math', icon: Sigma },
+        { type: 'item', label: 'Math Block', emit: 'insert-mathblock', icon: SquareSigma },
       ]
     },
     {

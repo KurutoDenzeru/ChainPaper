@@ -344,7 +344,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-math')">
-              <Calculator class="w-4 h-4" />
+              <Sigma class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -356,7 +356,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-mathblock')">
-              <Sigma class="w-4 h-4" />
+              <SquareSigma class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -669,7 +669,7 @@
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
   import TableInserter from '@/components/editor/TableInserter.vue'
   import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
-  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Calculator, Sigma } from 'lucide-vue-next'
+  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma } from 'lucide-vue-next'
 
   interface ActiveState { bold: boolean; italic: boolean; underline: boolean; strike: boolean; bullet: boolean; ordered: boolean }
   const props = defineProps<{

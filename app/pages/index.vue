@@ -140,9 +140,12 @@
   import { insertLink as domInsertLink } from '@/lib/editor-formatting'
   // lazy load markdown-it to avoid SSR type resolution issues
   let MarkdownIt: any
+  let katexPlugin: any
   if (typeof window !== 'undefined') {
     // @ts-ignore - shim declared, but resolver may still complain during dev
     import('markdown-it').then(m => { MarkdownIt = (m as any).default || m })
+    // @ts-ignore - plugin types not available
+    import('markdown-it-katex').then(k => { katexPlugin = k.default || k })
   }
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
@@ -432,11 +435,11 @@
 
     let snippet
     if (selected.trim()) {
-      // If there's selected text, wrap it in a code block
-      snippet = `\`\`\`\n${selected}\n\`\`\`\n`
+      // If there's selected text, wrap it in single backticks
+      snippet = `\`${selected}\``
     } else {
       // If no selection, insert default template
-      snippet = "```ts\n// code\n```\n"
+      snippet = "`code`"
     }
 
     replaceRange(ta, start, end, snippet)
@@ -450,7 +453,7 @@
 
     let snippet
     if (selected.trim()) {
-      // If there's selected text, wrap it in inline math
+      // If there's selected text, wrap it in math
       snippet = `$${selected}$`
     } else {
       // If no selection, insert default template
@@ -557,6 +560,11 @@
       breaks: false, // Changed to false for proper list rendering
       typographer: true
     })
+
+    // Add KaTeX support for math rendering if available
+    if (katexPlugin) {
+      md.use(katexPlugin)
+    }
 
     // Render convention: treat strong markup created with double-underscore (__text__) as underline
     // Leave double-asterisk (**) as bold. We override the strong_open/strong_close renderer
