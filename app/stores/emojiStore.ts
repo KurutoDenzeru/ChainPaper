@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import emojiList from 'emoji-datasource-apple/emoji.json'
 
 export interface Emoji {
   char: string
@@ -35,37 +36,20 @@ export const useEmojiStore = defineStore('emoji', () => {
     return c.replace(/\s+/g, '-')
   }
 
-  async function fetchAndCache() {
+
+  function loadFromPackage() {
     isLoading.value = true
     try {
-      const res = await fetch('https://raw.githubusercontent.com/iamcal/emoji-data/master/emoji.json')
-      if (!res.ok) throw new Error('Failed to fetch')
-      const data = await res.json()
-      const mapped: Emoji[] = data.map((e: any) => ({
+      const mapped: Emoji[] = emojiList.map((e: any) => ({
         char: codepointsToChar(e.unified),
         name: e.name || e.short_name || '',
         shortcode: e.short_name ? `:${e.short_name}:` : (e.short_names && e.short_names[0] ? `:${e.short_names[0]}:` : ''),
         category: normalizeCategory(e.category || ''),
         keywords: (e.short_names || e.keywords || []).map((k: any) => String(k).toLowerCase())
       }))
-
-      // Sort within categories alphabetically by name for predictable order and UX
-      mapped.sort((a, b) => (a.category === b.category ? a.name.localeCompare(b.name) : a.category!.localeCompare(b.category!)))
-
       allEmojis.value = mapped
       lastUpdated.value = Date.now()
       try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: lastUpdated.value, data: mapped })) } catch (e) { /* ignore */ }
-    } catch (err) {
-      // minimal fallback
-      allEmojis.value = [
-        { char: '😀', name: 'Grinning Face', shortcode: ':grinning:', category: 'smileys', keywords: ['face', 'smile'] },
-        { char: '😂', name: 'Face with Tears of Joy', shortcode: ':joy:', category: 'smileys', keywords: ['face', 'tears', 'joy'] },
-        { char: '🐶', name: 'Dog Face', shortcode: ':dog:', category: 'animals', keywords: ['dog', 'pet'] },
-        { char: '🍎', name: 'Red Apple', shortcode: ':apple:', category: 'food', keywords: ['fruit', 'apple'] },
-        { char: '🚗', name: 'Automobile', shortcode: ':car:', category: 'travel', keywords: ['car', 'vehicle'] },
-        { char: '🏁', name: 'Chequered Flag', shortcode: ':chequered_flag:', category: 'flags', keywords: ['flag'] }
-      ]
-      lastUpdated.value = Date.now()
     } finally {
       isLoading.value = false
     }
@@ -87,15 +71,16 @@ export const useEmojiStore = defineStore('emoji', () => {
         }
       }
     } catch (e) {
-      // ignore parse errors and fall through to fetch
+      // ignore parse errors and fall through to loadFromPackage
     }
-    // Kick off fetch but don't block if init was called without awaiting
-    await fetchAndCache()
+    // Always load from local package for instant access
+    loadFromPackage()
   }
 
   function getByCategory(cat: string) {
     const c = (cat || '').toLowerCase()
-    return allEmojis.value.filter(e => String(e.category || '').toLowerCase() === c).sort((a, b) => a.name.localeCompare(b.name))
+    // Use emoji data order for all categories
+    return allEmojis.value.filter(e => String(e.category || '').toLowerCase() === c)
   }
 
   return { allEmojis, isLoading, lastUpdated, init, getByCategory }

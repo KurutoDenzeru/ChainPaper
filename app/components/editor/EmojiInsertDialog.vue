@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="max-w-md">
+    <DialogContent class="!max-w-4xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Smile class="h-5 w-5" />
@@ -41,87 +41,97 @@
           </div>
           <div v-else>
             <Tabs v-model="activeTab" class="w-full">
-              <TabsList class="grid w-full grid-cols-4 lg:grid-cols-8">
-                <TabsTrigger value="recent">
-                  <Tooltip>
-                    <TooltipTrigger as-child>
-                      <span>🕒</span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Recently used</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TabsTrigger>
-                <TabsTrigger value="smileys">
-                  <Tooltip>
-                    <TooltipTrigger as-child>
-                      <span>😀</span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Smileys & People</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TabsTrigger>
-                <TabsTrigger value="animals">
-                  <Tooltip>
-                    <TooltipTrigger as-child>
-                      <span>🐶</span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Animals & Nature</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TabsTrigger>
-                <TabsTrigger value="food">
-                  <Tooltip>
-                    <TooltipTrigger as-child>
-                      <span>🍎</span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Food & Drink</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TabsTrigger>
-                <TabsTrigger value="activities">
-                  <Tooltip>
-                    <TooltipTrigger as-child>
-                      <span>⚽</span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Activities & Sports</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TabsTrigger>
-                <TabsTrigger value="travel">
-                  <Tooltip>
-                    <TooltipTrigger as-child>
-                      <span>🚗</span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Travel & Places</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TabsTrigger>
-                <TabsTrigger value="objects">
-                  <Tooltip>
-                    <TooltipTrigger as-child>
-                      <span>💡</span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Objects & Symbols</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TabsTrigger>
-                <TabsTrigger value="flags">
-                  <Tooltip>
-                    <TooltipTrigger as-child>
-                      <span>🏁</span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Flags</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TabsTrigger>
+              <!-- Make the tab list horizontally scrollable so 12 tabs fit on narrow screens -->
+              <TabsList class="flex w-full items-center gap-2 overflow-x-auto py-1 no-scrollbar">
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <TabsTrigger value="recent" class="flex-shrink-0 px-2 py-1 min-w-[44px]"><span>🕑</span></TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Recent</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <TabsTrigger value="smileys" class="flex-shrink-0 px-2 py-1 min-w-[44px]"><span>😃</span></TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Smileys & Emotion</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <TabsTrigger value="people" class="flex-shrink-0 px-2 py-1 min-w-[44px]"><span>🧑</span></TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>People</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <TabsTrigger value="animals" class="flex-shrink-0 px-2 py-1 min-w-[44px]"><span>🐶</span></TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Animals & Nature</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <TabsTrigger value="food" class="flex-shrink-0 px-2 py-1 min-w-[44px]"><span>🍎</span></TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Food & Drink</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <TabsTrigger value="activities" class="flex-shrink-0 px-2 py-1 min-w-[44px]"><span>⚽</span></TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Activities</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <TabsTrigger value="travel" class="flex-shrink-0 px-2 py-1 min-w-[44px]"><span>✈️</span></TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Travel & Places</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <TabsTrigger value="objects" class="flex-shrink-0 px-2 py-1 min-w-[44px]"><span>💡</span></TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Objects</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <TabsTrigger value="symbols" class="flex-shrink-0 px-2 py-1 min-w-[44px]"><span>❤️</span></TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Symbols</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <TabsTrigger value="flags" class="flex-shrink-0 px-2 py-1 min-w-[44px]"><span>🏁</span></TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Flags</p>
+                  </TooltipContent>
+                </Tooltip>
               </TabsList>
 
               <TabsContent value="recent" class="mt-4">
@@ -159,6 +169,44 @@
                   </button>
                 </div>
                 <div v-if="filteredSmileys.length === 0" class="text-center text-gray-500 py-8">
+                  No emojis found matching "{{ searchQuery }}"
+                </div>
+              </TabsContent>
+
+              <TabsContent value="people" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredPeople" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name" :aria-label="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredPeople.length === 0" class="text-center text-gray-500 py-8">
+                  No emojis found matching "{{ searchQuery }}"
+                </div>
+              </TabsContent>
+
+              <TabsContent value="body" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredBody" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name" :aria-label="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredBody.length === 0" class="text-center text-gray-500 py-8">
                   No emojis found matching "{{ searchQuery }}"
                 </div>
               </TabsContent>
@@ -276,6 +324,44 @@
                   No emojis found matching "{{ searchQuery }}"
                 </div>
               </TabsContent>
+              
+              <TabsContent value="nature" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredNature" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name" :aria-label="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredNature.length === 0" class="text-center text-gray-500 py-8">
+                  No emojis found matching "{{ searchQuery }}"
+                </div>
+              </TabsContent>
+
+              <TabsContent value="symbols" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredSymbols" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name" :aria-label="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredSymbols.length === 0" class="text-center text-gray-500 py-8">
+                  No emojis found matching "{{ searchQuery }}"
+                </div>
+              </TabsContent>
             </Tabs>
           </div>
         </TooltipProvider>
@@ -351,18 +437,6 @@
     }
   }
 
-  // Filtered emoji lists based on search query
-  const filteredRecentEmojis = computed(() => {
-    if (!searchQuery.value.trim()) return recentEmojis.value
-    const q = searchQuery.value.toLowerCase()
-    return recentEmojis.value.filter(e => (
-      e.char === searchQuery.value ||
-      e.name.toLowerCase().includes(q) ||
-      e.shortcode.toLowerCase().includes(q) ||
-      (e.keywords || []).some(k => k.includes(q))
-    ))
-  })
-
   // Helper to match an emoji against the query (exact char, name, shortcode, keywords)
   function matchesQuery(emoji: Emoji, query: string) {
     if (!query) return true
@@ -375,40 +449,35 @@
     return false
   }
 
-  const filteredSmileys = computed(() => {
-    const query = searchQuery.value.trim()
-    return allEmojis.filter((e: Emoji) => (e.category === 'smileys' || e.category === 'people' || e.category === 'emotion') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
+  function makeCategoryFilter(category: string) {
+    return computed(() => {
+      const query = searchQuery.value.trim()
+      return emojiStore.getByCategory(category).filter(e => matchesQuery(e, query))
+    })
+  }
+
+  const filteredRecentEmojis = computed(() => {
+    if (!searchQuery.value.trim()) return recentEmojis.value
+    const q = searchQuery.value.toLowerCase()
+    return recentEmojis.value.filter(e => (
+      e.char === searchQuery.value ||
+      e.name.toLowerCase().includes(q) ||
+      e.shortcode.toLowerCase().includes(q) ||
+      (e.keywords || []).some(k => k.includes(q))
+    ))
   })
 
-  const filteredAnimals = computed(() => {
-    const query = searchQuery.value.trim()
-    return allEmojis.filter((e: Emoji) => (e.category === 'animals' || e.category === 'nature') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
-  })
-
-  const filteredFood = computed(() => {
-    const query = searchQuery.value.trim()
-    return allEmojis.filter((e: Emoji) => (e.category === 'food' || e.category === 'food-drink' || e.category === 'food & drink') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
-  })
-
-  const filteredActivities = computed(() => {
-    const query = searchQuery.value.trim()
-    return allEmojis.filter((e: Emoji) => (e.category === 'activity' || e.category === 'activities') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
-  })
-
-  const filteredTravel = computed(() => {
-    const query = searchQuery.value.trim()
-    return allEmojis.filter((e: Emoji) => (e.category === 'travel' || e.category === 'places') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
-  })
-
-  const filteredObjects = computed(() => {
-    const query = searchQuery.value.trim()
-    return allEmojis.filter((e: Emoji) => (e.category === 'objects' || e.category === 'symbols') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
-  })
-
-  const filteredFlags = computed(() => {
-    const query = searchQuery.value.trim()
-    return allEmojis.filter((e: Emoji) => (e.category === 'flags' || e.category === 'country-flag' || e.category === 'regional') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
-  })
+  const filteredSmileys = makeCategoryFilter('smileys')
+  const filteredPeople = makeCategoryFilter('people')
+  const filteredBody = makeCategoryFilter('body')
+  const filteredAnimals = makeCategoryFilter('animals')
+  const filteredNature = makeCategoryFilter('nature')
+  const filteredFood = makeCategoryFilter('food')
+  const filteredActivities = makeCategoryFilter('activities')
+  const filteredTravel = makeCategoryFilter('travel')
+  const filteredObjects = makeCategoryFilter('objects')
+  const filteredSymbols = makeCategoryFilter('symbols')
+  const filteredFlags = makeCategoryFilter('flags')
 
   // Search results when user types something - includes exact char matches and fuzzy
   const searchResults = computed(() => {
@@ -451,6 +520,13 @@
 
     // Emit the emoji
     emit('insert-emoji', emoji)
+    // Blur any active element to avoid closing the dialog while a focused element is inside an aria-hidden ancestor
+    try {
+      const active = document.activeElement as HTMLElement | null
+      if (active && typeof active.blur === 'function') active.blur()
+    } catch (e) {
+      // ignore
+    }
     emit('update:open', false)
   }
 </script>
