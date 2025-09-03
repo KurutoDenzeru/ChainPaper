@@ -138,46 +138,78 @@
   import MarkdownWordCountDialog from '@/components/markdown/dialogs/MarkdownWordCountDialog.vue'
   import LinkInsertDialog from '@/components/editor/LinkInsertDialog.vue'
   import { insertLink as domInsertLink } from '@/lib/editor-formatting'
-  // lazy load markdown-it to avoid SSR type resolution issues
+  // Lazy load markdown-it plugins only when needed
   let MarkdownIt: any
   let katexPlugin: any
   let emojiPlugin: any
   let footnotePlugin: any
   let pluginsLoaded = ref(false)
+  let pluginsLoading = ref(false)
 
-  if (typeof window !== 'undefined') {
-    // Load all plugins together with better error handling
-    Promise.all([
-      // @ts-ignore - shim declared, but resolver may still complain during dev
-      import('markdown-it').then(m => {
-        MarkdownIt = (m as any).default || m
-        console.log('✓ Loaded markdown-it')
-      }).catch(e => console.warn('Failed to load markdown-it:', e)),
+  // Global cache to prevent re-loading plugins multiple times
+  const pluginCache = {
+    MarkdownIt: null as any,
+    katexPlugin: null as any,
+    emojiPlugin: null as any,
+    footnotePlugin: null as any,
+    loaded: false
+  }
 
-      // @ts-ignore - plugin types not available
-      import('markdown-it-katex').then(k => {
-        katexPlugin = k.default || k
-        console.log('✓ Loaded katex plugin')
-      }).catch(e => console.warn('Failed to load katex plugin:', e)),
-
-      // @ts-ignore - plugin types not available  
-      import('markdown-it-emoji').then(e => {
-        emojiPlugin = e.default || e
-        console.log('✓ Loaded emoji plugin:', typeof emojiPlugin)
-      }).catch(e => console.warn('Failed to load emoji plugin:', e)),
-
-      // @ts-ignore - plugin types not available
-      import('markdown-it-footnote').then(f => {
-        footnotePlugin = f.default || f
-        console.log('✓ Loaded footnote plugin')
-      }).catch(e => console.warn('Failed to load footnote plugin:', e))
-    ]).then(() => {
-      console.log('All plugins loaded, setting pluginsLoaded to true')
+  // Lazy load plugins only when switching to reader mode
+  async function loadMarkdownPlugins() {
+    if (pluginCache.loaded) {
+      // Use cached plugins
+      MarkdownIt = pluginCache.MarkdownIt
+      katexPlugin = pluginCache.katexPlugin
+      emojiPlugin = pluginCache.emojiPlugin
+      footnotePlugin = pluginCache.footnotePlugin
       pluginsLoaded.value = true
-    }).catch(e => {
-      console.warn('Some plugins failed to load:', e)
-      pluginsLoaded.value = true // Still allow rendering with available plugins
-    })
+      return
+    }
+
+    if (pluginsLoading.value) return // Already loading
+    
+    pluginsLoading.value = true
+    
+    try {
+      // Load plugins in parallel but only when needed
+      const [markdownModule, katexModule, emojiModule, footnoteModule] = await Promise.allSettled([
+        // @ts-ignore - module types handled below
+        import('markdown-it').catch((e: any) => ({ error: e })),
+        // @ts-ignore - plugin types not available
+        import('markdown-it-katex').catch((e: any) => ({ error: e })),
+        // @ts-ignore - plugin types not available
+        import('markdown-it-emoji').catch((e: any) => ({ error: e })),
+        // @ts-ignore - plugin types not available
+        import('markdown-it-footnote').catch((e: any) => ({ error: e }))
+      ])
+
+      // Process results with proper type checking
+      if (markdownModule.status === 'fulfilled' && !(markdownModule.value as any).error) {
+        MarkdownIt = pluginCache.MarkdownIt = (markdownModule.value as any).default || markdownModule.value
+      }
+      
+      if (katexModule.status === 'fulfilled' && !(katexModule.value as any).error) {
+        katexPlugin = pluginCache.katexPlugin = (katexModule.value as any).default || katexModule.value
+      }
+      
+      if (emojiModule.status === 'fulfilled' && !(emojiModule.value as any).error) {
+        emojiPlugin = pluginCache.emojiPlugin = (emojiModule.value as any).default || emojiModule.value
+      }
+      
+      if (footnoteModule.status === 'fulfilled' && !(footnoteModule.value as any).error) {
+        footnotePlugin = pluginCache.footnotePlugin = (footnoteModule.value as any).default || footnoteModule.value
+      }
+
+      pluginCache.loaded = true
+      pluginsLoaded.value = true
+      
+    } catch (e) {
+      console.warn('Failed to load some markdown plugins:', e)
+      pluginsLoaded.value = true // Allow rendering with available plugins
+    } finally {
+      pluginsLoading.value = false
+    }
   }
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
@@ -223,6 +255,19 @@
     nextTick(() => {
       textareaEl.value = document.querySelector('textarea')
     })
+    
+    // Preload markdown plugins during idle time for better UX
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      // Use requestIdleCallback for optimal performance
+      window.requestIdleCallback(() => {
+        loadMarkdownPlugins()
+      }, { timeout: 5000 }) // 5 second timeout fallback
+    } else {
+      // Fallback for browsers without requestIdleCallback
+      setTimeout(() => {
+        loadMarkdownPlugins()
+      }, 2000) // Load after 2 seconds of page load
+    }
   })
 
   onUnmounted(() => {
@@ -676,7 +721,19 @@
   // markdown renderer
   const renderedHtml = computed(() => {
     if (mode.value !== 'reader') return ''
-    if (!MarkdownIt || !pluginsLoaded.value) return '<p class="text-gray-400 text-sm">Loading renderer...</p>'
+    
+    // Show loading state while plugins are loading
+    if (pluginsLoading.value) {
+      return '<div class="flex items-center justify-center p-8"><div class="text-gray-400 text-sm">Loading markdown renderer...</div></div>'
+    }
+    
+    if (!MarkdownIt || !pluginsLoaded.value) {
+      // Trigger loading if not started yet
+      if (typeof window !== 'undefined' && !pluginCache.loaded && !pluginsLoading.value) {
+        loadMarkdownPlugins()
+      }
+      return '<div class="flex items-center justify-center p-8"><div class="text-gray-400 text-sm">Initializing renderer...</div></div>'
+    }
 
     // Configure markdown-it with proper options
     const md = new MarkdownIt({
@@ -802,7 +859,13 @@
   })
 
   function toggleMode() {
-    mode.value = mode.value === 'source' ? 'reader' : 'source'
+    const newMode = mode.value === 'source' ? 'reader' : 'source'
+    mode.value = newMode
+    
+    // Lazy load plugins only when switching to reader mode
+    if (newMode === 'reader' && typeof window !== 'undefined') {
+      loadMarkdownPlugins()
+    }
   }
 
   // Handle auto-continuation of lists when Enter is pressed
