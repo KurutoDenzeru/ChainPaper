@@ -24,7 +24,7 @@
               <div class="flex flex-col items-center space-y-3">
                 <!-- Grid selector -->
                 <div class="grid gap-1 p-3 border rounded-lg bg-gray-50/50"
-                  :style="{ gridTemplateColumns: `repeat(${maxCols}, 1fr)` }" @mouseleave="resetSelection">
+                  :style="{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }" @mouseleave="resetSelection">
                   <div v-for="(cell, index) in gridCells" :key="index" :class="[
                     'w-5 h-5 border border-gray-300 cursor-pointer transition-all duration-150 rounded-sm',
                     {
@@ -88,12 +88,12 @@
         </div>
       </div>
 
-      <DialogFooter class="flex gap-2">
-        <Button variant="outline" @click="$emit('update:open', false)">
+      <DialogFooter class="w-full flex gap-2">
+        <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">
           <X class="w-4 h-4 mr-2" />
           Cancel
         </Button>
-        <Button @click="insertCustomTable" class="bg-blue-600 hover:bg-blue-700">
+        <Button @click="insertCustomTable" class="w-1/2 bg-blue-600 hover:bg-blue-700">
           <Plus class="w-4 h-4 mr-2" />
           Insert Table
         </Button>
@@ -103,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed } from 'vue'
+  import { ref, computed, watch } from 'vue'
   import {
     Dialog,
     DialogContent,
@@ -140,8 +140,10 @@
   }
 
   // Grid configuration
-  const maxRows = 8
-  const maxCols = 8
+  const maxRows = 50
+  const maxCols = 20
+  const defaultGridRows = 6
+  const defaultGridCols = 6
 
   // Selection state
   const selectedRows = ref(3)
@@ -151,13 +153,13 @@
   const customRows = ref(3)
   const customCols = ref(3)
 
-  // Table options removed; always include a header in preview
-
-  // Generate grid cells
+  // Dynamically size grid to fit current selection or custom input
+  const gridRows = computed(() => Math.max(defaultGridRows, selectedRows.value, customRows.value))
+  const gridCols = computed(() => Math.max(defaultGridCols, selectedCols.value, customCols.value))
   const gridCells = computed(() => {
     const cells = []
-    for (let row = 1; row <= maxRows; row++) {
-      for (let col = 1; col <= maxCols; col++) {
+    for (let row = 1; row <= Math.min(gridRows.value, maxRows); row++) {
+      for (let col = 1; col <= Math.min(gridCols.value, maxCols); col++) {
         cells.push({ row, col })
       }
     }
@@ -207,6 +209,27 @@
     selectedRows.value = 3
     selectedCols.value = 3
   }
+
+  // Keep custom inputs and quick-selection in sync
+  watch(customRows, (v) => {
+    let n = Number(v) || 1
+    n = Math.max(1, Math.min(maxRows, n))
+    customRows.value = n
+    selectedRows.value = Math.min(maxRows, n)
+  })
+
+  watch(customCols, (v) => {
+    let n = Number(v) || 1
+    n = Math.max(1, Math.min(maxCols, n))
+    customCols.value = n
+    selectedCols.value = Math.min(maxCols, n)
+  })
+
+  // If user hovers the quick-selection, update the custom inputs as well (already done in updateSelection)
+  watch([selectedRows, selectedCols], ([r, c]) => {
+    customRows.value = r
+    customCols.value = c
+  })
 
   function insertTable(rows: number, cols: number) {
     const validRows = Math.max(1, Math.min(50, rows))
