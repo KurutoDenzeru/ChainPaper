@@ -134,8 +134,9 @@
   import { storeToRefs } from 'pinia'
   import {
     Edit3, Command, FileText, FolderOpen, Save, Download,
-    Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
-    Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
+  Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
+  Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
+  Type, Highlighter,
     List, ListOrdered, Quote, Link, Image, Table, AlignLeft, AlignCenter, AlignRight, AlignJustify,
     Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info, Indent, Outdent,
     Superscript, Subscript, Sigma, SquareSigma, Minus, Smile
@@ -286,6 +287,27 @@
             { type: 'item', label: 'Align Center', emit: 'set-alignment', payload: 'center', icon: AlignCenter },
             { type: 'item', label: 'Align Right', emit: 'set-alignment', payload: 'right', icon: AlignRight },
             { type: 'item', label: 'Align Justify', emit: 'set-alignment', payload: 'justify', icon: AlignJustify }
+          ]
+        },
+        { type: 'separator' },
+        {
+          type: 'sub', label: 'Text Color', icon: Type, items: [
+            { type: 'item', label: 'Default (Black)', emit: 'set-text-color', payload: '#111827' },
+            { type: 'item', label: 'Gray', emit: 'set-text-color', payload: '#6B7280' },
+            { type: 'item', label: 'Red', emit: 'set-text-color', payload: '#DC2626' },
+            { type: 'item', label: 'Orange', emit: 'set-text-color', payload: '#EA580C' },
+            { type: 'item', label: 'Blue', emit: 'set-text-color', payload: '#2563EB' },
+            { type: 'item', label: 'Purple', emit: 'set-text-color', payload: '#9333EA' }
+          ]
+        },
+        {
+          type: 'sub', label: 'Highlight', icon: Highlighter, items: [
+            { type: 'item', label: 'Yellow', emit: 'set-highlight', payload: '#FDE68A' },
+            { type: 'item', label: 'Peach', emit: 'set-highlight', payload: '#FFEDD5' },
+            { type: 'item', label: 'Pink', emit: 'set-highlight', payload: '#FFE4E6' },
+            { type: 'item', label: 'Lilac', emit: 'set-highlight', payload: '#F3E8FF' },
+            { type: 'item', label: 'Mint', emit: 'set-highlight', payload: '#DCFCE7' },
+            { type: 'item', label: 'Sky', emit: 'set-highlight', payload: '#E0F2FE' }
           ]
         },
         { type: 'separator' },

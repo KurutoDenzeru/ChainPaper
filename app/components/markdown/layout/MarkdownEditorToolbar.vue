@@ -208,27 +208,21 @@
         <!-- Text Color -->
         <Popover>
           <PopoverTrigger as-child>
-            <Tooltip>
-              <TooltipTrigger as-child>
-                <Button variant="ghost" size="sm" class="h-8 w-8 p-0">
-                  <div class="relative flex items-center justify-center">
-                    <Type class="w-4 h-4" />
-                    <div class="absolute bottom-0 left-0 w-full h-1 rounded"
-                      :style="{ backgroundColor: currentTextColor }">
-                    </div>
-                  </div>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Text Color</p>
-              </TooltipContent>
-            </Tooltip>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" title="Text Color" aria-label="Text Color">
+              <div class="relative flex items-center justify-center">
+                <Type class="w-4 h-4" />
+                <div class="absolute bottom-0 left-0 w-full h-1 rounded" :style="{ backgroundColor: currentTextColor }"></div>
+              </div>
+            </Button>
           </PopoverTrigger>
           <PopoverContent class="w-56 p-3">
             <div class="grid grid-cols-8 gap-1">
-              <button v-for="c in textColors" :key="c"
-                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform"
-                :style="{ backgroundColor: c }" @click="$emit('set-text-color', c)"></button>
+              <button v-for="c in textColors" :key="c" :title="c"
+                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center"
+                :class="{ 'ring-2 ring-offset-1 ring-indigo-500': c === currentTextColor }"
+                :style="{ backgroundColor: c }" @click="$emit('set-text-color', c)">
+                <Check v-if="c === currentTextColor" :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
+              </button>
             </div>
           </PopoverContent>
         </Popover>
@@ -236,27 +230,21 @@
         <!-- Highlight -->
         <Popover>
           <PopoverTrigger as-child>
-            <Tooltip>
-              <TooltipTrigger as-child>
-                <Button variant="ghost" size="sm" class="h-8 w-8 p-0">
-                  <div class="relative flex items-center justify-center">
-                    <Highlighter class="w-4 h-4" />
-                    <div class="absolute bottom-0 left-0 w-full h-1 rounded"
-                      :style="{ backgroundColor: currentHighlight }">
-                    </div>
-                  </div>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Highlight</p>
-              </TooltipContent>
-            </Tooltip>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" title="Highlight" aria-label="Highlight">
+              <div class="relative flex items-center justify-center">
+                <Highlighter class="w-4 h-4" />
+                <div class="absolute bottom-0 left-0 w-full h-1 rounded" :style="{ backgroundColor: currentHighlight }"></div>
+              </div>
+            </Button>
           </PopoverTrigger>
           <PopoverContent class="w-56 p-3">
             <div class="grid grid-cols-8 gap-1">
-              <button v-for="c in highlightColors" :key="c"
-                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform"
-                :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)"></button>
+              <button v-for="c in highlightColors" :key="c" :title="c"
+                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center"
+                :class="{ 'ring-2 ring-offset-1 ring-indigo-500': c === currentHighlight }"
+                :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)">
+                <Check v-if="c === currentHighlight" :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
+              </button>
             </div>
           </PopoverContent>
         </Popover>
@@ -270,18 +258,6 @@
           </TooltipTrigger>
           <TooltipContent>
             <p>Code Block</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Blockquote -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('toggle-blockquote')">
-              <Quote class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Blockquote</p>
           </TooltipContent>
         </Tooltip>
 
@@ -377,32 +353,26 @@
         </Tooltip>
 
         <!-- Footnote -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-footnote')">
-              <FileText class="w-4 h-4" />
+        <Popover>
+          <PopoverTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" title="Highlight" aria-label="Highlight">
+              <div class="relative flex items-center justify-center">
+                <Highlighter class="w-4 h-4" />
+                <div class="absolute bottom-0 left-0 w-full h-1 rounded" :style="{ backgroundColor: currentHighlight }"></div>
+              </div>
             </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Insert Footnote</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Emoji -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showEmojiDialog = true">
-              <Smile class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Insert Emoji</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
-
-        <!-- Lists -->
+          </PopoverTrigger>
+          <PopoverContent class="w-56 p-3">
+            <div class="grid grid-cols-8 gap-1">
+              <button v-for="c in highlightColors" :key="c" :title="c"
+                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center"
+                :class="{ 'ring-2 ring-offset-1 ring-indigo-500': c === currentHighlight }"
+                :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)">
+                <Check v-if="c === currentHighlight" :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
+              </button>
+            </div>
+          </PopoverContent>
+        </Popover>
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bullet }]"
@@ -709,7 +679,7 @@
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
   import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
   import EmojiInsertDialog from '@/components/editor/EmojiInsertDialog.vue'
-  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma, Smile, FileText as FootnoteIcon } from 'lucide-vue-next'
+  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma, Smile, FileText as FootnoteIcon, Check } from 'lucide-vue-next'
 
   interface ActiveState { bold: boolean; italic: boolean; underline: boolean; strike: boolean; bullet: boolean; ordered: boolean }
   const props = defineProps<{
@@ -807,6 +777,21 @@
   const highlightColors = ['#FEF3C7', '#FFEDD5', '#FFE4E6', '#F3E8FF', '#E0F2FE', '#DCFCE7', '#FEE2E2', '#E2E8F0', '#D1FAE5', '#FDE68A', '#FBCFE8', '#C7D2FE', '#E9D5FF', '#F5F3FF', '#FAE8FF', '#F1F5F9']
   const currentTextColor = computed(() => props.textColor || '#111827')
   const currentHighlight = computed(() => props.highlight || '#FDE68A')
+
+  // helper: determine if color is light to choose check icon contrast
+  function isLightColor(hex: string) {
+    try {
+      const s = String(hex).replace('#', '')
+      const r = parseInt(s.substring(0, 2), 16)
+      const g = parseInt(s.substring(2, 4), 16)
+      const b = parseInt(s.substring(4, 6), 16)
+      // perceptive luminance
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b
+      return lum > 200
+    } catch {
+      return false
+    }
+  }
 
   // Dialog states
   const showTableDialog = ref(false)
