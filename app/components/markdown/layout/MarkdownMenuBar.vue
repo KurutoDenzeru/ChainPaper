@@ -236,7 +236,7 @@
     (e: 'insert-mathblock'): void
     (e: 'insert-horizontal-line'): void
     (e: 'insert-footnote'): void
-    (e: 'insert-emoji'): void
+    (e: 'insert-emoji', char: string): void
     (e: 'format-bold'): void
     (e: 'format-italic'): void
     (e: 'format-underline'): void
@@ -257,6 +257,8 @@
     (e: 'show-about'): void
     (e: 'show-documentation'): void
     (e: 'toggle-preview'): void
+    (e: 'set-text-color', color: string): void
+    (e: 'set-highlight', color: string): void
   }>()
 
   // View state
@@ -505,8 +507,8 @@
   const highlightColors = ['#FDE68A', '#FFEDD5', '#FFE4E6', '#F3E8FF', '#DCFCE7', '#E0F2FE', '#FEF3C7', '#FEE2E2', '#E9D5FF', '#ECFCCB']
 
   // Emit typed wrappers because defineEmits types are specific
-  const emitTextColor = (c: string) => emit('set-text-color' as any, c)
-  const emitHighlight = (c: string) => emit('set-highlight' as any, c)
+  const emitTextColor = (c: string) => emit('set-text-color', c)
+  const emitHighlight = (c: string) => emit('set-highlight', c)
 
   function onMenuCustomTextColor(e: Event) {
     const v = (e.target as HTMLInputElement | null)?.value
@@ -614,6 +616,6 @@
 
   // Emoji insertion handler
   function handleEmojiInsert(emoji: any) {
-    emit('insert-emoji' as any, emoji.char)
+    emit('insert-emoji', emoji.char)
   }
 </script>
