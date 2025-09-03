@@ -14,11 +14,7 @@
       <!-- Search Input -->
       <div class="relative mb-4">
         <Search class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          v-model="searchQuery"
-          placeholder="Search emojis..."
-          class="pl-10"
-        />
+        <Input v-model="searchQuery" placeholder="Search emojis..." class="pl-10" />
       </div>
 
       <div class="mt-4">
@@ -221,7 +217,7 @@
                 No emojis found matching "{{ searchQuery }}"
               </div>
             </TabsContent>
-            
+
             <TabsContent value="travel" class="mt-4">
               <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
                 <button v-for="emoji in filteredTravelEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
@@ -240,7 +236,7 @@
                 No emojis found matching "{{ searchQuery }}"
               </div>
             </TabsContent>
-            
+
             <TabsContent value="flags" class="mt-4">
               <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
                 <button v-for="emoji in filteredFlagEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
@@ -1031,8 +1027,8 @@
   const filteredRecentEmojis = computed(() => {
     if (!searchQuery.value.trim()) return recentEmojis.value
     const query = searchQuery.value.toLowerCase()
-    return recentEmojis.value.filter(emoji => 
-      emoji.name.toLowerCase().includes(query) || 
+    return recentEmojis.value.filter(emoji =>
+      emoji.name.toLowerCase().includes(query) ||
       emoji.shortcode.toLowerCase().includes(query)
     )
   })
@@ -1040,8 +1036,8 @@
   const filteredSmileyEmojis = computed(() => {
     if (!searchQuery.value.trim()) return smileyEmojis.value
     const query = searchQuery.value.toLowerCase()
-    return smileyEmojis.value.filter(emoji => 
-      emoji.name.toLowerCase().includes(query) || 
+    return smileyEmojis.value.filter(emoji =>
+      emoji.name.toLowerCase().includes(query) ||
       emoji.shortcode.toLowerCase().includes(query)
     )
   })
@@ -1049,8 +1045,8 @@
   const filteredAnimalEmojis = computed(() => {
     if (!searchQuery.value.trim()) return animalEmojis.value
     const query = searchQuery.value.toLowerCase()
-    return animalEmojis.value.filter(emoji => 
-      emoji.name.toLowerCase().includes(query) || 
+    return animalEmojis.value.filter(emoji =>
+      emoji.name.toLowerCase().includes(query) ||
       emoji.shortcode.toLowerCase().includes(query)
     )
   })
@@ -1058,8 +1054,8 @@
   const filteredFoodEmojis = computed(() => {
     if (!searchQuery.value.trim()) return foodEmojis.value
     const query = searchQuery.value.toLowerCase()
-    return foodEmojis.value.filter(emoji => 
-      emoji.name.toLowerCase().includes(query) || 
+    return foodEmojis.value.filter(emoji =>
+      emoji.name.toLowerCase().includes(query) ||
       emoji.shortcode.toLowerCase().includes(query)
     )
   })
@@ -1067,8 +1063,8 @@
   const filteredActivityEmojis = computed(() => {
     if (!searchQuery.value.trim()) return activityEmojis.value
     const query = searchQuery.value.toLowerCase()
-    return activityEmojis.value.filter(emoji => 
-      emoji.name.toLowerCase().includes(query) || 
+    return activityEmojis.value.filter(emoji =>
+      emoji.name.toLowerCase().includes(query) ||
       emoji.shortcode.toLowerCase().includes(query)
     )
   })
@@ -1076,8 +1072,8 @@
   const filteredTravelEmojis = computed(() => {
     if (!searchQuery.value.trim()) return travelEmojis.value
     const query = searchQuery.value.toLowerCase()
-    return travelEmojis.value.filter(emoji => 
-      emoji.name.toLowerCase().includes(query) || 
+    return travelEmojis.value.filter(emoji =>
+      emoji.name.toLowerCase().includes(query) ||
       emoji.shortcode.toLowerCase().includes(query)
     )
   })
@@ -1085,8 +1081,8 @@
   const filteredObjectEmojis = computed(() => {
     if (!searchQuery.value.trim()) return objectEmojis.value
     const query = searchQuery.value.toLowerCase()
-    return objectEmojis.value.filter(emoji => 
-      emoji.name.toLowerCase().includes(query) || 
+    return objectEmojis.value.filter(emoji =>
+      emoji.name.toLowerCase().includes(query) ||
       emoji.shortcode.toLowerCase().includes(query)
     )
   })
@@ -1094,8 +1090,8 @@
   const filteredFlagEmojis = computed(() => {
     if (!searchQuery.value.trim()) return flagEmojis.value
     const query = searchQuery.value.toLowerCase()
-    return flagEmojis.value.filter(emoji => 
-      emoji.name.toLowerCase().includes(query) || 
+    return flagEmojis.value.filter(emoji =>
+      emoji.name.toLowerCase().includes(query) ||
       emoji.shortcode.toLowerCase().includes(query)
     )
   })
