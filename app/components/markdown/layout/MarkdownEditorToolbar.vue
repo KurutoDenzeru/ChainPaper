@@ -607,48 +607,55 @@
               <!-- Text Styles Section -->
               <div class="space-y-2">
                 <div class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">Text Styles</div>
-                <div class="grid grid-cols-2 gap-1">
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    @click="$emit('set-heading', 0)">
-                    <FileText class="w-4 h-4 text-gray-600" />
-                    <span class="text-sm">Paragraph</span>
-                  </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    @click="$emit('set-heading', 1)">
-                    <Heading1 class="w-4 h-4 text-gray-600" />
-                    <span class="text-sm">Heading 1</span>
-                  </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    @click="$emit('set-heading', 2)">
-                    <Heading2 class="w-4 h-4 text-gray-600" />
-                    <span class="text-sm">Heading 2</span>
-                  </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    @click="$emit('set-heading', 3)">
-                    <Heading3 class="w-4 h-4 text-gray-600" />
-                    <span class="text-sm">Heading 3</span>
-                  </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    @click="$emit('set-heading', 4)">
-                    <Heading4 class="w-4 h-4 text-gray-600" />
-                    <span class="text-sm">Heading 4</span>
-                  </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    @click="$emit('set-heading', 5)">
-                    <Heading5 class="w-4 h-4 text-gray-600" />
-                    <span class="text-sm">Heading 5</span>
-                  </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    @click="$emit('set-heading', 6)">
-                    <Heading6 class="w-4 h-4 text-gray-600" />
-                    <span class="text-sm">Heading 6</span>
-                  </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    @click="$emit('toggle-blockquote')">
-                    <Quote class="w-4 h-4 text-gray-600" />
-                    <span class="text-sm">Quote</span>
-                  </button>
-                </div>
+                <Select @update:modelValue="handleHeadingChange">
+                  <SelectTrigger class="w-full">
+                    <SelectValue placeholder="Select text style" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">
+                      <div class="flex items-center gap-2">
+                        <FileText class="w-4 h-4 text-gray-600" />
+                        <span>Paragraph</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="1">
+                      <div class="flex items-center gap-2">
+                        <Heading1 class="w-4 h-4 text-gray-600" />
+                        <span>Heading 1</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="2">
+                      <div class="flex items-center gap-2">
+                        <Heading2 class="w-4 h-4 text-gray-600" />
+                        <span>Heading 2</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="3">
+                      <div class="flex items-center gap-2">
+                        <Heading3 class="w-4 h-4 text-gray-600" />
+                        <span>Heading 3</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="4">
+                      <div class="flex items-center gap-2">
+                        <Heading4 class="w-4 h-4 text-gray-600" />
+                        <span>Heading 4</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="5">
+                      <div class="flex items-center gap-2">
+                        <Heading5 class="w-4 h-4 text-gray-600" />
+                        <span>Heading 5</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="6">
+                      <div class="flex items-center gap-2">
+                        <Heading6 class="w-4 h-4 text-gray-600" />
+                        <span>Heading 6</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <!-- Text Formatting Section -->
@@ -672,6 +679,11 @@
                     <span class="text-sm">Subscript</span>
                   </button>
                   <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    @click="$emit('toggle-blockquote')">
+                    <Quote class="w-4 h-4 text-gray-600" />
+                    <span class="text-sm">Quote</span>
+                  </button>
+                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors col-span-2"
                     @click="$emit('insert-code-block')">
                     <Code2 class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Code Block</span>
@@ -840,6 +852,7 @@
   import { Input } from '@/components/ui/input'
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
   import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
   import EmojiInsertDialog from '@/components/editor/EmojiInsertDialog.vue'
   import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, Search, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma, Smile, FileText as FootnoteIcon, Check } from 'lucide-vue-next'
@@ -905,6 +918,14 @@
   }
 
   function setAlign(a: string) { emit('set-alignment', a) }
+  
+  function handleHeadingChange(value: any) {
+    if (value !== null && value !== undefined) {
+      const level = Number(value)
+      emit('set-heading', level)
+    }
+  }
+  
   const alignmentIcon = computed(() => props.align === 'center' ? AlignCenter : props.align === 'right' ? AlignRight : props.align === 'justify' ? AlignJustify : AlignLeft)
 
   const active = computed(() => ({
