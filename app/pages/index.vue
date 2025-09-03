@@ -10,7 +10,7 @@
           @format-strikethrough="applyStrike" @format-superscript="applySuperscript" @format-subscript="applySubscript"
           @toggle-bullet-list="applyBulletList" @toggle-ordered-list="applyOrderedList"
           @toggle-blockquote="applyBlockquote" @indent="applyIndent" @unindent="applyUnindent" @undo="onUndo"
-          @redo="onRedo" />
+          @redo="onRedo" @set-text-color="applyColor" @set-highlight="applyHighlight" />
       </div>
       <div class="mt-2 pointer-events-auto">
         <MarkdownToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"

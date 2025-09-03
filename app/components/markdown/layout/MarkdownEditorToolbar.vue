@@ -211,7 +211,8 @@
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" title="Text Color" aria-label="Text Color">
               <div class="relative flex items-center justify-center">
                 <Type class="w-4 h-4" />
-                <div class="absolute bottom-0 left-0 w-full h-1 rounded" :style="{ backgroundColor: currentTextColor }"></div>
+                <div class="absolute bottom-0 left-0 w-full h-1 rounded" :style="{ backgroundColor: currentTextColor }">
+                </div>
               </div>
             </Button>
           </PopoverTrigger>
@@ -221,14 +222,16 @@
                 class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
                 :class="{ 'ring-2 ring-offset-1 ring-indigo-500': c === currentTextColor }"
                 :style="{ backgroundColor: c }" @click="$emit('set-text-color', c)">
-                <Check v-if="c === currentTextColor" :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
+                <Check v-if="c === currentTextColor"
+                  :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
               </button>
             </div>
             <div class="mt-3 border-t pt-3">
               <div class="text-xs text-gray-500 mb-2">Custom color</div>
               <div class="flex items-center gap-2">
                 <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer" @input="onCustomTextColor" />
-                <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb" @change="onCustomTextColorText" />
+                <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb"
+                  @change="onCustomTextColorText" />
               </div>
             </div>
           </PopoverContent>
@@ -240,18 +243,28 @@
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" title="Highlight" aria-label="Highlight">
               <div class="relative flex items-center justify-center">
                 <Highlighter class="w-4 h-4" />
-                <div class="absolute bottom-0 left-0 w-full h-1 rounded" :style="{ backgroundColor: currentHighlight }"></div>
+                <div class="absolute bottom-0 left-0 w-full h-1 rounded" :style="{ backgroundColor: currentHighlight }">
+                </div>
               </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="w-56 p-3">
-            <div class="grid grid-cols-8 gap-1">
-              <Button v-for="c in highlightColors" :key="c" :title="c"
-                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center "
+          <PopoverContent class="w-64 p-3">
+            <div class="grid grid-cols-8 gap-2">
+              <button v-for="c in highlightColors" :key="c" :title="c"
+                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
                 :class="{ 'ring-2 ring-offset-1 ring-indigo-500': c === currentHighlight }"
                 :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)">
-                <Check v-if="c === currentHighlight" :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
-              </Button>
+                <Check v-if="c === currentHighlight"
+                  :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
+              </button>
+            </div>
+            <div class="mt-3 border-t pt-3">
+              <div class="text-xs text-gray-500 mb-2">Custom highlight</div>
+              <div class="flex items-center gap-2">
+                <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer" @input="onCustomHighlight" />
+                <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb"
+                  @change="onCustomHighlightText" />
+              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -265,6 +278,18 @@
           </TooltipTrigger>
           <TooltipContent>
             <p>Code Block</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <!-- Blockquote -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('toggle-blockquote')">
+              <Quote class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Blockquote</p>
           </TooltipContent>
         </Tooltip>
 
@@ -360,33 +385,28 @@
         </Tooltip>
 
         <!-- Footnote -->
-        <Popover>
-          <PopoverTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" title="Highlight" aria-label="Highlight">
-              <div class="relative flex items-center justify-center">
-                <Highlighter class="w-4 h-4" />
-                <div class="absolute bottom-0 left-0 w-full h-1 rounded" :style="{ backgroundColor: currentHighlight }"></div>
-              </div>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-footnote')">
+              <FileText class="w-4 h-4" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent class="w-64 p-3">
-            <div class="grid grid-cols-8 gap-2">
-              <button v-for="c in highlightColors" :key="c" :title="c"
-                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
-                :class="{ 'ring-2 ring-offset-1 ring-indigo-500': c === currentHighlight }"
-                :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)">
-                <Check v-if="c === currentHighlight" :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
-              </button>
-            </div>
-            <div class="mt-3 border-t pt-3">
-              <div class="text-xs text-gray-500 mb-2">Custom highlight</div>
-              <div class="flex items-center gap-2">
-                <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer" @input="onCustomHighlight" />
-                <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb" @change="onCustomHighlightText" />
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Insert Footnote</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <!-- Emoji -->
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showEmojiDialog = true">
+              <Smile class="w-4 h-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Insert Emoji</p>
+          </TooltipContent>
+        </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bullet }]"
@@ -658,15 +678,32 @@
               <!-- Color controls -->
               <div class="space-y-1">
                 <div class="px-2 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">Colors</div>
-                <div class="grid grid-cols-8 gap-1">
+                <div class="grid grid-cols-8 gap-2">
                   <button v-for="c in textColors.slice(0, 8)" :key="c"
-                    class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform"
+                    class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer"
                     :style="{ backgroundColor: c }" @click="$emit('set-text-color', c)"></button>
                 </div>
-                <div class="grid grid-cols-8 gap-1 mt-1">
+                <div class="mt-3 border-t pt-3">
+                  <div class="text-xs text-gray-500 mb-2">Custom color</div>
+                  <div class="flex items-center gap-2">
+                    <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer" @input="onCustomTextColor" />
+                    <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb"
+                      @change="onCustomTextColorText" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-8 gap-2 mt-3">
                   <button v-for="c in highlightColors.slice(0, 8)" :key="c"
-                    class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform"
+                    class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer"
                     :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)"></button>
+                </div>
+                <div class="mt-3 border-t pt-3">
+                  <div class="text-xs text-gray-500 mb-2">Custom highlight</div>
+                  <div class="flex items-center gap-2">
+                    <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer" @input="onCustomHighlight" />
+                    <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb"
+                      @change="onCustomHighlightText" />
+                  </div>
                 </div>
               </div>
             </div>

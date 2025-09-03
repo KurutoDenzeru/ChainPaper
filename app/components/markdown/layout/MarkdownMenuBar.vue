@@ -43,18 +43,57 @@
                       {{ item.label }}
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                          <MenubarItem v-for="(sub, sidx) in (item as any).items" :key="menu.label + '-sub-' + sidx"
-                            @click="handleMenuEmit(sub)" class="flex items-center gap-2 justify-between">
-                            <div class="flex items-center gap-2">
-                              <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600" v-if="getIcon(sub)" />
-                              <span class="flex items-center gap-2">
-                                <span>{{ sub.label }}</span>
-                                <span v-if="isHexColor((sub as any).payload)" :style="{ backgroundColor: (sub as any).payload }"
-                                  class="w-4 h-4 rounded border border-gray-200 inline-block"></span>
-                              </span>
-                            </div>
-                        
-                          </MenubarItem>
+                      <!-- If this sub is the Text Color menu, show a swatch grid + custom picker -->
+                      <div v-if="String(item.label).toLowerCase() === 'text color'" class="p-2">
+                        <div class="grid grid-cols-8 gap-2">
+                          <button v-for="c in textColors" :key="c" :title="c"
+                            class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer"
+                            :style="{ backgroundColor: c }" @click="emitTextColor(c)"></button>
+                        </div>
+                        <div class="mt-3 border-t pt-3">
+                          <div class="text-xs text-gray-500 mb-2">Custom color</div>
+                          <div class="flex items-center gap-2">
+                            <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer"
+                              @input="onMenuCustomTextColor" />
+                            <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb"
+                              @change="onMenuCustomTextColorText" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- If this sub is the Highlight menu, show a swatch grid + custom picker -->
+                      <div v-else-if="String(item.label).toLowerCase() === 'highlight'" class="p-2">
+                        <div class="grid grid-cols-8 gap-2">
+                          <button v-for="c in highlightColors" :key="c" :title="c"
+                            class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer"
+                            :style="{ backgroundColor: c }" @click="emitHighlight(c)"></button>
+                        </div>
+                        <div class="mt-3 border-t pt-3">
+                          <div class="text-xs text-gray-500 mb-2">Custom highlight</div>
+                          <div class="flex items-center gap-2">
+                            <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer"
+                              @input="onMenuCustomHighlight" />
+                            <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb"
+                              @change="onMenuCustomHighlightText" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Default: simple list of items with optional swatch -->
+                      <div v-else>
+                        <MenubarItem v-for="(sub, sidx) in (item as any).items" :key="menu.label + '-sub-' + sidx"
+                          @click="handleMenuEmit(sub)" class="flex items-center gap-2 justify-between">
+                          <div class="flex items-center gap-2">
+                            <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600" v-if="getIcon(sub)" />
+                            <span class="flex items-center gap-2">
+                              <span>{{ sub.label }}</span>
+                              <span v-if="isHexColor((sub as any).payload)"
+                                :style="{ backgroundColor: (sub as any).payload }"
+                                class="w-4 h-4 rounded border border-gray-200 inline-block"></span>
+                            </span>
+                          </div>
+                        </MenubarItem>
+                      </div>
                     </MenubarSubContent>
                   </MenubarSub>
 
@@ -141,9 +180,9 @@
   import { storeToRefs } from 'pinia'
   import {
     Edit3, Command, FileText, FolderOpen, Save, Download,
-  Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
-  Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
-  Type, Highlighter,
+    Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
+    Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
+    Type, Highlighter,
     List, ListOrdered, Quote, Link, Image, Table, AlignLeft, AlignCenter, AlignRight, AlignJustify,
     Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info, Indent, Outdent,
     Superscript, Subscript, Sigma, SquareSigma, Minus, Smile
@@ -459,6 +498,34 @@
 
     if (item.payload !== undefined) emit(item.emit as any, item.payload)
     else emit(item.emit as any)
+  }
+
+  // small helpers & color lists for menu custom pickers
+  const textColors = ['#111827', '#6B7280', '#DC2626', '#EA580C', '#2563EB', '#9333EA', '#059669', '#B45309', '#0EA5E9', '#7C3AED']
+  const highlightColors = ['#FDE68A', '#FFEDD5', '#FFE4E6', '#F3E8FF', '#DCFCE7', '#E0F2FE', '#FEF3C7', '#FEE2E2', '#E9D5FF', '#ECFCCB']
+
+  // Emit typed wrappers because defineEmits types are specific
+  const emitTextColor = (c: string) => emit('set-text-color' as any, c)
+  const emitHighlight = (c: string) => emit('set-highlight' as any, c)
+
+  function onMenuCustomTextColor(e: Event) {
+    const v = (e.target as HTMLInputElement | null)?.value
+    if (v && isHexColor(v)) emitTextColor(v)
+  }
+
+  function onMenuCustomTextColorText(e: Event) {
+    const v = (e.target as HTMLInputElement | null)?.value
+    if (v && isHexColor(v)) emitTextColor(v)
+  }
+
+  function onMenuCustomHighlight(e: Event) {
+    const v = (e.target as HTMLInputElement | null)?.value
+    if (v && isHexColor(v)) emitHighlight(v)
+  }
+
+  function onMenuCustomHighlightText(e: Event) {
+    const v = (e.target as HTMLInputElement | null)?.value
+    if (v && isHexColor(v)) emitHighlight(v)
   }
 
   function isDisabled(item: any) {
