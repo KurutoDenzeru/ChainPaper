@@ -215,14 +215,21 @@
               </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="w-56 p-3">
-            <div class="grid grid-cols-8 gap-1">
+          <PopoverContent class="w-64 p-3">
+            <div class="grid grid-cols-8 gap-2">
               <button v-for="c in textColors" :key="c" :title="c"
-                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center"
+                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
                 :class="{ 'ring-2 ring-offset-1 ring-indigo-500': c === currentTextColor }"
                 :style="{ backgroundColor: c }" @click="$emit('set-text-color', c)">
                 <Check v-if="c === currentTextColor" :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
               </button>
+            </div>
+            <div class="mt-3 border-t pt-3">
+              <div class="text-xs text-gray-500 mb-2">Custom color</div>
+              <div class="flex items-center gap-2">
+                <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer" @input="onCustomTextColor" />
+                <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb" @change="onCustomTextColorText" />
+              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -239,12 +246,12 @@
           </PopoverTrigger>
           <PopoverContent class="w-56 p-3">
             <div class="grid grid-cols-8 gap-1">
-              <button v-for="c in highlightColors" :key="c" :title="c"
-                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center"
+              <Button v-for="c in highlightColors" :key="c" :title="c"
+                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center "
                 :class="{ 'ring-2 ring-offset-1 ring-indigo-500': c === currentHighlight }"
                 :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)">
                 <Check v-if="c === currentHighlight" :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
-              </button>
+              </Button>
             </div>
           </PopoverContent>
         </Popover>
@@ -362,14 +369,21 @@
               </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="w-56 p-3">
-            <div class="grid grid-cols-8 gap-1">
+          <PopoverContent class="w-64 p-3">
+            <div class="grid grid-cols-8 gap-2">
               <button v-for="c in highlightColors" :key="c" :title="c"
-                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center"
+                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
                 :class="{ 'ring-2 ring-offset-1 ring-indigo-500': c === currentHighlight }"
                 :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)">
                 <Check v-if="c === currentHighlight" :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
               </button>
+            </div>
+            <div class="mt-3 border-t pt-3">
+              <div class="text-xs text-gray-500 mb-2">Custom highlight</div>
+              <div class="flex items-center gap-2">
+                <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer" @input="onCustomHighlight" />
+                <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb" @change="onCustomHighlightText" />
+              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -805,5 +819,34 @@
   // Emoji insertion handler
   function handleEmojiInsert(emoji: any) {
     emit('insert-emoji', emoji.char)
+  }
+
+  // safe handlers for custom color inputs
+  function onCustomTextColor(e: Event) {
+    const t = e?.target as HTMLInputElement | null
+    if (!t) return
+    const v = String(t.value || '').trim()
+    if (v) emit('set-text-color', v)
+  }
+
+  function onCustomTextColorText(e: Event) {
+    const t = e?.target as HTMLInputElement | null
+    if (!t) return
+    const v = String(t.value || '').trim()
+    if (v) emit('set-text-color', v)
+  }
+
+  function onCustomHighlight(e: Event) {
+    const t = e?.target as HTMLInputElement | null
+    if (!t) return
+    const v = String(t.value || '').trim()
+    if (v) emit('set-highlight', v)
+  }
+
+  function onCustomHighlightText(e: Event) {
+    const t = e?.target as HTMLInputElement | null
+    if (!t) return
+    const v = String(t.value || '').trim()
+    if (v) emit('set-highlight', v)
   }
 </script>

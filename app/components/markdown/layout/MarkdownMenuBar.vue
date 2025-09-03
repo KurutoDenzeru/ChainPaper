@@ -43,11 +43,18 @@
                       {{ item.label }}
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <MenubarItem v-for="(sub, sidx) in (item as any).items" :key="menu.label + '-sub-' + sidx"
-                        @click="handleMenuEmit(sub)" class="flex items-center gap-2">
-                        <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600" v-if="getIcon(sub)" />
-                        {{ sub.label }}
-                      </MenubarItem>
+                          <MenubarItem v-for="(sub, sidx) in (item as any).items" :key="menu.label + '-sub-' + sidx"
+                            @click="handleMenuEmit(sub)" class="flex items-center gap-2 justify-between">
+                            <div class="flex items-center gap-2">
+                              <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600" v-if="getIcon(sub)" />
+                              <span class="flex items-center gap-2">
+                                <span>{{ sub.label }}</span>
+                                <span v-if="isHexColor((sub as any).payload)" :style="{ backgroundColor: (sub as any).payload }"
+                                  class="w-4 h-4 rounded border border-gray-200 inline-block"></span>
+                              </span>
+                            </div>
+                        
+                          </MenubarItem>
                     </MenubarSubContent>
                   </MenubarSub>
 
@@ -471,6 +478,11 @@
 
   function getIcon(item: any) {
     return item && (item as any).icon ? (item as any).icon : null
+  }
+
+  function isHexColor(v: any) {
+    if (!v || typeof v !== 'string') return false
+    return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(v.trim())
   }
 
   // Title editing state
