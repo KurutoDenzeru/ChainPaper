@@ -606,7 +606,9 @@
             <div class="p-3 space-y-4">
               <!-- Text Styles Section -->
               <div class="space-y-2">
-                <div class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">Text Styles</div>
+                <div
+                  class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  Text Styles</div>
                 <Select @update:modelValue="handleHeadingChange">
                   <SelectTrigger class="w-full">
                     <SelectValue placeholder="Select text style" />
@@ -660,30 +662,36 @@
 
               <!-- Text Formatting Section -->
               <div class="space-y-2">
-                <div class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">Text Format</div>
+                <div
+                  class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  Text Format</div>
                 <div class="grid grid-cols-2 gap-1">
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    :class="{ 'bg-blue-50 text-blue-700': active.strike }"
-                    @click="$emit('format-strikethrough')">
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    :class="{ 'bg-blue-50 text-blue-700': active.strike }" @click="$emit('format-strikethrough')">
                     <Strikethrough class="w-4 h-4" />
                     <span class="text-sm">Strikethrough</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('format-superscript')">
                     <Superscript class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Superscript</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('format-subscript')">
                     <Subscript class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Subscript</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('toggle-blockquote')">
                     <Quote class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Quote</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors col-span-2"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors col-span-2"
                     @click="$emit('insert-code-block')">
                     <Code2 class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Code Block</span>
@@ -693,8 +701,10 @@
 
               <!-- Colors Section -->
               <div class="space-y-3">
-                <div class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">Colors</div>
-                
+                <div
+                  class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  Colors</div>
+
                 <!-- Text Color -->
                 <div class="space-y-2">
                   <div class="flex items-center gap-2">
@@ -706,12 +716,15 @@
                       class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer shadow-sm"
                       :class="{ 'ring-2 ring-offset-1 ring-blue-500': c === currentTextColor }"
                       :style="{ backgroundColor: c }" @click="$emit('set-text-color', c)">
-                      <Check v-if="c === currentTextColor" :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
+                      <Check v-if="c === currentTextColor"
+                        :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
                     </button>
                   </div>
                   <div class="flex items-center gap-2 mt-2">
-                    <input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer" @input="onCustomTextColor" />
-                    <input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded" placeholder="#rrggbb" @change="onCustomTextColorText" />
+                    <input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
+                      @input="onCustomTextColor" />
+                    <input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
+                      placeholder="#rrggbb" @change="onCustomTextColorText" />
                   </div>
                 </div>
 
@@ -726,38 +739,45 @@
                       class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer shadow-sm"
                       :class="{ 'ring-2 ring-offset-1 ring-blue-500': c === currentHighlight }"
                       :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)">
-                      <Check v-if="c === currentHighlight" :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
+                      <Check v-if="c === currentHighlight"
+                        :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
                     </button>
                   </div>
                   <div class="flex items-center gap-2 mt-2">
-                    <input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer" @input="onCustomHighlight" />
-                    <input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded" placeholder="#rrggbb" @change="onCustomHighlightText" />
+                    <input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
+                      @input="onCustomHighlight" />
+                    <input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
+                      placeholder="#rrggbb" @change="onCustomHighlightText" />
                   </div>
                 </div>
               </div>
 
               <!-- Lists & Layout Section -->
               <div class="space-y-2">
-                <div class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">Lists & Layout</div>
+                <div
+                  class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  Lists & Layout</div>
                 <div class="grid grid-cols-2 gap-1">
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    :class="{ 'bg-blue-50 text-blue-700': active.bullet }"
-                    @click="$emit('toggle-bullet-list')">
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    :class="{ 'bg-blue-50 text-blue-700': active.bullet }" @click="$emit('toggle-bullet-list')">
                     <List class="w-4 h-4" />
                     <span class="text-sm">Bullet List</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    :class="{ 'bg-blue-50 text-blue-700': active.ordered }"
-                    @click="$emit('toggle-ordered-list')">
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    :class="{ 'bg-blue-50 text-blue-700': active.ordered }" @click="$emit('toggle-ordered-list')">
                     <ListOrdered class="w-4 h-4" />
                     <span class="text-sm">Numbered</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('indent')">
                     <Indent class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Indent</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('unindent')">
                     <Outdent class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Unindent</span>
@@ -768,16 +788,20 @@
                 <div class="space-y-2 mt-3">
                   <div class="text-xs font-medium text-gray-600">Alignment</div>
                   <div class="grid grid-cols-4 gap-1">
-                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors" @click="setAlign('left')">
+                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
+                      @click="setAlign('left')">
                       <AlignLeft class="w-4 h-4 text-gray-600" />
                     </button>
-                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors" @click="setAlign('center')">
+                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
+                      @click="setAlign('center')">
                       <AlignCenter class="w-4 h-4 text-gray-600" />
                     </button>
-                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors" @click="setAlign('right')">
+                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
+                      @click="setAlign('right')">
                       <AlignRight class="w-4 h-4 text-gray-600" />
                     </button>
-                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors" @click="setAlign('justify')">
+                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
+                      @click="setAlign('justify')">
                       <AlignJustify class="w-4 h-4 text-gray-600" />
                     </button>
                   </div>
@@ -786,44 +810,54 @@
 
               <!-- Insert Elements Section -->
               <div class="space-y-2">
-                <div class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">Insert</div>
+                <div
+                  class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  Insert</div>
                 <div class="grid grid-cols-2 gap-1">
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-link')">
                     <Link class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Link</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-image')">
                     <ImageIcon class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Image</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="showTableDialog = true">
                     <Table class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Table</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-horizontal-line')">
                     <Minus class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Divider</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-math')">
                     <Sigma class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Math</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-mathblock')">
                     <SquareSigma class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Math Block</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-footnote')">
                     <FootnoteIcon class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Footnote</span>
                   </button>
-                  <button class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  <button
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="showEmojiDialog = true">
                     <Smile class="w-4 h-4 text-gray-600" />
                     <span class="text-sm">Emoji</span>
@@ -918,14 +952,14 @@
   }
 
   function setAlign(a: string) { emit('set-alignment', a) }
-  
+
   function handleHeadingChange(value: any) {
     if (value !== null && value !== undefined) {
       const level = Number(value)
       emit('set-heading', level)
     }
   }
-  
+
   const alignmentIcon = computed(() => props.align === 'center' ? AlignCenter : props.align === 'right' ? AlignRight : props.align === 'justify' ? AlignJustify : AlignLeft)
 
   const active = computed(() => ({

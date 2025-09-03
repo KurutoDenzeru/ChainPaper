@@ -168,9 +168,9 @@
     }
 
     if (pluginsLoading.value) return // Already loading
-    
+
     pluginsLoading.value = true
-    
+
     try {
       // Load plugins in parallel but only when needed
       const [markdownModule, katexModule, emojiModule, footnoteModule] = await Promise.allSettled([
@@ -188,22 +188,22 @@
       if (markdownModule.status === 'fulfilled' && !(markdownModule.value as any).error) {
         MarkdownIt = pluginCache.MarkdownIt = (markdownModule.value as any).default || markdownModule.value
       }
-      
+
       if (katexModule.status === 'fulfilled' && !(katexModule.value as any).error) {
         katexPlugin = pluginCache.katexPlugin = (katexModule.value as any).default || katexModule.value
       }
-      
+
       if (emojiModule.status === 'fulfilled' && !(emojiModule.value as any).error) {
         emojiPlugin = pluginCache.emojiPlugin = (emojiModule.value as any).default || emojiModule.value
       }
-      
+
       if (footnoteModule.status === 'fulfilled' && !(footnoteModule.value as any).error) {
         footnotePlugin = pluginCache.footnotePlugin = (footnoteModule.value as any).default || footnoteModule.value
       }
 
       pluginCache.loaded = true
       pluginsLoaded.value = true
-      
+
     } catch (e) {
       console.warn('Failed to load some markdown plugins:', e)
       pluginsLoaded.value = true // Allow rendering with available plugins
@@ -255,7 +255,7 @@
     nextTick(() => {
       textareaEl.value = document.querySelector('textarea')
     })
-    
+
     // Preload markdown plugins during idle time for better UX
     if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
       // Use requestIdleCallback for optimal performance
@@ -721,12 +721,12 @@
   // markdown renderer
   const renderedHtml = computed(() => {
     if (mode.value !== 'reader') return ''
-    
+
     // Show loading state while plugins are loading
     if (pluginsLoading.value) {
       return '<div class="flex items-center justify-center p-8"><div class="text-gray-400 text-sm">Loading markdown renderer...</div></div>'
     }
-    
+
     if (!MarkdownIt || !pluginsLoaded.value) {
       // Trigger loading if not started yet
       if (typeof window !== 'undefined' && !pluginCache.loaded && !pluginsLoading.value) {
@@ -861,7 +861,7 @@
   function toggleMode() {
     const newMode = mode.value === 'source' ? 'reader' : 'source'
     mode.value = newMode
-    
+
     // Lazy load plugins only when switching to reader mode
     if (newMode === 'reader' && typeof window !== 'undefined') {
       loadMarkdownPlugins()
