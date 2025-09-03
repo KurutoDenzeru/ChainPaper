@@ -3,8 +3,8 @@
     <div class="flex flex-row items-start w-full">
       <!-- Left Side: Brand Icon (spans two rows) -->
       <div class="flex flex-col items-center justify-start mr-3">
-        <NuxtImg src="/markdown.webp" alt="ChainPaper Markdown" loading="eager"
-          class="w-18 h-18 flex items-center justify-center" />
+        <NuxtImg src="/markdown.webp" alt="ChainPaper Markdown" width="72" height="72" loading="eager"
+          fetchpriority="high" sizes="72px" class="w-18 h-18 flex items-center justify-center" />
       </div>
       <!-- Right Side: Two rows -->
       <div class="flex flex-col self-center flex-1">

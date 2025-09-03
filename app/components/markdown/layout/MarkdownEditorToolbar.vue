@@ -130,9 +130,15 @@
 
           <Popover>
             <PopoverTrigger as-child>
-              <div>
+              <button
+                type="button"
+                aria-haspopup="dialog"
+                :aria-expanded="false"
+                class="w-20 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                tabindex="0"
+              >
                 <Input type="number" v-model="zoomModel" class="w-20 text-center h-8 rounded" />
-              </div>
+              </button>
             </PopoverTrigger>
             <PopoverContent class="w-32 p-2">
               <div class="flex flex-col">
