@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-4xl">
+    <DialogContent class="!max-w-3xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Table class="w-5 h-5 text-blue-600" />
@@ -68,21 +68,11 @@
                   <Input v-model.number="customCols" type="number" min="1" max="20" class="text-center" placeholder="3" />
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Preview -->
-        <div class="space-y-3">
-          <div class="flex items-center gap-2">
-            <Eye class="w-4 h-4 text-gray-600" />
-            <span class="text-sm font-medium text-gray-900">Preview</span>
-          </div>
-
-          <div class="p-3 bg-gray-50 rounded-lg border">
-            <div class="text-xs text-gray-500 mb-2">Markdown output:</div>
-            <div class="font-mono text-xs text-gray-700 bg-white p-2 rounded border overflow-x-auto">
-              {{ previewMarkdown }}
+              <div class="mt-4">
+                <div class="text-xs text-gray-500 bg-gray-50 rounded p-2 border">
+                  <strong>Note:</strong> The quick selection grid only shows up to <span class="font-bold">8 × 8</span> cells for preview, but you can generate tables up to <span class="font-bold">50 rows × 20 columns</span> using Custom Dimensions.
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -142,20 +132,8 @@
   // Grid configuration
   const maxRows = 50
   const maxCols = 20
-  const defaultGridRows = 6
-  const defaultGridCols = 6
-
-  // Selection state
-  const selectedRows = ref(3)
-  const selectedCols = ref(3)
-
-  // Custom input state
-  const customRows = ref(3)
-  const customCols = ref(3)
-
-  // Dynamically size grid to fit current selection or custom input
-  const gridRows = computed(() => Math.max(defaultGridRows, selectedRows.value, customRows.value))
-  const gridCols = computed(() => Math.max(defaultGridCols, selectedCols.value, customCols.value))
+  const gridRows = computed(() => 8)
+  const gridCols = computed(() => 8)
   const gridCells = computed(() => {
     const cells = []
     for (let row = 1; row <= Math.min(gridRows.value, maxRows); row++) {
@@ -166,51 +144,15 @@
     return cells
   })
 
-  // Generate preview markdown
-  const previewMarkdown = computed(() => {
-    const rows = customRows.value || selectedRows.value
-    const cols = customCols.value || selectedCols.value
+  // Selection state
+  const selectedRows = ref(3)
+  const selectedCols = ref(3)
 
-    // Always generate Markdown table syntax
-    let markdown = ''
+  // Custom input state
+  const customRows = ref(3)
+  const customCols = ref(3)
 
-    // Always include a header row in preview
-    markdown += '|'
-    for (let i = 1; i <= cols; i++) {
-      markdown += ` Header ${i} |`
-    }
-    markdown += '\n|'
-    for (let i = 1; i <= cols; i++) {
-      markdown += ' --- |'
-    }
-    markdown += '\n'
-
-    // Data rows
-    for (let r = 1; r <= rows; r++) {
-      markdown += '|'
-      for (let c = 1; c <= cols; c++) {
-        markdown += ` Cell ${r}.${c} |`
-      }
-      markdown += '\n'
-    }
-
-    return markdown.trim()
-  })
-
-  function updateSelection(row: number, col: number) {
-    selectedRows.value = row
-    selectedCols.value = col
-    // Update custom inputs to match selection
-    customRows.value = row
-    customCols.value = col
-  }
-
-  function resetSelection() {
-    selectedRows.value = 3
-    selectedCols.value = 3
-  }
-
-  // Keep custom inputs and quick-selection in sync
+  // Dynamically size grid to fit current selection or custom input
   watch(customRows, (v) => {
     let n = Number(v) || 1
     n = Math.max(1, Math.min(maxRows, n))
@@ -230,6 +172,19 @@
     customRows.value = r
     customCols.value = c
   })
+
+  function updateSelection(row: number, col: number) {
+    selectedRows.value = row
+    selectedCols.value = col
+    // Update custom inputs to match selection
+    customRows.value = row
+    customCols.value = col
+  }
+
+  function resetSelection() {
+    selectedRows.value = 3
+    selectedCols.value = 3
+  }
 
   function insertTable(rows: number, cols: number) {
     const validRows = Math.max(1, Math.min(50, rows))
