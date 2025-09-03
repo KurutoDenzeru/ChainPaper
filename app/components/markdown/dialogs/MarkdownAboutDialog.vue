@@ -1,13 +1,13 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-3xl">
+    <DialogContent class="!max-w-2xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Info class="w-5 h-5" />
-          About ChainPaper
+          About ChainPaper - Trustless Whitepaper
         </DialogTitle>
         <DialogDescription>
-          Modern markdown editor with document authentication and blockchain-inspired security
+          Information on how this project encapsulates authorship assurance using modern web technologies.
         </DialogDescription>
       </DialogHeader>
 
@@ -16,9 +16,33 @@
         <div class="space-y-3">
           <h3 class="text-lg font-semibold text-gray-900">Project Description</h3>
           <p class="text-gray-600 leading-relaxed">
-            ChainPaper combines markdown editing with document authentication, proof-of-authorship verification,
-            and multiple export formats. Built with Vue 3 and Nuxt for a modern, secure editing experience.
+            ✍️ Secure markdown platform for authorship assurance, crafted with Nuxt, Tailwind, and Shadcn for instant preview and modern usability.
           </p>
+        </div>
+
+        <!-- Features -->
+        <div class="space-y-2">
+          <h3 class="text-lg font-semibold text-gray-900">Features</h3>
+          <ul class="list-disc pl-5 text-gray-600">
+            <li>Real-time markdown editing and instant preview</li>
+            <li>Authorship verification with cryptographic proofs</li>
+            <li>Advanced formatting: tables, math, lists, alignment</li>
+            <li>Rich media insertion: emojis, tables, code blocks</li>
+            <li>Responsive design for all devices</li>
+            <li>Export options with verification metadata</li>
+          </ul>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="space-y-2">
+          <h3 class="text-lg font-semibold text-gray-900">Tech Stack</h3>
+          <ul class="list-disc pl-5 text-gray-600">
+            <li>Nuxt.js & Vue 3</li>
+            <li>TypeScript</li>
+            <li>Shadcn Vue & Tailwind CSS</li>
+            <li>KaTeX for math rendering</li>
+            <li>Markdown-it parser</li>
+          </ul>
         </div>
 
         <!-- Links -->
@@ -42,7 +66,6 @@
             </a>
           </div>
         </div>
-
       </div>
 
       <DialogFooter>

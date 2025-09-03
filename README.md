@@ -2,7 +2,7 @@
 
 # ChainPaper - Trustless Whitepaper
 
-> 📄 Decentralized application for document editing with built-in authorship verification. Maintains a verifiable history of contributions using cryptographic proofs.
+> ✍️ Secure markdown platform for authorship assurance, crafted with Nuxt, Tailwind, and Shadcn for instant preview and modern usability.
 
 ---
 
@@ -13,7 +13,6 @@
 - **Advanced Formatting:** Support for superscript, subscript, math expressions (KaTeX), tables, lists, and text alignment.
 - **Rich Media Insertion:** Insert emojis, tables, horizontal lines, footnotes, and code blocks with customizable options.
 - **Responsive Design:** Optimized for desktops, tablets, and mobile devices with adaptive layouts.
-- **Collaborative Features:** Verifiable contribution tracking with cryptographic signatures.
 - **Export Options:** Generate documents with proper formatting and verification metadata.
 - **Open Source:** Free to use and contribute to, built with modern web technologies.
 
