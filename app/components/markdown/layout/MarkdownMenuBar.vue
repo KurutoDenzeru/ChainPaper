@@ -156,12 +156,12 @@
   import { Input } from '@/components/ui/input'
   import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
   import EmojiInsertDialog from '@/components/editor/EmojiInsertDialog.vue'
-  import MarkdownWordCountDialog from '../editor/MarkdownWordCountDialog.vue'
-  import MarkdownAuthProofDialog from '../editor/MarkdownAuthProofDialog.vue'
-  import MarkdownExportDialog from '../editor/MarkdownExportDialog.vue'
-  import MarkdownSaveDialog from '../editor/MarkdownSaveDialog.vue'
-  import MarkdownAboutDialog from '../editor/MarkdownAboutDialog.vue'
-  import MarkdownGuideDialog from '../editor/MarkdownGuideDialog.vue'
+  import MarkdownWordCountDialog from '../dialogs/MarkdownWordCountDialog.vue'
+  import MarkdownAuthProofDialog from '../dialogs/MarkdownAuthProofDialog.vue'
+  import MarkdownExportDialog from '../dialogs/MarkdownExportDialog.vue'
+  import MarkdownSaveDialog from '../dialogs/MarkdownSaveDialog.vue'
+  import MarkdownAboutDialog from '../dialogs/MarkdownAboutDialog.vue'
+  import MarkdownGuideDialog from '../dialogs/MarkdownGuideDialog.vue'
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
   const store = useMarkdownDocStore()

@@ -1,75 +1,298 @@
 <template>
-  <Dialog :open="isOpen" @update:open="handleOpenChange">
-    <DialogContent class="sm:max-w-lg">
+  <Dialog :open="open" @update:open="$emit('update:open', $event)">
+    <DialogContent class="!max-w-3xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <BarChart3 class="w-5 h-5 text-gray-600" />
-          <span>Markdown Statistics</span>
+          <Hash class="w-5 h-5 text-blue-600" />
+          Markdown Document Statistics
         </DialogTitle>
         <DialogDescription>
-          Length and structure of your markdown document.
+          Detailed statistics and analysis of your markdown document.
         </DialogDescription>
       </DialogHeader>
-      <div class="space-y-4 py-2">
-        <div class="grid grid-cols-2 gap-4">
-          <Stat icon="File" label="Chars (with spaces)" :value="stats.charsWithSpaces" />
-          <Stat icon="Type" label="Chars (no spaces)" :value="stats.charsNoSpaces" />
-          <Stat icon="List" label="Words" :value="stats.words" />
-          <Stat icon="FileText" label="Sentences" :value="stats.sentences" />
-          <Stat icon="Hash" label="Paragraphs" :value="stats.paragraphs" />
-          <Stat icon="Clock" label="Read time" :value="stats.readingMinutes + ' min'" />
+
+      <div class="space-y-6">
+        <!-- Quick Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="p-3 bg-blue-50 rounded-lg text-center">
+            <div class="text-2xl font-bold text-blue-600">{{ stats.words }}</div>
+            <div class="text-sm text-blue-700">Words</div>
+          </div>
+          <div class="p-3 bg-green-50 rounded-lg text-center">
+            <div class="text-2xl font-bold text-green-600">{{ stats.characters }}</div>
+            <div class="text-sm text-green-700">Characters</div>
+          </div>
+          <div class="p-3 bg-purple-50 rounded-lg text-center">
+            <div class="text-2xl font-bold text-purple-600">{{ stats.charactersNoSpaces }}</div>
+            <div class="text-sm text-purple-700">No Spaces</div>
+          </div>
+          <div class="p-3 bg-orange-50 rounded-lg text-center">
+            <div class="text-2xl font-bold text-orange-600">{{ stats.paragraphs }}</div>
+            <div class="text-sm text-orange-700">Paragraphs</div>
+          </div>
         </div>
-        <div class="border-t pt-3 space-y-1 text-sm text-gray-600">
-          <div>Lines: <span class="font-medium">{{ stats.lines }}</span></div>
-          <div>Avg words / paragraph: <span class="font-medium">{{ stats.avgWordsPerParagraph }}</span></div>
+
+        <!-- Detailed Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <h4 class="font-semibold text-gray-900 flex items-center gap-2">
+              <FileText class="w-4 h-4" />
+              Text Analysis
+            </h4>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Lines:</span>
+                <span class="font-medium">{{ stats.lines }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Sentences:</span>
+                <span class="font-medium">{{ stats.sentences }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Average words per sentence:</span>
+                <span class="font-medium">{{ stats.avgWordsPerSentence }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Reading time:</span>
+                <span class="font-medium">{{ stats.readingTime }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <h4 class="font-semibold text-gray-900 flex items-center gap-2">
+              <Hash class="w-4 h-4" />
+              Markdown Elements
+            </h4>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Headings:</span>
+                <span class="font-medium">{{ stats.headings }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Links:</span>
+                <span class="font-medium">{{ stats.links }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Images:</span>
+                <span class="font-medium">{{ stats.images }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Code blocks:</span>
+                <span class="font-medium">{{ stats.codeBlocks }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Lists:</span>
+                <span class="font-medium">{{ stats.lists }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Tables:</span>
+                <span class="font-medium">{{ stats.tables }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Heading Breakdown -->
+        <div v-if="headingBreakdown.length > 0" class="space-y-3">
+          <h4 class="font-semibold text-gray-900 flex items-center gap-2">
+            <Heading class="w-4 h-4" />
+            Heading Structure
+          </h4>
+          <div class="space-y-2">
+            <div v-for="heading in headingBreakdown" :key="`${heading.level}-${heading.text}`"
+              class="flex items-center gap-2 text-sm">
+              <div class="flex-shrink-0" :style="{ marginLeft: `${(heading.level - 1) * 16}px` }">
+                <component :is="getHeadingIcon(heading.level)" class="w-4 h-4 text-gray-500" />
+              </div>
+              <span class="text-gray-600">H{{ heading.level }}:</span>
+              <span class="font-medium truncate">{{ heading.text }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Words -->
+        <div v-if="topWords.length > 0" class="space-y-3">
+          <h4 class="font-semibold text-gray-900 flex items-center gap-2">
+            <BarChart3 class="w-4 h-4" />
+            Most Frequent Words
+          </h4>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+            <div v-for="word in topWords" :key="word.word"
+              class="flex justify-between items-center p-2 bg-gray-50 rounded text-sm">
+              <span class="font-medium">{{ word.word }}</span>
+              <span class="text-gray-600">{{ word.count }}</span>
+            </div>
+          </div>
         </div>
       </div>
+
       <DialogFooter>
-        <Button variant="outline" class="w-full" @click="handleOpenChange(false)">Close</Button>
+        <div class="flex gap-2 w-full">
+          <Button variant="outline" class="w-1/2" @click="exportStats">
+            <Download class="w-4 h-4 mr-2" />
+            Export Stats
+          </Button>
+          <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">
+            Close
+          </Button>
+        </div>
       </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>
+
 <script setup lang="ts">
-import { ref, computed, watch, h, defineComponent } from 'vue'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Type, List, FileText, Hash, Clock, File, BarChart3 } from 'lucide-vue-next'
+  import { computed } from 'vue'
+  import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+  } from '@/components/ui/dialog'
+  import { Button } from '@/components/ui/button'
+  import {
+    Hash,
+    FileText,
+    Heading,
+    BarChart3,
+    Download,
+    Heading1,
+    Heading2,
+    Heading3,
+    Heading4,
+    Heading5,
+    Heading6
+  } from 'lucide-vue-next'
+  import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
-interface Props { open?: boolean; stats?: Record<string, any> }
-const props = withDefaults(defineProps<Props>(), { open:false, stats: undefined })
-const emit = defineEmits<{ 'update:open':[boolean] }>()
-const isOpen = ref(props.open)
-watch(()=>props.open, v=> isOpen.value = v )
-function handleOpenChange(v:boolean){ isOpen.value = v; emit('update:open', v) }
+  interface Props {
+    open: boolean
+  }
 
-const stats = computed(()=> ({
-  charsWithSpaces: props.stats?.charsWithSpaces ?? 0,
-  charsNoSpaces: props.stats?.charsNoSpaces ?? 0,
-  words: props.stats?.words ?? 0,
-  sentences: props.stats?.sentences ?? 0,
-  paragraphs: props.stats?.paragraphs ?? 0,
-  readingMinutes: props.stats?.readingMinutes ?? 0,
-  lines: props.stats?.lines ?? 0,
-  avgWordsPerParagraph: props.stats?.avgWordsPerParagraph ?? 0,
-}))
+  defineProps<Props>()
+  defineEmits<{
+    'update:open': [value: boolean]
+  }>()
 
-const iconMap: Record<string, any> = { Type, List, FileText, Hash, Clock, File }
+  const store = useMarkdownDocStore()
 
-const Stat = defineComponent({
-  name: 'Stat',
-  props: { icon: { type: String, required: true }, label: { type: String, required: true }, value: { required: true } },
-  setup(p){
-    return ()=>{
-      const Icon = iconMap[p.icon as string] || File
-      return h('div', { class: 'flex items-start gap-3' }, [
-        h(Icon, { class: 'w-5 h-5 text-gray-600 mt-1' }),
-        h('div', {}, [
-          h('div', { class: 'text-xs text-gray-500' }, p.label as any),
-          h('div', { class: 'text-lg font-medium' }, String(p.value))
-        ])
-      ])
+  // Calculate statistics
+  const stats = computed(() => {
+    const content = store.content
+
+    // Basic counts
+    const characters = content.length
+    const charactersNoSpaces = content.replace(/\s/g, '').length
+    const words = content.trim() ? content.trim().split(/\s+/).length : 0
+    const lines = content.split('\n').length
+    const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim()).length
+
+    // Sentences (simple approximation)
+    const sentences = content.split(/[.!?]+/).filter(s => s.trim()).length
+    const avgWordsPerSentence = sentences > 0 ? Math.round(words / sentences * 10) / 10 : 0
+
+    // Reading time (average 200 words per minute)
+    const readingMinutes = Math.ceil(words / 200)
+    const readingTime = readingMinutes === 1 ? '1 minute' : `${readingMinutes} minutes`
+
+    // Markdown elements
+    const headings = (content.match(/^#{1,6}\s+/gm) || []).length
+    const links = (content.match(/\[.*?\]\(.*?\)/g) || []).length
+    const images = (content.match(/!\[.*?\]\(.*?\)/g) || []).length
+    const codeBlocks = (content.match(/```[\s\S]*?```/g) || []).length + (content.match(/`[^`\n]+`/g) || []).length
+    const lists = (content.match(/^[\s]*[-*+]\s+/gm) || []).length + (content.match(/^[\s]*\d+\.\s+/gm) || []).length
+    const tables = (content.match(/\|.*\|/g) || []).length
+
+    return {
+      characters,
+      charactersNoSpaces,
+      words,
+      lines,
+      paragraphs,
+      sentences,
+      avgWordsPerSentence,
+      readingTime,
+      headings,
+      links,
+      images,
+      codeBlocks,
+      lists,
+      tables
+    }
+  })
+
+  // Heading breakdown
+  const headingBreakdown = computed(() => {
+    const content = store.content
+    const headingMatches = content.matchAll(/^(#{1,6})\s+(.+)$/gm)
+    const headings = []
+
+    for (const match of headingMatches) {
+      if (match[1] && match[2]) {
+        headings.push({
+          level: match[1].length,
+          text: match[2].trim()
+        })
+      }
+    }
+
+    return headings
+  })
+
+  // Top words analysis
+  const topWords = computed(() => {
+    const content = store.content.toLowerCase()
+    const words = content.match(/\b[a-z]{3,}\b/g) || []
+
+    // Common words to exclude
+    const commonWords = new Set([
+      'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'man', 'new', 'now', 'old', 'see', 'two', 'way', 'who', 'boy', 'did', 'its', 'let', 'put', 'say', 'she', 'too', 'use'
+    ])
+
+    const wordCount = new Map<string, number>()
+
+    for (const word of words) {
+      if (!commonWords.has(word)) {
+        wordCount.set(word, (wordCount.get(word) || 0) + 1)
+      }
+    }
+
+    return Array.from(wordCount.entries())
+      .map(([word, count]) => ({ word, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 12)
+  })
+
+  function getHeadingIcon(level: number) {
+    switch (level) {
+      case 1: return Heading1
+      case 2: return Heading2
+      case 3: return Heading3
+      case 4: return Heading4
+      case 5: return Heading5
+      case 6: return Heading6
+      default: return Heading
     }
   }
-})
+
+  function exportStats() {
+    const statsData = {
+      title: store.title,
+      timestamp: new Date().toISOString(),
+      statistics: stats.value,
+      headingStructure: headingBreakdown.value,
+      topWords: topWords.value
+    }
+
+    const blob = new Blob([JSON.stringify(statsData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${store.title.replace(/[^a-z0-9]/gi, '_')}_stats.json`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
 </script>

@@ -115,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-  import MarkdownWordCountDialog from '@/components/markdown/editor/MarkdownWordCountDialog.vue'
+  import MarkdownWordCountDialog from '~/components/markdown/dialogs/MarkdownWordCountDialog.vue'
   const showWordCountDialog = ref(false)
   import { ref, computed, watch } from 'vue'
   import { Minus, Plus, BookOpen, Edit } from 'lucide-vue-next'
