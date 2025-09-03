@@ -40,243 +40,243 @@
             </div>
           </div>
           <div v-else>
-          <Tabs v-model="activeTab" class="w-full">
-            <TabsList class="grid w-full grid-cols-4 lg:grid-cols-8">
-              <TabsTrigger value="recent">
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <span>🕒</span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Recently used</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TabsTrigger>
-              <TabsTrigger value="smileys">
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <span>😀</span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Smileys & People</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TabsTrigger>
-              <TabsTrigger value="animals">
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <span>🐶</span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Animals & Nature</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TabsTrigger>
-              <TabsTrigger value="food">
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <span>🍎</span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Food & Drink</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TabsTrigger>
-              <TabsTrigger value="activities">
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <span>⚽</span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Activities & Sports</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TabsTrigger>
-              <TabsTrigger value="travel">
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <span>🚗</span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Travel & Places</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TabsTrigger>
-              <TabsTrigger value="objects">
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <span>💡</span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Objects & Symbols</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TabsTrigger>
-              <TabsTrigger value="flags">
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <span>🏁</span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Flags</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="recent" class="mt-4">
-              <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in filteredRecentEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
-                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+            <Tabs v-model="activeTab" class="w-full">
+              <TabsList class="grid w-full grid-cols-4 lg:grid-cols-8">
+                <TabsTrigger value="recent">
                   <Tooltip>
                     <TooltipTrigger as-child>
-                      <span>{{ emoji.char }}</span>
+                      <span>🕒</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{{ emoji.name }}</p>
+                      <p>Recently used</p>
                     </TooltipContent>
                   </Tooltip>
-                </button>
-              </div>
-              <div v-if="filteredRecentEmojis.length === 0" class="text-center text-gray-500 py-8">
-                <p v-if="!searchQuery.trim()">No recently used emojis</p>
-                <p v-else>No emojis found matching "{{ searchQuery }}"</p>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="smileys" class="mt-4">
-              <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in filteredSmileys" :key="emoji.char" @click="selectEmoji(emoji)"
-                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                </TabsTrigger>
+                <TabsTrigger value="smileys">
                   <Tooltip>
                     <TooltipTrigger as-child>
-                      <span>{{ emoji.char }}</span>
+                      <span>😀</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{{ emoji.name }}</p>
+                      <p>Smileys & People</p>
                     </TooltipContent>
                   </Tooltip>
-                </button>
-              </div>
-              <div v-if="filteredSmileys.length === 0" class="text-center text-gray-500 py-8">
-                No emojis found matching "{{ searchQuery }}"
-              </div>
-            </TabsContent>
-
-            <TabsContent value="animals" class="mt-4">
-              <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in filteredAnimals" :key="emoji.char" @click="selectEmoji(emoji)"
-                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                </TabsTrigger>
+                <TabsTrigger value="animals">
                   <Tooltip>
                     <TooltipTrigger as-child>
-                      <span>{{ emoji.char }}</span>
+                      <span>🐶</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{{ emoji.name }}</p>
+                      <p>Animals & Nature</p>
                     </TooltipContent>
                   </Tooltip>
-                </button>
-              </div>
-              <div v-if="filteredAnimals.length === 0" class="text-center text-gray-500 py-8">
-                No emojis found matching "{{ searchQuery }}"
-              </div>
-            </TabsContent>
-
-            <TabsContent value="food" class="mt-4">
-              <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in filteredFood" :key="emoji.char" @click="selectEmoji(emoji)"
-                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                </TabsTrigger>
+                <TabsTrigger value="food">
                   <Tooltip>
                     <TooltipTrigger as-child>
-                      <span>{{ emoji.char }}</span>
+                      <span>🍎</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{{ emoji.name }}</p>
+                      <p>Food & Drink</p>
                     </TooltipContent>
                   </Tooltip>
-                </button>
-              </div>
-              <div v-if="filteredFood.length === 0" class="text-center text-gray-500 py-8">
-                No emojis found matching "{{ searchQuery }}"
-              </div>
-            </TabsContent>
-
-            <TabsContent value="activities" class="mt-4">
-              <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in filteredActivities" :key="emoji.char" @click="selectEmoji(emoji)"
-                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                </TabsTrigger>
+                <TabsTrigger value="activities">
                   <Tooltip>
                     <TooltipTrigger as-child>
-                      <span>{{ emoji.char }}</span>
+                      <span>⚽</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{{ emoji.name }}</p>
+                      <p>Activities & Sports</p>
                     </TooltipContent>
                   </Tooltip>
-                </button>
-              </div>
-              <div v-if="filteredActivities.length === 0" class="text-center text-gray-500 py-8">
-                No emojis found matching "{{ searchQuery }}"
-              </div>
-            </TabsContent>
-
-            <TabsContent value="objects" class="mt-4">
-              <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in filteredObjects" :key="emoji.char" @click="selectEmoji(emoji)"
-                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                </TabsTrigger>
+                <TabsTrigger value="travel">
                   <Tooltip>
                     <TooltipTrigger as-child>
-                      <span>{{ emoji.char }}</span>
+                      <span>🚗</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{{ emoji.name }}</p>
+                      <p>Travel & Places</p>
                     </TooltipContent>
                   </Tooltip>
-                </button>
-              </div>
-              <div v-if="filteredObjects.length === 0" class="text-center text-gray-500 py-8">
-                No emojis found matching "{{ searchQuery }}"
-              </div>
-            </TabsContent>
-
-            <TabsContent value="travel" class="mt-4">
-              <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in filteredTravel" :key="emoji.char" @click="selectEmoji(emoji)"
-                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                </TabsTrigger>
+                <TabsTrigger value="objects">
                   <Tooltip>
                     <TooltipTrigger as-child>
-                      <span>{{ emoji.char }}</span>
+                      <span>💡</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{{ emoji.name }}</p>
+                      <p>Objects & Symbols</p>
                     </TooltipContent>
                   </Tooltip>
-                </button>
-              </div>
-              <div v-if="filteredTravel.length === 0" class="text-center text-gray-500 py-8">
-                No emojis found matching "{{ searchQuery }}"
-              </div>
-            </TabsContent>
-
-            <TabsContent value="flags" class="mt-4">
-              <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="emoji in filteredFlags" :key="emoji.char" @click="selectEmoji(emoji)"
-                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                </TabsTrigger>
+                <TabsTrigger value="flags">
                   <Tooltip>
                     <TooltipTrigger as-child>
-                      <span>{{ emoji.char }}</span>
+                      <span>🏁</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{{ emoji.name }}</p>
+                      <p>Flags</p>
                     </TooltipContent>
                   </Tooltip>
-                </button>
-              </div>
-              <div v-if="filteredFlags.length === 0" class="text-center text-gray-500 py-8">
-                No emojis found matching "{{ searchQuery }}"
-              </div>
-            </TabsContent>
-          </Tabs>
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="recent" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredRecentEmojis" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredRecentEmojis.length === 0" class="text-center text-gray-500 py-8">
+                  <p v-if="!searchQuery.trim()">No recently used emojis</p>
+                  <p v-else>No emojis found matching "{{ searchQuery }}"</p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="smileys" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredSmileys" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredSmileys.length === 0" class="text-center text-gray-500 py-8">
+                  No emojis found matching "{{ searchQuery }}"
+                </div>
+              </TabsContent>
+
+              <TabsContent value="animals" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredAnimals" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredAnimals.length === 0" class="text-center text-gray-500 py-8">
+                  No emojis found matching "{{ searchQuery }}"
+                </div>
+              </TabsContent>
+
+              <TabsContent value="food" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredFood" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredFood.length === 0" class="text-center text-gray-500 py-8">
+                  No emojis found matching "{{ searchQuery }}"
+                </div>
+              </TabsContent>
+
+              <TabsContent value="activities" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredActivities" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredActivities.length === 0" class="text-center text-gray-500 py-8">
+                  No emojis found matching "{{ searchQuery }}"
+                </div>
+              </TabsContent>
+
+              <TabsContent value="objects" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredObjects" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredObjects.length === 0" class="text-center text-gray-500 py-8">
+                  No emojis found matching "{{ searchQuery }}"
+                </div>
+              </TabsContent>
+
+              <TabsContent value="travel" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredTravel" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredTravel.length === 0" class="text-center text-gray-500 py-8">
+                  No emojis found matching "{{ searchQuery }}"
+                </div>
+              </TabsContent>
+
+              <TabsContent value="flags" class="mt-4">
+                <div class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <button v-for="emoji in filteredFlags" :key="emoji.char" @click="selectEmoji(emoji)"
+                    class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="emoji.name">
+                    <Tooltip>
+                      <TooltipTrigger as-child>
+                        <span>{{ emoji.char }}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{{ emoji.name }}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </button>
+                </div>
+                <div v-if="filteredFlags.length === 0" class="text-center text-gray-500 py-8">
+                  No emojis found matching "{{ searchQuery }}"
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </TooltipProvider>
       </div>
@@ -292,6 +292,7 @@
 
 <script setup lang="ts">
   import { ref, onMounted, computed } from 'vue'
+  import { useEmojiStore } from '@/stores/emojiStore'
   import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
   import { Button } from '@/components/ui/button'
   import { Input } from '@/components/ui/input'
@@ -319,13 +320,16 @@
   const activeTab = ref('recent')
   const recentEmojis = ref<Emoji[]>([])
   const searchQuery = ref('')
-  const isLoading = ref(false)
-  const allEmojis = ref<Emoji[]>([])
+  const emojiStore = useEmojiStore()
+  const isLoading = emojiStore.isLoading
+  const allEmojis = emojiStore.allEmojis
 
   // Convert unified codepoint string (e.g. "1F600" or "1F1FA-1F1F8") to actual character(s)
   function codepointsToChar(unified: string) {
     return unified.split('-').map(u => String.fromCodePoint(parseInt(u, 16))).join('')
   }
+  // We now use the centralized Pinia emoji store to initialize and serve emoji data.
+
   // Detect whether a glyph renders on this platform (avoids tofu/empty squares)
   function isEmojiSupported(emoji: string) {
     try {
@@ -338,56 +342,12 @@
       ctx.font = '16px Arial'
       ctx.fillText(emoji, 0, 0)
       const data = ctx.getImageData(0, 0, 20, 20).data
-      // If any pixel has non-zero alpha, assume it rendered
       for (let i = 0; i < data.length; i += 4) {
         if (data[i + 3] !== 0) return true
       }
       return false
     } catch {
       return true
-    }
-  }
-
-  // Load emoji dataset from a FOSS CDN (iamcal/emoji-data). Falls back to a small set.
-  function normalizeCategory(cat: string) {
-    const c = (cat || '').toLowerCase()
-    if (c.includes('smile')) return 'smileys'
-    if (c.includes('people') || c.includes('body')) return 'people'
-    if (c.includes('animal') || c.includes('nature')) return 'animals'
-    if (c.includes('food')) return 'food'
-    if (c.includes('activity')) return 'activities'
-    if (c.includes('travel') || c.includes('place')) return 'travel'
-    if (c.includes('object') || c.includes('objects')) return 'objects'
-    if (c.includes('symbol')) return 'symbols'
-    if (c.includes('flag')) return 'flags'
-    return c.replace(/\s+/g, '-')
-  }
-
-  async function loadEmojis() {
-    isLoading.value = true
-    try {
-      const res = await fetch('https://raw.githubusercontent.com/iamcal/emoji-data/master/emoji.json')
-      if (!res.ok) throw new Error('Failed to fetch')
-      const data = await res.json()
-      allEmojis.value = data.map((e: any) => ({
-        char: codepointsToChar(e.unified),
-        name: e.name || e.short_name || '',
-        shortcode: e.short_name ? `:${e.short_name}:` : (e.short_names && e.short_names[0] ? `:${e.short_names[0]}:` : ''),
-        category: normalizeCategory(e.category || ''),
-        keywords: (e.short_names || e.keywords || []).map((k: string) => String(k).toLowerCase())
-      }))
-    } catch (err) {
-      // Minimal fallback
-      allEmojis.value = [
-        { char: '😀', name: 'Grinning Face', shortcode: ':grinning:', category: 'smileys', keywords: ['face', 'smile'] },
-        { char: '😂', name: 'Face with Tears of Joy', shortcode: ':joy:', category: 'smileys', keywords: ['face', 'tears', 'joy'] },
-        { char: '🐶', name: 'Dog Face', shortcode: ':dog:', category: 'animals', keywords: ['dog', 'pet'] },
-        { char: '🍎', name: 'Red Apple', shortcode: ':apple:', category: 'food', keywords: ['fruit', 'apple'] },
-        { char: '🚗', name: 'Automobile', shortcode: ':car:', category: 'travel', keywords: ['car', 'vehicle'] },
-        { char: '🏁', name: 'Chequered Flag', shortcode: ':chequered_flag:', category: 'flags', keywords: ['flag'] }
-      ]
-    } finally {
-      isLoading.value = false
     }
   }
 
@@ -417,44 +377,44 @@
 
   const filteredSmileys = computed(() => {
     const query = searchQuery.value.trim()
-    return allEmojis.value.filter(e => (e.category === 'smileys' || e.category === 'people' || e.category === 'emotion') && matchesQuery(e, query))
+    return allEmojis.filter((e: Emoji) => (e.category === 'smileys' || e.category === 'people' || e.category === 'emotion') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
   })
 
   const filteredAnimals = computed(() => {
     const query = searchQuery.value.trim()
-    return allEmojis.value.filter(e => (e.category === 'animals' || e.category === 'nature') && matchesQuery(e, query))
+    return allEmojis.filter((e: Emoji) => (e.category === 'animals' || e.category === 'nature') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
   })
 
   const filteredFood = computed(() => {
     const query = searchQuery.value.trim()
-    return allEmojis.value.filter(e => (e.category === 'food' || e.category === 'food-drink' || e.category === 'food & drink') && matchesQuery(e, query))
+    return allEmojis.filter((e: Emoji) => (e.category === 'food' || e.category === 'food-drink' || e.category === 'food & drink') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
   })
 
   const filteredActivities = computed(() => {
     const query = searchQuery.value.trim()
-    return allEmojis.value.filter(e => (e.category === 'activity' || e.category === 'activities') && matchesQuery(e, query))
+    return allEmojis.filter((e: Emoji) => (e.category === 'activity' || e.category === 'activities') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
   })
 
   const filteredTravel = computed(() => {
     const query = searchQuery.value.trim()
-    return allEmojis.value.filter(e => (e.category === 'travel' || e.category === 'places') && matchesQuery(e, query))
+    return allEmojis.filter((e: Emoji) => (e.category === 'travel' || e.category === 'places') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
   })
 
   const filteredObjects = computed(() => {
     const query = searchQuery.value.trim()
-    return allEmojis.value.filter(e => (e.category === 'objects' || e.category === 'symbols') && matchesQuery(e, query))
+    return allEmojis.filter((e: Emoji) => (e.category === 'objects' || e.category === 'symbols') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
   })
 
   const filteredFlags = computed(() => {
     const query = searchQuery.value.trim()
-    return allEmojis.value.filter(e => (e.category === 'flags' || e.category === 'country-flag' || e.category === 'regional') && matchesQuery(e, query))
+    return allEmojis.filter((e: Emoji) => (e.category === 'flags' || e.category === 'country-flag' || e.category === 'regional') && matchesQuery(e, query)).sort((a: Emoji, b: Emoji) => a.name.localeCompare(b.name))
   })
 
   // Search results when user types something - includes exact char matches and fuzzy
   const searchResults = computed(() => {
     const q = searchQuery.value.trim()
     if (!q) return []
-    return allEmojis.value.filter(e => matchesQuery(e, q))
+    return allEmojis.filter((e: Emoji) => matchesQuery(e, q))
   })
 
   // Load recent emojis from localStorage
@@ -467,10 +427,15 @@
         // Ignore parsing errors
       }
     }
-    // Load emoji dataset from CDN and filter unsupported glyphs
-    loadEmojis().then(() => {
-      // Filter out emojis not supported on this platform to avoid squares
-      allEmojis.value = allEmojis.value.filter(e => isEmojiSupported(e.char))
+    // Initialize store (uses cache + background fetch). After init, filter unsupported glyphs.
+    emojiStore.init().then(() => {
+      try {
+        // filter out unsupported glyphs in place
+        const supported = emojiStore.allEmojis.filter((e: Emoji) => isEmojiSupported(e.char))
+        emojiStore.allEmojis = supported
+      } catch (e) {
+        // ignore
+      }
     }).catch(() => {
       // ignore
     })
