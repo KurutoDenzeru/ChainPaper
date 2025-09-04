@@ -550,7 +550,7 @@
   // Title editing state
   const isEditingTitle = ref(false)
   const editingTitle = ref('')
-  const titleInput = ref<HTMLInputElement | null>(null)
+  const titleInput = ref<InstanceType<typeof Input> | null>(null)
 
   // detect platform on client to show correct modifier icon in shortcuts
   const isMac = ref(false)
@@ -566,8 +566,11 @@
     isEditingTitle.value = true
     editingTitle.value = title.value || ''
     nextTick(() => {
-      titleInput.value?.focus()
-      titleInput.value?.select()
+      const inputElement = titleInput.value?.$el as HTMLInputElement
+      if (inputElement) {
+        inputElement.focus()
+        inputElement.select()
+      }
     })
   }
 

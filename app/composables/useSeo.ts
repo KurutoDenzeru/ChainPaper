@@ -5,7 +5,7 @@ import type { SeoConfig } from '../../types/seo'
 const DEFAULT_CONFIG = {
   title: 'ChainPaper - Trustless Whitepaper Collaboration',
   description: '✍️ Secure markdown platform for authorship assurance, crafted with Nuxt, Tailwind, and Shadcn for instant preview and modern usability.',
-  ogImage: '/openGraph.png',
+  ogImage: '/OpenGraph.webp',
   ogUrl: 'https://chainpaper.nuxt.dev/',
   twitterCard: 'summary_large_image' as const,
   siteName: 'ChainPaper',
