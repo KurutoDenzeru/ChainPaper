@@ -35,7 +35,8 @@
                 <p>Click to view detailed word count statistics</p>
               </TooltipContent>
             </Tooltip>
-            <MarkdownWordCountDialog :open="showWordCountDialog" :stats="{ words: wordCount, characters: characterCount }" @update:open="v => showWordCountDialog = v" />
+            <MarkdownWordCountDialog :open="showWordCountDialog"
+              :stats="{ words: wordCount, characters: characterCount }" @update:open="v => showWordCountDialog = v" />
             <div class="hidden sm:flex items-center gap-2">•</div>
             <Tooltip>
               <TooltipTrigger as-child>
@@ -74,32 +75,31 @@
               </TooltipContent>
             </Tooltip>
 
-          <Popover>
-            <PopoverTrigger as-child>
-              <button
-                type="button"
-                aria-haspopup="dialog"
-                :aria-expanded="false"
-                class="w-16 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                tabindex="0"
-              >
-                <Input type="number" class="w-16 text-center text-sm rounded-md border border-gray-200 px-2 py-1"
-                  v-model="zoomModel" min="50" max="200" placeholder="100" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent class="w-32 p-2">
-              <div class="flex flex-col">
-                <button class="text-left px-2 py-1 rounded hover:bg-gray-100 font-medium" @click="selectZoom('fit')">
-                  Fit
+            <Popover>
+              <PopoverTrigger as-child>
+                <button type="button" aria-haspopup="dialog" :aria-expanded="false"
+                  class="w-16 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  tabindex="0">
+                  <!-- Provide accessible name and spinbutton semantics for screen readers -->
+                  <Input type="number" class="w-16 text-center text-sm rounded-md border border-gray-200 px-2 py-1"
+                    v-model="zoomModel" min="50" max="200" placeholder="100" aria-label="Zoom percentage"
+                    role="spinbutton" aria-valuemin="50" aria-valuemax="200"
+                    :aria-valuenow="isFit ? 100 : zoomPercent" />
                 </button>
-                <div class="border-t my-1" />
-                <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-gray-100"
-                  @click="selectZoom(opt)">
-                  {{ opt }}%
-                </button>
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverTrigger>
+              <PopoverContent class="w-32 p-2">
+                <div class="flex flex-col">
+                  <button class="text-left px-2 py-1 rounded hover:bg-gray-100 font-medium" @click="selectZoom('fit')">
+                    Fit
+                  </button>
+                  <div class="border-t my-1" />
+                  <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-gray-100"
+                    @click="selectZoom(opt)">
+                    {{ opt }}%
+                  </button>
+                </div>
+              </PopoverContent>
+            </Popover>
 
             <Tooltip>
               <TooltipTrigger as-child>
