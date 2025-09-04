@@ -9,7 +9,8 @@
           <Tooltip>
             <TooltipTrigger as-child>
               <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="toggleMode"
-                :title="mode === 'source' ? 'Switch to Reader' : 'Switch to Source'">
+                :title="mode === 'source' ? 'Switch to Reader' : 'Switch to Source'"
+                :aria-label="mode === 'source' ? 'Switch to Reader view' : 'Switch to Source view'">
                 <BookOpen v-if="mode === 'source'" class="w-4 h-4" />
                 <Edit v-else class="w-4 h-4" />
               </Button>
@@ -24,7 +25,8 @@
         <!-- View Controls -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" @click="$emit('toggle-find')" class="h-8 w-8 p-0">
+            <Button variant="ghost" size="sm" @click="$emit('toggle-find')" class="h-8 w-8 p-0"
+              aria-label="Find in document">
               <Search class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -38,7 +40,8 @@
         <!-- Undo/Redo -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" @click="$emit('undo')" :disabled="!canUndo" class="h-8 w-8 p-0">
+            <Button variant="ghost" size="sm" @click="$emit('undo')" :disabled="!canUndo" class="h-8 w-8 p-0"
+              aria-label="Undo">
               <Undo2 class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -48,7 +51,8 @@
         </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" @click="$emit('redo')" :disabled="!canRedo" class="h-8 w-8 p-0">
+            <Button variant="ghost" size="sm" @click="$emit('redo')" :disabled="!canRedo" class="h-8 w-8 p-0"
+              aria-label="Redo">
               <Redo2 class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -66,7 +70,7 @@
         <Popover>
           <PopoverTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16"
-              title="Heading Styles">
+              title="Heading Styles" aria-label="Heading styles">
               <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600" />
               <ChevronDown class="w-3 h-3 text-gray-500" />
             </Button>
@@ -119,7 +123,7 @@
         <div class="flex items-center gap-1 ml-1">
           <Tooltip>
             <TooltipTrigger as-child>
-              <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="changeZoom(-25)">
+              <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="changeZoom(-25)" aria-label="Zoom out">
                 <Minus class="w-4 h-4" />
               </Button>
             </TooltipTrigger>
@@ -130,14 +134,11 @@
 
           <Popover>
             <PopoverTrigger as-child>
-              <button
-                type="button"
-                aria-haspopup="dialog"
-                :aria-expanded="false"
+              <button type="button" aria-haspopup="dialog" :aria-expanded="false"
                 class="w-20 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                tabindex="0"
-              >
-                <Input type="number" v-model="zoomModel" class="w-20 text-center h-8 rounded" />
+                tabindex="0">
+                <Input type="number" v-model="zoomModel" class="w-20 text-center h-8 rounded"
+                  aria-label="Zoom percentage" role="spinbutton" aria-valuemin="50" aria-valuemax="200" :aria-valuenow="isFit ? 100 : zoomPercent" />
               </button>
             </PopoverTrigger>
             <PopoverContent class="w-32 p-2">
@@ -153,7 +154,7 @@
 
           <Tooltip>
             <TooltipTrigger as-child>
-              <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="changeZoom(25)">
+              <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="changeZoom(25)" aria-label="Zoom in">
                 <Plus class="w-4 h-4" />
               </Button>
             </TooltipTrigger>
@@ -169,7 +170,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bold }]"
-              @click="$emit('format-bold')">
+              @click="$emit('format-bold')" :aria-pressed="active.bold" aria-label="Bold">
               <Bold class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -180,7 +181,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.italic }]"
-              @click="$emit('format-italic')">
+              @click="$emit('format-italic')" :aria-pressed="active.italic" aria-label="Italic">
               <Italic class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -191,7 +192,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.underline }]"
-              @click="$emit('format-underline')">
+              @click="$emit('format-underline')" :aria-pressed="active.underline" aria-label="Underline">
               <Underline class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -202,7 +203,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.strike }]"
-              @click="$emit('format-strikethrough')">
+              @click="$emit('format-strikethrough')" :aria-pressed="active.strike" aria-label="Strikethrough">
               <Strikethrough class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -278,7 +279,8 @@
         <!-- Code Block -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-code-block')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-code-block')"
+              aria-label="Insert code block">
               <Code2 class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -290,7 +292,8 @@
         <!-- Blockquote -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('toggle-blockquote')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('toggle-blockquote')"
+              aria-label="Toggle blockquote">
               <Quote class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -302,7 +305,8 @@
         <!-- Superscript -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-superscript')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-superscript')"
+              aria-label="Superscript">
               <Superscript class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -314,7 +318,8 @@
         <!-- Subscript -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-subscript')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-subscript')"
+              aria-label="Subscript">
               <Subscript class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -329,7 +334,7 @@
         <Popover>
           <PopoverTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16"
-              title="Text Alignment">
+              title="Text Alignment" aria-label="Text alignment">
               <component :is="alignmentIcon" class="w-4 h-4" />
               <ChevronDown class="w-3 h-3 text-gray-500" />
             </Button>
@@ -357,7 +362,8 @@
         <!-- Math -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-math')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-math')"
+              aria-label="Insert math">
               <Sigma class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -369,7 +375,8 @@
         <!-- Mathblock -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-mathblock')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-mathblock')"
+              aria-label="Insert math block">
               <SquareSigma class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -381,7 +388,8 @@
         <!-- Horizontal Line -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-horizontal-line')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-horizontal-line')"
+              aria-label="Insert divider">
               <Minus class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -393,7 +401,8 @@
         <!-- Footnote -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-footnote')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-footnote')"
+              aria-label="Insert footnote">
               <FileText class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -405,7 +414,8 @@
         <!-- Emoji -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showEmojiDialog = true">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showEmojiDialog = true"
+              aria-label="Insert emoji">
               <Smile class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -416,7 +426,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bullet }]"
-              @click="$emit('toggle-bullet-list')">
+              @click="$emit('toggle-bullet-list')" :aria-pressed="active.bullet" aria-label="Toggle bullet list">
               <List class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -427,7 +437,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.ordered }]"
-              @click="$emit('toggle-ordered-list')">
+              @click="$emit('toggle-ordered-list')" :aria-pressed="active.ordered" aria-label="Toggle numbered list">
               <ListOrdered class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -439,7 +449,7 @@
         <!-- Indent/Unindent -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('unindent')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('unindent')" aria-label="Unindent">
               <Outdent class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -449,7 +459,7 @@
         </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('indent')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('indent')" aria-label="Indent">
               <Indent class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -463,7 +473,8 @@
         <!-- Insert Tools -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-link')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-link')"
+              aria-label="Insert link">
               <Link class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -473,7 +484,8 @@
         </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-image')">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-image')"
+              aria-label="Insert image">
               <ImageIcon class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -483,7 +495,8 @@
         </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showTableDialog = true">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showTableDialog = true"
+              aria-label="Insert table">
               <Table class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -553,15 +566,15 @@
 
         <!-- Basic Formatting -->
         <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bold }]"
-          @click="$emit('format-bold')">
+          @click="$emit('format-bold')" :aria-pressed="active.bold" aria-label="Bold">
           <Bold class="w-4 h-4" />
         </Button>
         <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.italic }]"
-          @click="$emit('format-italic')">
+          @click="$emit('format-italic')" :aria-pressed="active.italic" aria-label="Italic">
           <Italic class="w-4 h-4" />
         </Button>
         <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.underline }]"
-          @click="$emit('format-underline')">
+          @click="$emit('format-underline')" :aria-pressed="active.underline" aria-label="Underline">
           <Underline class="w-4 h-4" />
         </Button>
 
@@ -569,11 +582,11 @@
 
         <!-- Lists -->
         <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bullet }]"
-          @click="$emit('toggle-bullet-list')">
+          @click="$emit('toggle-bullet-list')" :aria-pressed="active.bullet" aria-label="Toggle bullet list">
           <List class="w-4 h-4" />
         </Button>
         <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.ordered }]"
-          @click="$emit('toggle-ordered-list')">
+          @click="$emit('toggle-ordered-list')" :aria-pressed="active.ordered" aria-label="Toggle numbered list">
           <ListOrdered class="w-4 h-4" />
         </Button>
 
@@ -585,15 +598,15 @@
         <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
         <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bold }]"
-          @click="$emit('format-bold')">
+          @click="$emit('format-bold')" aria-label="Bold" :aria-pressed="active.bold">
           <Bold class="w-4 h-4" />
         </Button>
         <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.italic }]"
-          @click="$emit('format-italic')">
+          @click="$emit('format-italic')" aria-label="Italic" :aria-pressed="active.italic">
           <Italic class="w-4 h-4" />
         </Button>
         <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.underline }]"
-          @click="$emit('format-underline')">
+          @click="$emit('format-underline')" aria-label="Underline" :aria-pressed="active.underline">
           <Underline class="w-4 h-4" />
         </Button>
 
@@ -604,7 +617,7 @@
       <div class="flex lg:hidden gap-1 flex-shrink-0 items-center">
         <Popover>
           <PopoverTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0">
+            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" aria-label="More options">
               <MoreHorizontal class="w-4 h-4" />
             </Button>
           </PopoverTrigger>
