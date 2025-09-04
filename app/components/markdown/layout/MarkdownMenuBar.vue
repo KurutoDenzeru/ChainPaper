@@ -12,7 +12,9 @@
         <div class="flex items-center gap-2 mb-1">
           <div v-if="!isEditingTitle" @click="startEditingTitle"
             class="flex items-center gap-2 px-3 rounded hover:bg-gray-100 cursor-pointer transition-colors">
-            <span class="text-lg text-gray-900 font-medium -ml-2">{{ title || 'Untitled Markdown' }}</span>
+            <!-- render default title once when empty to reduce hydration/LCP work -->
+            <span v-once :key="title || 'untitled-markdown'" class="text-lg text-gray-900 font-medium -ml-2">{{ title ||
+              'Untitled Markdown' }}</span>
             <Edit3 class="w-4 h-4 text-gray-600" />
             <span v-if="isDirty" class="text-orange-500">•</span>
           </div>
@@ -176,7 +178,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, nextTick, onMounted } from 'vue'
+  import { ref, nextTick, onMounted, defineAsyncComponent } from 'vue'
   import { storeToRefs } from 'pinia'
   import {
     Edit3, Command, FileText, FolderOpen, Save, Download,
@@ -187,28 +189,17 @@
     Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info, Indent, Outdent,
     Superscript, Subscript, Sigma, SquareSigma, Minus, Smile
   } from 'lucide-vue-next'
-  import {
-    Menubar,
-    MenubarCheckboxItem,
-    MenubarContent,
-    MenubarItem,
-    MenubarMenu,
-    MenubarSeparator,
-    MenubarShortcut,
-    MenubarSub,
-    MenubarSubContent,
-    MenubarSubTrigger,
-    MenubarTrigger,
-  } from '@/components/ui/menubar'
+  import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from '@/components/ui/menubar'
   import { Input } from '@/components/ui/input'
-  import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
-  import EmojiInsertDialog from '@/components/editor/EmojiInsertDialog.vue'
-  import MarkdownWordCountDialog from '../dialogs/MarkdownWordCountDialog.vue'
-  import MarkdownAuthProofDialog from '../dialogs/MarkdownAuthProofDialog.vue'
-  import MarkdownExportDialog from '../dialogs/MarkdownExportDialog.vue'
-  import MarkdownSaveDialog from '../dialogs/MarkdownSaveDialog.vue'
-  import MarkdownAboutDialog from '../dialogs/MarkdownAboutDialog.vue'
-  import MarkdownGuideDialog from '../dialogs/MarkdownGuideDialog.vue'
+  // Lazy-load dialog components to reduce initial bundle and improve LCP
+  const TableInsertDialog = defineAsyncComponent(() => import('@/components/editor/TableInsertDialog.vue'))
+  const EmojiInsertDialog = defineAsyncComponent(() => import('@/components/editor/EmojiInsertDialog.vue'))
+  const MarkdownWordCountDialog = defineAsyncComponent(() => import('../dialogs/MarkdownWordCountDialog.vue'))
+  const MarkdownAuthProofDialog = defineAsyncComponent(() => import('../dialogs/MarkdownAuthProofDialog.vue'))
+  const MarkdownExportDialog = defineAsyncComponent(() => import('../dialogs/MarkdownExportDialog.vue'))
+  const MarkdownSaveDialog = defineAsyncComponent(() => import('../dialogs/MarkdownSaveDialog.vue'))
+  const MarkdownAboutDialog = defineAsyncComponent(() => import('../dialogs/MarkdownAboutDialog.vue'))
+  const MarkdownGuideDialog = defineAsyncComponent(() => import('../dialogs/MarkdownGuideDialog.vue'))
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
   const store = useMarkdownDocStore()
