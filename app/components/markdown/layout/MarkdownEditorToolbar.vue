@@ -137,8 +137,10 @@
               <button type="button" aria-haspopup="dialog" :aria-expanded="false"
                 class="w-20 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 tabindex="0">
-                <Input type="number" v-model="zoomModel" class="w-20 text-center h-8 rounded"
-                  aria-label="Zoom percentage" role="spinbutton" aria-valuemin="50" aria-valuemax="200" :aria-valuenow="isFit ? 100 : zoomPercent" />
+                <span class="sr-only" id="editor-zoom-label">Zoom percentage</span>
+                <Input id="editor-zoom-input" type="number" v-model="zoomModel" class="w-20 text-center h-8 rounded"
+                  aria-labelledby="editor-zoom-label" aria-label="Zoom percentage" role="spinbutton" aria-valuemin="50"
+                  aria-valuemax="200" :aria-valuenow="isFit ? 100 : zoomPercent" />
               </button>
             </PopoverTrigger>
             <PopoverContent class="w-32 p-2">
