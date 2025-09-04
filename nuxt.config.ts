@@ -34,14 +34,8 @@ export default defineNuxtConfig({
       title: 'ChainPaper - Trustless Whitepaper Collaboration',
       meta: [
         { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Trustless whitepaper collaboration tool with authorship proofs, no backend required.' },
-        { name: 'keywords', content: 'whitepaper, collaboration, trustless, authorship, proof, no backend' },
-        { name: 'author', content: 'ChainPaper' },
-        { name: 'robots', content: 'index, follow' },
       ],
-
-  link: [],
+      link: [],
     }
   },
 

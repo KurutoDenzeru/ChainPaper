@@ -53,6 +53,9 @@
   </div>
 </template>
 <script setup lang="ts">
+  // Initialize SEO and OpenGraph meta tags
+  useSeo()
+
   import ImageInsertDialog from '@/components/editor/ImageInsertDialog.vue'
   const imageDialogOpen = ref(false)
 
