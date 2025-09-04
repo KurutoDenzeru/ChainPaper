@@ -18,11 +18,13 @@
             <Edit3 class="w-4 h-4 text-gray-600" />
             <span v-if="isDirty" class="text-orange-500">•</span>
           </div>
-          <div v-else class="flex items-center gap-2">
-            <Input ref="titleInput" v-model="editingTitle" @blur="saveTitle" @keyup.enter="saveTitle"
-              @keyup.escape="cancelEdit" class="text-lg bg-transparent border-2 rounded-md outline-none px-1 min-w-48"
-              :placeholder="'Untitled Markdown'" />
-          </div>
+          <client-only>
+            <div v-if="isEditingTitle" class="flex items-center gap-2">
+              <Input ref="titleInput" v-model="editingTitle" @blur="saveTitle" @keyup.enter="saveTitle"
+                @keyup.escape="cancelEdit" class="text-lg bg-transparent border-2 rounded-md outline-none px-1 min-w-48"
+                :placeholder="'Untitled Markdown'" />
+            </div>
+          </client-only>
         </div>
         <!-- Second Row: Menu Items -->
         <div class="flex items-center gap-1">
