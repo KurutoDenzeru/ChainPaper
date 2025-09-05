@@ -50,6 +50,7 @@
     <LinkInsertDialog :open="linkDialogOpen" :selectedText="linkDialogSelectedText"
       @update:open="v => linkDialogOpen = v" @insert="handleLinkInsert" />
     <ImageInsertDialog :open="imageDialogOpen" @update:open="v => imageDialogOpen = v" @insert="handleImageInsert" />
+    <Toaster />
   </div>
 </template>
 <script setup lang="ts">
@@ -141,6 +142,9 @@
   import MarkdownWordCountDialog from '@/components/markdown/dialogs/MarkdownWordCountDialog.vue'
   import LinkInsertDialog from '@/components/editor/LinkInsertDialog.vue'
   import { insertLink as domInsertLink } from '@/lib/editor-formatting'
+  import { Toaster } from '@/components/ui/sonner'
+  import { toast } from 'vue-sonner'
+  import 'vue-sonner/style.css'
   // Lazy load markdown-it plugins only when needed
   let MarkdownIt: any
   let katexPlugin: any
@@ -258,6 +262,30 @@
     nextTick(() => {
       textareaEl.value = document.querySelector('textarea')
     })
+
+    // Restore saved document if available
+    try {
+      const savedDoc = localStorage.getItem('chainpaper_current_doc')
+      if (savedDoc) {
+        const data = JSON.parse(savedDoc)
+        // Only restore if the store is in its default state
+        if (store.title === 'Untitled Markdown' && !store.content.trim()) {
+          store.setTitle(data.title || 'Untitled Markdown')
+          store.setContent(data.content || '', false) // Don't push to history
+          store.markSaved() // Mark as saved since we just loaded it
+
+          // Show toast notification after a short delay to ensure UI is ready
+          setTimeout(() => {
+            toast.info('Document restored', {
+              description: `Restored "${data.title || 'Untitled'}" from previous session`,
+              duration: 3000
+            })
+          }, 1000)
+        }
+      }
+    } catch (error) {
+      console.warn('Could not restore saved document:', error)
+    }
 
     // Preload markdown plugins during idle time for better UX
     if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {

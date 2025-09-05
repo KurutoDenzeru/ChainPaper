@@ -13,8 +13,8 @@
           <div v-if="!isEditingTitle" @click="startEditingTitle" @keydown.enter="startEditingTitle" role="button"
             tabindex="0" aria-label="Edit document title"
             class="flex items-center gap-2 px-3 rounded hover:bg-gray-100 cursor-pointer transition-colors">
-            <!-- render default title once when empty to reduce hydration/LCP work -->
-            <span v-once :key="title || 'untitled-markdown'" class="text-lg text-gray-900 font-medium -ml-2">{{ title ||
+            <!-- render title reactively to show updates -->
+            <span class="text-lg text-gray-900 font-medium -ml-2">{{ title ||
               'Untitled Markdown' }}</span>
             <Edit3 class="w-4 h-4 text-gray-600" />
             <span v-if="isDirty" class="text-orange-500">•</span>

@@ -92,21 +92,23 @@
         </div>
       </div>
 
-      <DialogFooter>
-        <Button variant="outline" @click="$emit('update:open', false)">
-          Cancel
-        </Button>
-        <Button @click="handleSave" :disabled="!filename.trim()">
-          <Save class="w-4 h-4 mr-2" />
-          Save Document
-        </Button>
+      <DialogFooter class="w-full">
+        <div class="flex w-full gap-3">
+          <Button variant="outline" @click="$emit('update:open', false)" class="flex-1">
+            Cancel
+          </Button>
+          <Button @click="handleSave" :disabled="!filename.trim()" class="flex-1">
+            <Save class="w-4 h-4 mr-2" />
+            Save Document
+          </Button>
+        </div>
       </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
   import {
     Dialog,
     DialogContent,
@@ -125,12 +127,13 @@
     Download
   } from 'lucide-vue-next'
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
+  import { toast } from 'vue-sonner'
 
   interface Props {
     open: boolean
   }
 
-  defineProps<Props>()
+  const props = defineProps<Props>()
   defineEmits<{
     'update:open': [value: boolean]
   }>()
@@ -138,7 +141,7 @@
   const store = useMarkdownDocStore()
 
   // State
-  const autoSave = ref(false)
+  const autoSave = ref(true) // Default to enabled
   const saveMetadata = ref(true)
   const createBackup = ref(false)
   const filename = ref('')
@@ -150,7 +153,6 @@
     if (!store.content.trim()) return 0
     return store.content.trim().split(/\s+/).length
   })
-
   const characterCount = computed(() => store.content.length)
 
   const lastModified = computed(() => {
@@ -159,10 +161,17 @@
 
   // Watch for store title changes to update filename
   watch(() => store.title, (newTitle) => {
-    if (newTitle && !filename.value) {
+    if (newTitle && newTitle !== 'Untitled Markdown') {
       filename.value = sanitizeFilename(newTitle)
     }
   }, { immediate: true })
+
+  // Also watch for dialog open to refresh filename
+  watch(() => props.open, (isOpen) => {
+    if (isOpen && store.title && store.title !== 'Untitled Markdown') {
+      filename.value = sanitizeFilename(store.title)
+    }
+  })
 
   // Methods
   function sanitizeFilename(title: string): string {
@@ -174,15 +183,17 @@
       || 'untitled'
   }
 
-  async function saveToLocal() {
+  async function saveToLocal(silent = false) {
     try {
-      statusMessage.value = 'Saving to local storage...'
-      errorMessage.value = ''
+      if (!silent) {
+        statusMessage.value = 'Saving to local storage...'
+        errorMessage.value = ''
+      }
 
       const saveData = {
         title: store.title,
         content: store.content,
-        filename: filename.value || sanitizeFilename(store.title),
+        filename: filename.value || sanitizeFilename(store.title || 'untitled'),
         savedAt: new Date().toISOString(),
         metadata: saveMetadata.value ? {
           wordCount: wordCount.value,
@@ -201,17 +212,35 @@
       const storageKey = `chainpaper_doc_${filename.value || 'untitled'}`
       localStorage.setItem(storageKey, JSON.stringify(saveData))
 
+      // Also save as current document for auto-restoration
+      localStorage.setItem('chainpaper_current_doc', JSON.stringify(saveData))
+
       // Update store save state
       store.markSaved()
 
-      statusMessage.value = 'Successfully saved to local storage!'
+      if (!silent) {
+        statusMessage.value = 'Successfully saved to local storage!'
+        toast.success('Document saved successfully!', {
+          description: `Saved "${store.title || 'Untitled'}" to browser storage`
+        })
 
-      setTimeout(() => {
-        statusMessage.value = ''
-      }, 3000)
+        setTimeout(() => {
+          statusMessage.value = ''
+        }, 3000)
+      } else {
+        // Silent auto-save notification
+        toast.success('Auto-saved', {
+          description: `Document "${store.title || 'Untitled'}" saved automatically`,
+          duration: 2000
+        })
+      }
 
     } catch (error: any) {
-      errorMessage.value = `Failed to save: ${error.message}`
+      const message = `Failed to save: ${error.message}`
+      errorMessage.value = message
+      toast.error('Save failed', {
+        description: message
+      })
     }
   }
 
@@ -224,12 +253,13 @@
 
       if (saveMetadata.value) {
         const metadata = `---
-        title: ${store.title}
-        date: ${new Date().toISOString()}
-        word_count: ${wordCount.value}
-        character_count: ${characterCount.value}
-        ---
-        `
+title: ${store.title}
+date: ${new Date().toISOString()}
+word_count: ${wordCount.value}
+character_count: ${characterCount.value}
+---
+
+`
         content = metadata + content
       }
 
@@ -243,13 +273,20 @@
       URL.revokeObjectURL(url)
 
       statusMessage.value = 'File downloaded successfully!'
+      toast.success('Download complete!', {
+        description: `Downloaded "${filename.value || 'untitled'}.md"`
+      })
 
       setTimeout(() => {
         statusMessage.value = ''
       }, 3000)
 
     } catch (error: any) {
-      errorMessage.value = `Download failed: ${error.message}`
+      const message = `Download failed: ${error.message}`
+      errorMessage.value = message
+      toast.error('Download failed', {
+        description: message
+      })
     }
   }
 
@@ -258,27 +295,37 @@
     await saveToLocal()
   }
 
-  // Auto-save functionality
-  let autoSaveInterval: NodeJS.Timeout | null = null
+  // Auto-save functionality (client-only)
+  let autoSaveInterval: number | null = null
 
-  watch(autoSave, (enabled) => {
-    if (enabled) {
-      autoSaveInterval = setInterval(async () => {
-        if (store.content && filename.value) {
-          await saveToLocal()
+  onMounted(() => {
+    // Watch the autoSave toggle and create/clear interval on the client
+    const stop = watch(autoSave, (enabled) => {
+      if (enabled) {
+        // Ensure any previous interval is cleared
+        if (autoSaveInterval) {
+          clearInterval(autoSaveInterval)
         }
-      }, 30000) // 30 seconds
-    } else if (autoSaveInterval) {
-      clearInterval(autoSaveInterval)
-      autoSaveInterval = null
-    }
-  })
+        autoSaveInterval = window.setInterval(async () => {
+          if (store.isDirty && store.content.trim()) {
+            await saveToLocal(true) // Silent save for auto-save
+          }
+        }, 30000) // 30 seconds
+      } else {
+        if (autoSaveInterval) {
+          clearInterval(autoSaveInterval)
+          autoSaveInterval = null
+        }
+      }
+    }, { immediate: true })
 
-  // Clean up interval on unmount
-  import { onUnmounted } from 'vue'
-  onUnmounted(() => {
-    if (autoSaveInterval) {
-      clearInterval(autoSaveInterval)
-    }
+    // Clean up when component unmounts
+    onUnmounted(() => {
+      if (autoSaveInterval) {
+        clearInterval(autoSaveInterval)
+        autoSaveInterval = null
+      }
+      stop()
+    })
   })
 </script>
