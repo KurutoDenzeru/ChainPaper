@@ -11,9 +11,12 @@
               <span class="text-xs font-medium">Mode:</span>
               <Tooltip>
                 <TooltipTrigger as-child>
-                  <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="toggleMode">
-                    <BookOpen v-if="mode === 'source'" class="w-4 h-4" />
-                    <Edit v-else class="w-4 h-4" />
+                  <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="toggleMode"
+                    :aria-label="mode === 'source' ? 'Switch to reader view' : 'Switch to source view'"
+                    :aria-pressed="mode === 'source'"
+                    title="{{ mode === 'source' ? 'Switch to Reader View' : 'Switch to Source View' }}">
+                    <BookOpen v-if="mode === 'source'" class="w-4 h-4" aria-hidden="true" />
+                    <Edit v-else class="w-4 h-4" aria-hidden="true" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>

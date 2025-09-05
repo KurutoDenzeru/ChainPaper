@@ -10,9 +10,10 @@
             <TooltipTrigger as-child>
               <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="toggleMode"
                 :title="mode === 'source' ? 'Switch to Reader' : 'Switch to Source'"
-                :aria-label="mode === 'source' ? 'Switch to Reader view' : 'Switch to Source view'">
-                <BookOpen v-if="mode === 'source'" class="w-4 h-4" />
-                <Edit v-else class="w-4 h-4" />
+                :aria-label="mode === 'source' ? 'Switch to Reader view' : 'Switch to Source view'"
+                :aria-pressed="mode === 'source'">
+                <BookOpen v-if="mode === 'source'" class="w-4 h-4" aria-hidden="true" />
+                <Edit v-else class="w-4 h-4" aria-hidden="true" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -283,6 +284,7 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-code-block')"
               aria-label="Insert code block">
+              aria-label="Insert code block">
               <Code2 class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -295,6 +297,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('toggle-blockquote')"
+              aria-label="Toggle blockquote">
               aria-label="Toggle blockquote">
               <Quote class="w-4 h-4" />
             </Button>
@@ -309,6 +312,7 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-superscript')"
               aria-label="Superscript">
+              aria-label="Superscript">
               <Superscript class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -321,6 +325,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-subscript')"
+              aria-label="Subscript">
               aria-label="Subscript">
               <Subscript class="w-4 h-4" />
             </Button>
@@ -365,6 +370,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-math')"
+              aria-label="Insert inline math">
               aria-label="Insert math">
               <Sigma class="w-4 h-4" />
             </Button>
@@ -379,6 +385,7 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-mathblock')"
               aria-label="Insert math block">
+              aria-label="Insert math block">
               <SquareSigma class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -391,6 +398,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-horizontal-line')"
+              aria-label="Insert horizontal line">
               aria-label="Insert divider">
               <Minus class="w-4 h-4" />
             </Button>
@@ -405,6 +413,7 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-footnote')"
               aria-label="Insert footnote">
+              aria-label="Insert footnote">
               <FileText class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -417,6 +426,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showEmojiDialog = true"
+              aria-label="Insert emoji">
               aria-label="Insert emoji">
               <Smile class="w-4 h-4" />
             </Button>
@@ -477,6 +487,7 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-link')"
               aria-label="Insert link">
+              aria-label="Insert link">
               <Link class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -488,6 +499,7 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-image')"
               aria-label="Insert image">
+              aria-label="Insert image">
               <ImageIcon class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -498,6 +510,7 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showTableDialog = true"
+              aria-label="Insert table">
               aria-label="Insert table">
               <Table class="w-4 h-4" />
             </Button>
