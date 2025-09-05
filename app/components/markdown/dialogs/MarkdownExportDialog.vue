@@ -1,5 +1,5 @@
 <template>
-  <Dialog :open="open" @update:open="$emit('update:open', $event)">
+  <Dialog :open="props.open" @update:open="onUpdateOpen">
     <DialogContent class="max-w-2xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
@@ -13,8 +13,17 @@
 
       <div class="space-y-6">
         <!-- Export Options -->
+                <!-- Export Options -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button variant="outline" class="h-24 flex flex-col items-center gap-2 p-4" @click="exportAsMarkdown">
+          <Button 
+            variant="outline" 
+            :class="[
+              'h-24 flex flex-col items-center gap-2 p-4 transition-all',
+              exportFormat === 'markdown' 
+                ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50' 
+                : 'hover:ring-1 hover:ring-gray-300'
+            ]" 
+            @click="exportAsMarkdown">
             <FileText class="w-8 h-8 text-blue-600" />
             <div class="text-center">
               <div class="font-medium">Markdown</div>
@@ -22,7 +31,15 @@
             </div>
           </Button>
 
-          <Button variant="outline" class="h-24 flex flex-col items-center gap-2 p-4" @click="exportAsHTML">
+          <Button 
+            variant="outline" 
+            :class="[
+              'h-24 flex flex-col items-center gap-2 p-4 transition-all',
+              exportFormat === 'html' 
+                ? 'ring-2 ring-orange-500 border-orange-500 bg-orange-50' 
+                : 'hover:ring-1 hover:ring-gray-300'
+            ]" 
+            @click="exportAsHTML">
             <Globe class="w-8 h-8 text-orange-600" />
             <div class="text-center">
               <div class="font-medium">HTML</div>
@@ -30,7 +47,15 @@
             </div>
           </Button>
 
-          <Button variant="outline" class="h-24 flex flex-col items-center gap-2 p-4" @click="exportAsJSON">
+          <Button 
+            variant="outline" 
+            :class="[
+              'h-24 flex flex-col items-center gap-2 p-4 transition-all',
+              exportFormat === 'json' 
+                ? 'ring-2 ring-purple-500 border-purple-500 bg-purple-50' 
+                : 'hover:ring-1 hover:ring-gray-300'
+            ]" 
+            @click="exportAsJSON">
             <FileDown class="w-8 h-8 text-purple-600" />
             <div class="text-center">
               <div class="font-medium">JSON</div>
@@ -45,33 +70,10 @@
 
           <div class="space-y-3">
             <div class="flex items-center space-x-2">
-              <Checkbox id="include-metadata" v-model:checked="includeMetadata" />
-              <Label for="include-metadata">Include metadata (title, timestamp)</Label>
-            </div>
-
-            <div class="flex items-center space-x-2">
               <Checkbox id="include-proof" v-model:checked="includeProof" />
               <Label for="include-proof">Include cryptographic proof (if available)</Label>
             </div>
-
-            <div v-if="exportFormat === 'html'" class="space-y-2">
-              <div class="flex items-center space-x-2">
-                <Checkbox id="standalone-html" v-model:checked="standaloneHTML" />
-                <Label for="standalone-html">Standalone HTML (include CSS)</Label>
-              </div>
-
-              <div class="flex items-center space-x-2">
-                <Checkbox id="syntax-highlight" v-model:checked="syntaxHighlight" />
-                <Label for="syntax-highlight">Syntax highlighting for code blocks</Label>
-              </div>
-            </div>
           </div>
-        </div>
-
-        <!-- Preview -->
-        <div v-if="previewContent" class="space-y-2">
-          <h4 class="font-semibold text-gray-900">Preview</h4>
-          <Textarea :model-value="previewContent" readonly rows="8" class="font-mono text-xs bg-gray-50" />
         </div>
 
         <!-- Status Message -->
@@ -82,7 +84,7 @@
 
       <DialogFooter class="w-full">
         <div class="flex w-full gap-3">
-          <Button variant="outline" @click="$emit('update:open', false)" class="flex-1">
+          <Button variant="outline" @click="close" class="flex-1">
             Cancel
           </Button>
           <Button @click="performExport" :disabled="!exportFormat" class="flex-1">
@@ -99,7 +101,6 @@
   import { ref, computed } from 'vue'
   import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
   import { Button } from '@/components/ui/button'
-  import { Textarea } from '@/components/ui/textarea'
   import { Checkbox } from '@/components/ui/checkbox'
   import { Label } from '@/components/ui/label'
   import {
@@ -116,9 +117,7 @@
     initialFormat?: 'markdown' | 'html' | 'json' | 'pdf' | null
   }
 
-  defineEmits<{
-    'update:open': [value: boolean]
-  }>()
+  const emit = defineEmits<{ (e: 'update:open', value: boolean): void }>()
 
   const store = useMarkdownDocStore()
 
@@ -126,11 +125,7 @@
   const props = defineProps<Props>()
   // State
   const exportFormat = ref<'markdown' | 'html' | 'json' | null>(null)
-  const includeMetadata = ref(true)
-  const includeProof = ref(false)
-  const standaloneHTML = ref(true)
-  const syntaxHighlight = ref(true)
-  const previewContent = ref('')
+  const includeProof = ref(true)
   const statusMessage = ref('')
 
   // Computed
@@ -141,20 +136,13 @@
   })
 
   // Methods
-  function exportAsMarkdown() {
-    exportFormat.value = 'markdown'
-    generatePreview()
-  }
+  const onUpdateOpen = (v: boolean) => emit('update:open', v)
+  const close = () => emit('update:open', false)
+  function exportAsMarkdown() { exportFormat.value = 'markdown' }
 
-  function exportAsHTML() {
-    exportFormat.value = 'html'
-    generatePreview()
-  }
+  function exportAsHTML() { exportFormat.value = 'html' }
 
-  function exportAsJSON() {
-    exportFormat.value = 'json'
-    generatePreview()
-  }
+  function exportAsJSON() { exportFormat.value = 'json' }
 
   // react to prop initialFormat when dialog opens
   if (props.initialFormat) {
@@ -163,55 +151,6 @@
     else if (props.initialFormat === 'markdown') exportFormat.value = 'markdown'
     else if (props.initialFormat === 'html') exportFormat.value = 'html'
     else if (props.initialFormat === 'json') exportFormat.value = 'json'
-    // generate preview immediately
-    generatePreview()
-  }
-
-  function generatePreview() {
-    if (!exportFormat.value) return
-
-    let content = ''
-
-    switch (exportFormat.value) {
-      case 'markdown':
-        content = store.content
-        if (includeMetadata.value) {
-          const metadata = `---
-        title: ${store.title}
-        date: ${new Date().toISOString()}
-        ---
-        `
-          content = metadata + content
-        }
-        break
-
-      case 'html':
-        content = convertMarkdownToHTML(store.content)
-        if (standaloneHTML.value) {
-          content = wrapInHTMLDocument(content)
-        }
-        break
-
-      case 'json':
-        const jsonData: any = {
-          title: store.title,
-          content: store.content
-        }
-
-        if (includeMetadata.value) {
-          jsonData.metadata = {
-            exportedAt: new Date().toISOString(),
-            version: 'chainpaper-md-1',
-            wordCount: store.content.trim().split(/\s+/).length,
-            characterCount: store.content.length
-          }
-        }
-
-        content = JSON.stringify(jsonData, null, 2)
-        break
-    }
-
-    previewContent.value = content.slice(0, 1000) + (content.length > 1000 ? '\n...' : '')
   }
 
   function convertMarkdownToHTML(markdown: string): string {
@@ -267,14 +206,28 @@
 
       switch (exportFormat.value) {
         case 'markdown':
-          content = store.content
-          if (includeMetadata.value) {
-            const metadata = `---
-          title: ${store.title}
-          date: ${new Date().toISOString()}
-          ---
-          `
-            content = metadata + content
+          // Always include metadata
+          const metadata = `---
+title: ${store.title}
+date: ${new Date().toISOString()}
+---
+
+`
+          content = metadata + store.content
+          
+          // Attach proof only if user enabled it and proof exists
+          if (includeProof.value) {
+            try {
+              const stored = localStorage.getItem('chainpaper_current_proof')
+              if (stored) {
+                const proofObj = JSON.parse(stored)
+                content = content + `\n\n<!-- Cryptographic Proof: ${JSON.stringify(proofObj)} -->\n`
+              } else {
+                content = content + `\n\n<!-- No cryptographic proof available. Generate one via Tools > Verify Authorship -->\n`
+              }
+            } catch (_e) {
+              // ignore
+            }
           }
           mimeType = 'text/markdown'
           extension = '.md'
@@ -282,16 +235,49 @@
 
         case 'html':
           content = convertMarkdownToHTML(store.content)
-          if (standaloneHTML.value) {
-            content = wrapInHTMLDocument(content)
+          
+          // Attach proof only if user enabled it and proof exists
+          if (includeProof.value) {
+            try {
+              const stored = localStorage.getItem('chainpaper_current_proof')
+              if (stored) {
+                const proofObj = JSON.parse(stored)
+                // Append proof metadata as a JSON script block
+                content = content + "\n<script type=\"application/json\" id=\"chainpaper-proof\">" + JSON.stringify(proofObj) + "</scr" + "ipt>"
+              } else {
+                content = content + "\n<!-- No cryptographic proof available -->"
+              }
+            } catch (_e) {
+              // ignore
+            }
           }
+          
+          // Always wrap in full HTML document
+          content = wrapInHTMLDocument(content)
           mimeType = 'text/html'
           extension = '.html'
           break
 
         case 'json':
           const exportData = await store.exportJSON()
-          content = JSON.stringify(exportData.obj, null, 2)
+          const obj = exportData.obj
+          
+          // Attach proof only if user enabled it and proof exists
+          if (includeProof.value) {
+            try {
+              const stored = localStorage.getItem('chainpaper_current_proof')
+              if (stored) {
+                const proofObj = JSON.parse(stored)
+                ;(obj as any).proof = proofObj
+              } else {
+                ;(obj as any).proofNote = 'No cryptographic proof available. Generate one via Tools > Verify Authorship'
+              }
+            } catch (_e) {
+              // ignore
+            }
+          }
+          
+          content = JSON.stringify(obj, null, 2)
           mimeType = 'application/json'
           extension = '.json'
           break

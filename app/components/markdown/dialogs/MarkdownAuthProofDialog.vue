@@ -318,6 +318,14 @@
       exported.value = JSON.stringify(exportData, null, 2)
       currentProof.value = proof
 
+      // Persist latest proof so other UI (export dialog) can include it
+      try {
+        localStorage.setItem('chainpaper_current_proof', JSON.stringify(proof))
+        if (publicKeyB64.value) localStorage.setItem('chainpaper_public_key', publicKeyB64.value)
+      } catch (e) {
+        // ignore storage errors (private keys shouldn't be persisted)
+      }
+
       // Try to verify locally if we have public key
       if (publicKeyB64.value) {
         await verifyProof()
