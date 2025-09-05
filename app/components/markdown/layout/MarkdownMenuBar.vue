@@ -128,7 +128,7 @@
                               </span>
                               <span v-else
                                 class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">{{
-                                mod }}</span>
+                                  mod }}</span>
                             </template>
                           </div>
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
@@ -139,11 +139,11 @@
                         <template v-else>
                           <span
                             class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs font-medium mr-1">{{
-                            getShortcut(item)?.pc || getShortcut(item)?.key || 'Ctrl' }}</span>
+                              getShortcut(item)?.pc || getShortcut(item)?.key || 'Ctrl' }}</span>
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
                           <span
                             class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
-                            getShortcut(item)?.key }}</span>
+                              getShortcut(item)?.key }}</span>
                         </template>
                       </div>
                     </MenubarShortcut>
@@ -178,6 +178,9 @@
   <!-- Emoji Insert Dialog -->
   <EmojiInsertDialog :open="showEmojiDialog" @update:open="showEmojiDialog = $event"
     @insert-emoji="handleEmojiInsert" />
+
+  <!-- Hidden file input used for importing files (markdown, html, json) -->
+  <input ref="fileInput" type="file" accept=".md,.markdown,.json,.html,text/*" class="hidden" @change="onFileChange" />
 </template>
 
 <script setup lang="ts">
@@ -440,6 +443,11 @@
       return
     }
 
+    if (item.emit === 'open-document') {
+      openFilePicker()
+      return
+    }
+
     if (item.emit === 'export-markdown' || item.emit === 'export-html' || item.emit === 'export-pdf' || item.emit === 'export-document') {
       // If a specific format was requested, preselect it; otherwise open export dialog without preselection
       if (item.emit === 'export-markdown') exportInitialFormat.value = 'markdown'
@@ -614,5 +622,118 @@
   // Emoji insertion handler
   function handleEmojiInsert(emoji: any) {
     emit('insert-emoji', emoji.char)
+  }
+
+  // File import helpers
+  const fileInput = ref<HTMLInputElement | null>(null)
+
+  function openFilePicker() {
+    if (!fileInput.value) return
+    fileInput.value.value = ''
+    fileInput.value.click()
+  }
+
+  async function onFileChange(e: Event) {
+    const input = e.target as HTMLInputElement
+    if (!input || !input.files || input.files.length === 0) return
+    const file = input.files[0]
+    if (!file) return
+    await handleImportFile(file)
+    input.value = ''
+  }
+
+  async function handleImportFile(file: File) {
+    try {
+      const text = await file.text()
+      const name = file.name || 'imported'
+
+      // Try JSON first
+      if (file.type === 'application/json' || name.endsWith('.json')) {
+        try {
+          const obj = JSON.parse(text)
+          // Expecting export shape: { title, content, attachments?, meta? }
+          if (obj && typeof obj === 'object') {
+            // Remove any embedded proof before loading
+            if (obj.proof) delete obj.proof
+            if (obj.proofNote) delete obj.proofNote
+
+            store.setTitle(obj.title || name.replace(/\.[^.]+$/, ''))
+            store.setContent(obj.content || '')
+            // attachments - if present and simple map of name->dataUri
+            if (obj.attachments && typeof obj.attachments === 'object') {
+              for (const k of Object.keys(obj.attachments)) {
+                try { store.addAttachment(obj.attachments[k], k) } catch (_) { }
+              }
+            }
+            return
+          }
+        } catch (jsonErr) {
+          // fallthrough to other parsers
+        }
+      }
+
+      // Markdown: strip YAML frontmatter if present and remove any cryptographic proof comments
+      if (name.endsWith('.md') || name.endsWith('.markdown') || text.trim().startsWith('---')) {
+        let body = text
+        if (body.startsWith('---')) {
+          const parts = body.split(/---\s*\n/)
+          if (parts.length >= 3) {
+            // parts[1] is frontmatter
+            body = parts.slice(2).join('---\n')
+          }
+        }
+        // Remove HTML comment proofs like: <!-- Cryptographic Proof: {...} -->
+        body = body.replace(/<!--\s*Cryptographic Proof:[\s\S]*?-->/gi, '')
+        // Remove any residual proof notes
+        body = body.replace(/<!--\s*No cryptographic proof available[\s\S]*?-->/gi, '')
+
+        store.setTitle(name.replace(/\.[^.]+$/, ''))
+        store.setContent(body.trim())
+        return
+      }
+
+      // HTML: try extracting meaningful text and title
+      if (name.endsWith('.html') || text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+        // Simple DOM parse using DOMParser in browser
+        try {
+          const parser = new DOMParser()
+          const doc = parser.parseFromString(text, 'text/html')
+          const title = doc.querySelector('title')?.textContent || name.replace(/\.[^.]+$/, '')
+          // remove any embedded proof script or comments
+          const proofScript = doc.querySelector('#chainpaper-proof')
+          if (proofScript && proofScript.parentNode) proofScript.parentNode.removeChild(proofScript)
+          // remove HTML comment proofs
+          // iterate through comments and remove ones containing 'Cryptographic Proof'
+          const iterator = document.createNodeIterator(doc, NodeFilter.SHOW_COMMENT)
+          const commentsToRemove: Comment[] = []
+          let cur: Comment | null = iterator.nextNode() as Comment | null
+          while (cur) {
+            if (/Cryptographic Proof/i.test(cur.nodeValue || '')) commentsToRemove.push(cur)
+            cur = iterator.nextNode() as Comment | null
+          }
+          for (const c of commentsToRemove) {
+            if (c.parentNode) c.parentNode.removeChild(c)
+          }
+
+          // extract body text; keep basic tags
+          const bodyEl = doc.body
+          const extracted = bodyEl ? bodyEl.innerText || bodyEl.textContent || '' : ''
+          store.setTitle(title)
+          store.setContent((extracted || '').trim())
+          return
+        } catch (err) {
+          // fallback to raw text
+          store.setTitle(name.replace(/\.[^.]+$/, ''))
+          store.setContent(text)
+          return
+        }
+      }
+
+      // Default: plain text -> set content
+      store.setTitle(name.replace(/\.[^.]+$/, ''))
+      store.setContent(text)
+    } catch (err) {
+      console.error('Failed to import file', err)
+    }
   }
 </script>

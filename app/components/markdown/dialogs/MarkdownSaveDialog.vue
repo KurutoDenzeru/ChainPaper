@@ -41,15 +41,7 @@
               <Label for="auto-save">Enable auto-save every 30 seconds</Label>
             </div>
 
-            <div class="flex items-center space-x-2">
-              <Checkbox id="save-metadata" v-model:checked="saveMetadata" />
-              <Label for="save-metadata">Include document metadata</Label>
-            </div>
-
-            <div class="flex items-center space-x-2">
-              <Checkbox id="create-backup" v-model:checked="createBackup" />
-              <Label for="create-backup">Create backup copy</Label>
-            </div>
+            <!-- Metadata always included; backup option removed -->
           </div>
         </div>
 
@@ -141,9 +133,13 @@
   const store = useMarkdownDocStore()
 
   // State
-  const autoSave = ref(true) // Default to enabled
-  const saveMetadata = ref(true)
-  const createBackup = ref(false)
+    // Bind autoSave directly to the Pinia store so preference persists across sessions
+    const autoSave = computed({
+      get: () => store.autoSaveEnabled,
+      set: (v: boolean) => store.setAutoSaveEnabled(v)
+    })
+  // We always include metadata in saves/exports now.
+  // The backup option has been removed.
   const filename = ref('')
   const statusMessage = ref('')
   const errorMessage = ref('')
@@ -195,18 +191,14 @@
         content: store.content,
         filename: filename.value || sanitizeFilename(store.title || 'untitled'),
         savedAt: new Date().toISOString(),
-        metadata: saveMetadata.value ? {
-          wordCount: wordCount.value,
-          characterCount: characterCount.value,
-          createdAt: new Date().toISOString()
-        } : undefined
+          metadata: {
+            wordCount: wordCount.value,
+            characterCount: characterCount.value,
+            createdAt: new Date().toISOString()
+          }
       }
 
-      // Create backup if requested
-      if (createBackup.value) {
-        const backupKey = `chainpaper_backup_${Date.now()}`
-        localStorage.setItem(backupKey, JSON.stringify(saveData))
-      }
+  // Backup option removed; do not create extra backups here.
 
       // Save to main storage
       const storageKey = `chainpaper_doc_${filename.value || 'untitled'}`
@@ -251,8 +243,8 @@
 
       let content = store.content
 
-      if (saveMetadata.value) {
-        const metadata = `---
+      // Always include metadata
+      const metadata = `---
 title: ${store.title}
 date: ${new Date().toISOString()}
 word_count: ${wordCount.value}
@@ -260,7 +252,17 @@ character_count: ${characterCount.value}
 ---
 
 `
-        content = metadata + content
+      content = metadata + content
+
+      // Append persisted cryptographic proof (if present) to the markdown file
+      try {
+        const proofRaw = localStorage.getItem('chainpaper_current_proof')
+        if (proofRaw) {
+          // store as an HTML comment so it won't render in markdown
+          content += `\n\n<!-- Cryptographic Proof: ${proofRaw} -->\n`
+        }
+      } catch (e) {
+        // ignore localStorage failures
       }
 
       // Create and download file
