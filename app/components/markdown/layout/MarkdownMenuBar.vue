@@ -2,15 +2,16 @@
   <Menubar class="px-2 sm:px-4 py-9 bg-white border border-gray-200 rounded-lg shadow-sm text-gray-600">
     <div class="flex flex-row items-start w-full">
       <!-- Left Side: Brand Icon (spans two rows) -->
-      <div class="flex flex-col items-center justify-start mr-3">
+      <div class="flex flex-col items-center justify-start mr-3" role="presentation">
         <NuxtImg src="/markdown.webp" alt="ChainPaper Markdown" loading="eager" fetchpriority="high" sizes="72px"
           class="w-18 h-auto object-contain flex items-center justify-center" />
       </div>
       <!-- Right Side: Two rows -->
       <div class="flex flex-col self-center flex-1">
         <!-- First Row: Document Title Input -->
-        <div class="flex items-center gap-2 mb-1">
-          <div v-if="!isEditingTitle" @click="startEditingTitle"
+        <div class="flex items-center gap-2 mb-1" role="presentation">
+          <div v-if="!isEditingTitle" @click="startEditingTitle" @keydown.enter="startEditingTitle" role="button"
+            tabindex="0" aria-label="Edit document title"
             class="flex items-center gap-2 px-3 rounded hover:bg-gray-100 cursor-pointer transition-colors">
             <!-- render default title once when empty to reduce hydration/LCP work -->
             <span v-once :key="title || 'untitled-markdown'" class="text-lg text-gray-900 font-medium -ml-2">{{ title ||
@@ -127,7 +128,7 @@
                               </span>
                               <span v-else
                                 class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">{{
-                                  mod }}</span>
+                                mod }}</span>
                             </template>
                           </div>
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
@@ -138,11 +139,11 @@
                         <template v-else>
                           <span
                             class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs font-medium mr-1">{{
-                              getShortcut(item)?.pc || getShortcut(item)?.key || 'Ctrl' }}</span>
+                            getShortcut(item)?.pc || getShortcut(item)?.key || 'Ctrl' }}</span>
                           <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
                           <span
                             class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
-                              getShortcut(item)?.key }}</span>
+                            getShortcut(item)?.key }}</span>
                         </template>
                       </div>
                     </MenubarShortcut>
