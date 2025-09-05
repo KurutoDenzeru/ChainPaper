@@ -13,17 +13,14 @@
 
       <div class="space-y-6">
         <!-- Export Options -->
-                <!-- Export Options -->
+        <!-- Export Options -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button 
-            variant="outline" 
-            :class="[
-              'h-24 flex flex-col items-center gap-2 p-4 transition-all',
-              exportFormat === 'markdown' 
-                ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50' 
-                : 'hover:ring-1 hover:ring-gray-300'
-            ]" 
-            @click="exportAsMarkdown">
+          <Button variant="outline" :class="[
+            'h-24 flex flex-col items-center gap-2 p-4 transition-all',
+            exportFormat === 'markdown'
+              ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50'
+              : 'hover:ring-1 hover:ring-gray-300'
+          ]" @click="exportAsMarkdown">
             <FileText class="w-8 h-8 text-blue-600" />
             <div class="text-center">
               <div class="font-medium">Markdown</div>
@@ -31,15 +28,12 @@
             </div>
           </Button>
 
-          <Button 
-            variant="outline" 
-            :class="[
-              'h-24 flex flex-col items-center gap-2 p-4 transition-all',
-              exportFormat === 'html' 
-                ? 'ring-2 ring-orange-500 border-orange-500 bg-orange-50' 
-                : 'hover:ring-1 hover:ring-gray-300'
-            ]" 
-            @click="exportAsHTML">
+          <Button variant="outline" :class="[
+            'h-24 flex flex-col items-center gap-2 p-4 transition-all',
+            exportFormat === 'html'
+              ? 'ring-2 ring-orange-500 border-orange-500 bg-orange-50'
+              : 'hover:ring-1 hover:ring-gray-300'
+          ]" @click="exportAsHTML">
             <Globe class="w-8 h-8 text-orange-600" />
             <div class="text-center">
               <div class="font-medium">HTML</div>
@@ -47,33 +41,18 @@
             </div>
           </Button>
 
-          <Button 
-            variant="outline" 
-            :class="[
-              'h-24 flex flex-col items-center gap-2 p-4 transition-all',
-              exportFormat === 'json' 
-                ? 'ring-2 ring-purple-500 border-purple-500 bg-purple-50' 
-                : 'hover:ring-1 hover:ring-gray-300'
-            ]" 
-            @click="exportAsJSON">
+          <Button variant="outline" :class="[
+            'h-24 flex flex-col items-center gap-2 p-4 transition-all',
+            exportFormat === 'json'
+              ? 'ring-2 ring-purple-500 border-purple-500 bg-purple-50'
+              : 'hover:ring-1 hover:ring-gray-300'
+          ]" @click="exportAsJSON">
             <FileDown class="w-8 h-8 text-purple-600" />
             <div class="text-center">
               <div class="font-medium">JSON</div>
               <div class="text-xs text-gray-600">.json file</div>
             </div>
           </Button>
-        </div>
-
-        <!-- Export Settings -->
-        <div class="space-y-4">
-          <h4 class="font-semibold text-gray-900">Export Settings</h4>
-
-          <div class="space-y-3">
-            <div class="flex items-center space-x-2">
-              <Checkbox id="include-proof" v-model:checked="includeProof" />
-              <Label for="include-proof">Include cryptographic proof (if available)</Label>
-            </div>
-          </div>
         </div>
 
         <!-- Status Message -->
@@ -101,8 +80,7 @@
   import { ref, computed } from 'vue'
   import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
   import { Button } from '@/components/ui/button'
-  import { Checkbox } from '@/components/ui/checkbox'
-  import { Label } from '@/components/ui/label'
+  // Checkbox and Label removed: proof inclusion is always-on when available
   import {
     Download,
     FileText,
@@ -125,7 +103,6 @@
   const props = defineProps<Props>()
   // State
   const exportFormat = ref<'markdown' | 'html' | 'json' | null>(null)
-  const includeProof = ref(true)
   const statusMessage = ref('')
 
   // Computed
@@ -176,22 +153,22 @@
 
   function wrapInHTMLDocument(content: string): string {
     return `<!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${store.title}</title>
-      <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; }
-          h1, h2, h3 { color: #333; }
-          code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
-          a { color: #0066cc; }
-      </style>
-  </head>
-  <body>
-      ${content}
-  </body>
-  </html>`
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${store.title}</title>
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; }
+            h1, h2, h3 { color: #333; }
+            code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+            a { color: #0066cc; }
+        </style>
+    </head>
+    <body>
+        ${content}
+    </body>
+    </html>`
   }
 
   async function performExport() {
@@ -208,26 +185,24 @@
         case 'markdown':
           // Always include metadata
           const metadata = `---
-title: ${store.title}
-date: ${new Date().toISOString()}
----
+          title: ${store.title}
+          date: ${new Date().toISOString()}
+          ---
 
 `
           content = metadata + store.content
-          
-          // Attach proof only if user enabled it and proof exists
-          if (includeProof.value) {
-            try {
-              const stored = localStorage.getItem('chainpaper_current_proof')
-              if (stored) {
-                const proofObj = JSON.parse(stored)
-                content = content + `\n\n<!-- Cryptographic Proof: ${JSON.stringify(proofObj)} -->\n`
-              } else {
-                content = content + `\n\n<!-- No cryptographic proof available. Generate one via Tools > Verify Authorship -->\n`
-              }
-            } catch (_e) {
-              // ignore
+
+          // Attach proof if available
+          try {
+            const stored = localStorage.getItem('chainpaper_current_proof')
+            if (stored) {
+              const proofObj = JSON.parse(stored)
+              content = content + `\n\n<!-- Cryptographic Proof: ${JSON.stringify(proofObj)} -->\n`
+            } else {
+              content = content + `\n\n<!-- No cryptographic proof available. Generate one via Tools > Verify Authorship -->\n`
             }
+          } catch (_e) {
+            // ignore
           }
           mimeType = 'text/markdown'
           extension = '.md'
@@ -235,23 +210,21 @@ date: ${new Date().toISOString()}
 
         case 'html':
           content = convertMarkdownToHTML(store.content)
-          
-          // Attach proof only if user enabled it and proof exists
-          if (includeProof.value) {
-            try {
-              const stored = localStorage.getItem('chainpaper_current_proof')
-              if (stored) {
-                const proofObj = JSON.parse(stored)
-                // Append proof metadata as a JSON script block
-                content = content + "\n<script type=\"application/json\" id=\"chainpaper-proof\">" + JSON.stringify(proofObj) + "</scr" + "ipt>"
-              } else {
-                content = content + "\n<!-- No cryptographic proof available -->"
-              }
-            } catch (_e) {
-              // ignore
+
+          // Attach proof if available
+          try {
+            const stored = localStorage.getItem('chainpaper_current_proof')
+            if (stored) {
+              const proofObj = JSON.parse(stored)
+              // Append proof metadata as a JSON script block
+              content = content + "\n<script type=\"application/json\" id=\"chainpaper-proof\">" + JSON.stringify(proofObj) + "</scr" + "ipt>"
+            } else {
+              content = content + "\n<!-- No cryptographic proof available -->"
             }
+          } catch (_e) {
+            // ignore
           }
-          
+
           // Always wrap in full HTML document
           content = wrapInHTMLDocument(content)
           mimeType = 'text/html'
@@ -261,22 +234,20 @@ date: ${new Date().toISOString()}
         case 'json':
           const exportData = await store.exportJSON()
           const obj = exportData.obj
-          
-          // Attach proof only if user enabled it and proof exists
-          if (includeProof.value) {
-            try {
-              const stored = localStorage.getItem('chainpaper_current_proof')
-              if (stored) {
-                const proofObj = JSON.parse(stored)
-                ;(obj as any).proof = proofObj
-              } else {
-                ;(obj as any).proofNote = 'No cryptographic proof available. Generate one via Tools > Verify Authorship'
-              }
-            } catch (_e) {
-              // ignore
+
+          // Attach proof if available
+          try {
+            const stored = localStorage.getItem('chainpaper_current_proof')
+            if (stored) {
+              const proofObj = JSON.parse(stored)
+                ; (obj as any).proof = proofObj
+            } else {
+              ; (obj as any).proofNote = 'No cryptographic proof available. Generate one via Tools > Verify Authorship'
             }
+          } catch (_e) {
+            // ignore
           }
-          
+
           content = JSON.stringify(obj, null, 2)
           mimeType = 'application/json'
           extension = '.json'
