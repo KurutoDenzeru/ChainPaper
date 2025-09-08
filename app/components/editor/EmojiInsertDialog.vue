@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-3xl">
+    <DialogContent class="!max-w-2xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Smile class="h-5 w-5" /> Insert Emoji
@@ -34,22 +34,32 @@
 
             <TabsContent value="recent" class="mt-4">
               <div v-if="filteredRecent.length" class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="e in filteredRecent" :key="e.char"
-                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="e.name"
-                  @click="selectEmoji(e)" :aria-label="e.name">
-                  <span>{{ e.char }}</span>
-                </button>
+                <Tooltip v-for="e in filteredRecent" :key="e.char">
+                  <TooltipTrigger as-child>
+                    <button class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer"
+                      :title="e.name" @click="selectEmoji(e)" :aria-label="e.name">
+                      <span>{{ e.char }}</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent class="whitespace-nowrap">{{ e.name }} <span class="text-muted-foreground ml-1">{{
+                      e.shortcode }}</span></TooltipContent>
+                </Tooltip>
               </div>
               <div v-else class="text-center text-gray-500 py-8">No recently used emojis</div>
             </TabsContent>
 
             <TabsContent v-for="cat in categoriesOrdered" :key="cat" :value="cat" class="mt-4">
               <div v-if="getCategoryEmojis(cat).length" class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <button v-for="e in getCategoryEmojis(cat)" :key="e.char"
-                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="e.name"
-                  @click="selectEmoji(e)" :aria-label="e.name">
-                  <span>{{ e.char }}</span>
-                </button>
+                <Tooltip v-for="e in getCategoryEmojis(cat)" :key="e.char">
+                  <TooltipTrigger as-child>
+                    <button class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer"
+                      :title="e.name" @click="selectEmoji(e)" :aria-label="e.name">
+                      <span>{{ e.char }}</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent class="whitespace-nowrap">{{ e.name }} <span class="text-muted-foreground ml-1">{{
+                      e.shortcode }}</span></TooltipContent>
+                </Tooltip>
               </div>
               <div v-else class="text-center text-gray-500 py-8">No emojis in {{ categoryLabel(cat) }}</div>
             </TabsContent>
