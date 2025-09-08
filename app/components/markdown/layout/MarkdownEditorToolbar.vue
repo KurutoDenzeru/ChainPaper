@@ -284,7 +284,6 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-code-block')"
               aria-label="Insert code block">
-              aria-label="Insert code block">
               <Code2 class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -297,7 +296,6 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('toggle-blockquote')"
-              aria-label="Toggle blockquote">
               aria-label="Toggle blockquote">
               <Quote class="w-4 h-4" />
             </Button>
@@ -312,7 +310,6 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-superscript')"
               aria-label="Superscript">
-              aria-label="Superscript">
               <Superscript class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -325,7 +322,6 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-subscript')"
-              aria-label="Subscript">
               aria-label="Subscript">
               <Subscript class="w-4 h-4" />
             </Button>
@@ -371,7 +367,6 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-math')"
               aria-label="Insert inline math">
-              aria-label="Insert math">
               <Sigma class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -384,7 +379,6 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-mathblock')"
-              aria-label="Insert math block">
               aria-label="Insert math block">
               <SquareSigma class="w-4 h-4" />
             </Button>
@@ -399,7 +393,6 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-horizontal-line')"
               aria-label="Insert horizontal line">
-              aria-label="Insert divider">
               <Minus class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -413,7 +406,6 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-footnote')"
               aria-label="Insert footnote">
-              aria-label="Insert footnote">
               <FileText class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -426,7 +418,6 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showEmojiDialog = true"
-              aria-label="Insert emoji">
               aria-label="Insert emoji">
               <Smile class="w-4 h-4" />
             </Button>
@@ -487,7 +478,6 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-link')"
               aria-label="Insert link">
-              aria-label="Insert link">
               <Link class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -499,7 +489,6 @@
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-image')"
               aria-label="Insert image">
-              aria-label="Insert image">
               <ImageIcon class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
@@ -510,7 +499,6 @@
         <Tooltip>
           <TooltipTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showTableDialog = true"
-              aria-label="Insert table">
               aria-label="Insert table">
               <Table class="w-4 h-4" />
             </Button>
