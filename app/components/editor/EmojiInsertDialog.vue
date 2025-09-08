@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-4xl">
+    <DialogContent class="!max-w-3xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Smile class="h-5 w-5" /> Insert Emoji
@@ -14,20 +14,47 @@
           <Input v-model="searchQuery" placeholder="Search emojis..." class="pl-10" />
         </div>
 
-        <Tabs v-model="activeTab" class="w-full">
-          <TabsList class="flex w-full items-center gap-2 overflow-x-auto py-1 no-scrollbar">
-            <TabsTrigger value="recent">Recent</TabsTrigger>
-            <TabsTrigger v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</TabsTrigger>
-          </TabsList>
+        <TooltipProvider>
+          <Tabs v-model="activeTab" class="w-full">
+            <TabsList class="flex w-full items-center gap-2 overflow-x-auto py-1 no-scrollbar">
+              <Tooltip>
+                <TooltipTrigger as-child>
+                  <TabsTrigger value="recent" class="text-lg">🕒</TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>Recent</TooltipContent>
+              </Tooltip>
 
-          <TabsContent value="recent" class="mt-4">
-            <EmojiGrid :items="filteredRecentEmojis" @select="selectEmoji" empty-text="No recently used emojis" />
-          </TabsContent>
+              <Tooltip v-for="cat in categoriesOrdered" :key="cat">
+                <TooltipTrigger as-child>
+                  <TabsTrigger :value="cat" class="text-lg">{{ categoryIcon(cat) }}</TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent>{{ categoryLabel(cat) }}</TooltipContent>
+              </Tooltip>
+            </TabsList>
 
-          <TabsContent v-for="cat in categories" :key="cat" :value="cat" class="mt-4">
-            <EmojiGrid :items="makeCategoryFilter(cat)" @select="selectEmoji" :empty-text="`No emojis in ${cat}`" />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="recent" class="mt-4">
+              <div v-if="filteredRecent.length" class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                <button v-for="e in filteredRecent" :key="e.char"
+                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="e.name"
+                  @click="selectEmoji(e)" :aria-label="e.name">
+                  <span>{{ e.char }}</span>
+                </button>
+              </div>
+              <div v-else class="text-center text-gray-500 py-8">No recently used emojis</div>
+            </TabsContent>
+
+            <TabsContent v-for="cat in categoriesOrdered" :key="cat" :value="cat" class="mt-4">
+              <div v-if="getCategoryEmojis(cat).length" class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                <button v-for="e in getCategoryEmojis(cat)" :key="e.char"
+                  class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer" :title="e.name"
+                  @click="selectEmoji(e)" :aria-label="e.name">
+                  <span>{{ e.char }}</span>
+                </button>
+              </div>
+              <div v-else class="text-center text-gray-500 py-8">No emojis in {{ categoryLabel(cat) }}</div>
+            </TabsContent>
+          </Tabs>
+        </TooltipProvider>
       </div>
 
       <DialogFooter>
@@ -39,32 +66,13 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
-  import { useEmojiStore } from '@/stores/emojiStore'
   import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
   import { Button } from '@/components/ui/button'
   import { Input } from '@/components/ui/input'
   import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
   import { Smile, Search } from 'lucide-vue-next'
-
-  // Local inline EmojiGrid component
-  const EmojiGrid = {
-    props: {
-      items: { type: Array as () => any[], required: true },
-      emptyText: { type: String, default: 'No emojis' }
-    },
-    emits: ['select'],
-    template: `
-    <div>
-      <div v-if="items && items.length" class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-        <button v-for="e in items" :key="e.char" class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer"
-          :title="e.name" @click="$emit('select', e)" :aria-label="e.name">
-          <span>{{ e.char }}</span>
-        </button>
-      </div>
-      <div v-else class="text-center text-gray-500 py-8">{{ emptyText }}</div>
-    </div>
-  `
-  }
+  import STATIC_EMOJIS from '@/lib/static-emojis'
 
   interface Emoji {
     char: string
@@ -80,39 +88,92 @@
     (e: 'insert-emoji', emoji: Emoji): void
   }>()
 
-  const activeTab = ref('recent')
-  const searchQuery = ref('')
+  const activeTab = ref<string>('recent')
+  const searchQuery = ref<string>('')
   const recentEmojis = ref<Emoji[]>([])
 
-  const store = useEmojiStore()
-  const allEmojis = store.allEmojis
+  // Normalize categories to lowercase canonical keys
+  function normalizeCategory(c?: string) {
+    if (!c) return ''
+    return String(c).toLowerCase()
+  }
 
-  const categories = computed(() => store.getCategories())
+  const allEmojis = STATIC_EMOJIS.map(e => ({
+    char: e.char,
+    name: e.name,
+    shortcode: e.shortcode || '',
+    category: normalizeCategory(e.category),
+    keywords: (e.keywords || []).map(k => String(k).toLowerCase())
+  })) as Emoji[]
+
+  const categories = computed(() => {
+    const s = new Set<string>()
+    for (const e of allEmojis) if (e.category) s.add(e.category)
+    return Array.from(s)
+  })
+
+  const preferredOrder = ['smileys', 'people', 'animals', 'food', 'activities', 'travel', 'objects', 'symbols', 'flags', 'nature']
+  const categoriesOrdered = computed(() => {
+    const available = categories.value
+    const head = preferredOrder.filter(p => available.includes(p))
+    const tail = available.filter(c => !preferredOrder.includes(c))
+    return [...head, ...tail]
+  })
 
   function matchesQuery(e: Emoji, q: string) {
     if (!q) return true
     const s = q.toLowerCase()
-    return e.char === q || (e.name || '').toLowerCase().includes(s) || (e.shortcode || '').toLowerCase().includes(s) || (e.keywords || []).some(k => k.includes(s))
+    if (e.char === q) return true
+    if ((e.name || '').toLowerCase().includes(s)) return true
+    if ((e.shortcode || '').toLowerCase().includes(s)) return true
+    if ((e.keywords || []).some(k => k.includes(s))) return true
+    return false
   }
 
-  function makeCategoryFilter(category: string) {
-    return computed(() => {
-      const q = searchQuery.value.trim()
-      return store.getByCategory(category).filter(e => matchesQuery(e, q))
-    })
-  }
-
-  const filteredRecentEmojis = computed(() => {
+  function getCategoryEmojis(cat: string) {
     const q = searchQuery.value.trim().toLowerCase()
-    if (!q) return recentEmojis.value
-    return recentEmojis.value.filter(e => matchesQuery(e, q))
+    const list = allEmojis.filter(e => (e.category || '').toLowerCase() === cat.toLowerCase())
+    return q ? list.filter(e => matchesQuery(e, q)) : list
+  }
+
+  const filteredRecent = computed(() => {
+    const q = searchQuery.value.trim().toLowerCase()
+    return q ? recentEmojis.value.filter(e => matchesQuery(e, q)) : recentEmojis.value
   })
 
-  onMounted(() => {
-    store.init()
-    // background attempt to load full emoji JSON if available
-    store.loadFromUrl('/emoji.json').catch(() => { })
+  function categoryIcon(cat: string) {
+    const map: Record<string, string> = {
+      smileys: '😀',
+      people: '👋',
+      animals: '🐶',
+      food: '🍎',
+      activities: '⚽',
+      travel: '✈️',
+      objects: '💡',
+      symbols: '❤️',
+      flags: '🇺🇸',
+      nature: '🌞'
+    }
+    return map[cat.toLowerCase()] || '📂'
+  }
 
+  function categoryLabel(cat: string) {
+    const map: Record<string, string> = {
+      smileys: 'Smileys & Emotion',
+      people: 'People & Body',
+      animals: 'Animals & Nature',
+      food: 'Food & Drink',
+      activities: 'Activities & Sports',
+      travel: 'Travel & Places',
+      objects: 'Objects',
+      symbols: 'Symbols',
+      flags: 'Flags',
+      nature: 'Nature'
+    }
+    return map[cat.toLowerCase()] || (cat.charAt(0).toUpperCase() + cat.slice(1))
+  }
+
+  onMounted(() => {
     const saved = localStorage.getItem('recent-emojis')
     if (saved) {
       try { recentEmojis.value = JSON.parse(saved) } catch { /* ignore */ }
@@ -121,7 +182,7 @@
 
   function selectEmoji(e: Emoji) {
     recentEmojis.value = [e, ...recentEmojis.value.filter(r => r.char !== e.char)].slice(0, 24)
-    localStorage.setItem('recent-emojis', JSON.stringify(recentEmojis.value))
+    try { localStorage.setItem('recent-emojis', JSON.stringify(recentEmojis.value)) } catch (_) { }
     emit('insert-emoji', e)
     emit('update:open', false)
   }
