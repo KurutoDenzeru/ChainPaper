@@ -15,55 +15,73 @@
         </div>
 
         <TooltipProvider>
-          <Tabs v-model="activeTab" class="w-full">
-            <TabsList class="flex w-full items-center gap-2 overflow-x-auto py-1 no-scrollbar">
-              <Tooltip>
+          <div v-if="showSearch" class="mt-2">
+            <div v-if="searchResults.length" class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+              <Tooltip v-for="e in searchResults" :key="e.char">
                 <TooltipTrigger as-child>
-                  <TabsTrigger value="recent" class="text-lg">🕒</TabsTrigger>
+                  <button class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer"
+                    :title="e.name" @click="selectEmoji(e)" :aria-label="e.name">
+                    <span>{{ e.char }}</span>
+                  </button>
                 </TooltipTrigger>
-                <TooltipContent>Recent</TooltipContent>
+                <TooltipContent class="whitespace-nowrap">{{ e.name }} <span class="text-muted-foreground ml-1">{{
+                    e.shortcode }}</span></TooltipContent>
               </Tooltip>
+            </div>
+            <div v-else class="text-center text-gray-500 py-8">No emojis found</div>
+          </div>
 
-              <Tooltip v-for="cat in categoriesOrdered" :key="cat">
-                <TooltipTrigger as-child>
-                  <TabsTrigger :value="cat" class="text-lg">{{ categoryIcon(cat) }}</TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent>{{ categoryLabel(cat) }}</TooltipContent>
-              </Tooltip>
-            </TabsList>
-
-            <TabsContent value="recent" class="mt-4">
-              <div v-if="filteredRecent.length" class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <Tooltip v-for="e in filteredRecent" :key="e.char">
+          <div v-else>
+            <Tabs v-model="activeTab" class="w-full">
+              <TabsList class="flex w-full items-center gap-2 overflow-x-auto py-1 no-scrollbar">
+                <Tooltip>
                   <TooltipTrigger as-child>
-                    <button class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer"
-                      :title="e.name" @click="selectEmoji(e)" :aria-label="e.name">
-                      <span>{{ e.char }}</span>
-                    </button>
+                    <TabsTrigger value="recent" class="text-lg">🕒</TabsTrigger>
                   </TooltipTrigger>
-                  <TooltipContent class="whitespace-nowrap">{{ e.name }} <span class="text-muted-foreground ml-1">{{
-                      e.shortcode }}</span></TooltipContent>
+                  <TooltipContent>Recent</TooltipContent>
                 </Tooltip>
-              </div>
-              <div v-else class="text-center text-gray-500 py-8">No recently used emojis</div>
-            </TabsContent>
 
-            <TabsContent v-for="cat in categoriesOrdered" :key="cat" :value="cat" class="mt-4">
-              <div v-if="getCategoryEmojis(cat).length" class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                <Tooltip v-for="e in getCategoryEmojis(cat)" :key="e.char">
+                <Tooltip v-for="cat in categoriesOrdered" :key="cat">
                   <TooltipTrigger as-child>
-                    <button class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer"
-                      :title="e.name" @click="selectEmoji(e)" :aria-label="e.name">
-                      <span>{{ e.char }}</span>
-                    </button>
+                    <TabsTrigger :value="cat" class="text-lg">{{ categoryIcon(cat) }}</TabsTrigger>
                   </TooltipTrigger>
-                  <TooltipContent class="whitespace-nowrap">{{ e.name }} <span class="text-muted-foreground ml-1">{{
-                      e.shortcode }}</span></TooltipContent>
+                  <TooltipContent>{{ categoryLabel(cat) }}</TooltipContent>
                 </Tooltip>
-              </div>
-              <div v-else class="text-center text-gray-500 py-8">No emojis in {{ categoryLabel(cat) }}</div>
-            </TabsContent>
-          </Tabs>
+              </TabsList>
+
+              <TabsContent value="recent" class="mt-4">
+                <div v-if="filteredRecent.length" class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <Tooltip v-for="e in filteredRecent" :key="e.char">
+                    <TooltipTrigger as-child>
+                      <button class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer"
+                        :title="e.name" @click="selectEmoji(e)" :aria-label="e.name">
+                        <span>{{ e.char }}</span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent class="whitespace-nowrap">{{ e.name }} <span class="text-muted-foreground ml-1">{{
+                        e.shortcode }}</span></TooltipContent>
+                  </Tooltip>
+                </div>
+                <div v-else class="text-center text-gray-500 py-8">No recently used emojis</div>
+              </TabsContent>
+
+              <TabsContent v-for="cat in categoriesOrdered" :key="cat" :value="cat" class="mt-4">
+                <div v-if="getCategoryEmojis(cat).length" class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                  <Tooltip v-for="e in getCategoryEmojis(cat)" :key="e.char">
+                    <TooltipTrigger as-child>
+                      <button class="p-2 hover:bg-gray-100 rounded text-2xl transition-colors cursor-pointer"
+                        :title="e.name" @click="selectEmoji(e)" :aria-label="e.name">
+                        <span>{{ e.char }}</span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent class="whitespace-nowrap">{{ e.name }} <span class="text-muted-foreground ml-1">{{
+                        e.shortcode }}</span></TooltipContent>
+                  </Tooltip>
+                </div>
+                <div v-else class="text-center text-gray-500 py-8">No emojis in {{ categoryLabel(cat) }}</div>
+              </TabsContent>
+            </Tabs>
+          </div>
         </TooltipProvider>
       </div>
 
@@ -126,8 +144,10 @@
   const categoriesOrdered = computed(() => {
     const available = categories.value
     const head = preferredOrder.filter(p => available.includes(p))
-    const tail = available.filter(c => !preferredOrder.includes(c))
-    return [...head, ...tail]
+    // limit tabs up to and including 'flags' so we don't show too many tabs
+    const stopIndex = head.indexOf('flags')
+    const limitedHead = stopIndex >= 0 ? head.slice(0, stopIndex + 1) : head
+    return limitedHead
   })
 
   function matchesQuery(e: Emoji, q: string) {
@@ -139,6 +159,14 @@
     if ((e.keywords || []).some(k => k.includes(s))) return true
     return false
   }
+
+  const searchResults = computed(() => {
+    const q = searchQuery.value.trim()
+    if (!q) return []
+    return allEmojis.filter(e => matchesQuery(e, q))
+  })
+
+  const showSearch = computed(() => searchQuery.value.trim().length > 0)
 
   function getCategoryEmojis(cat: string) {
     const q = searchQuery.value.trim().toLowerCase()
