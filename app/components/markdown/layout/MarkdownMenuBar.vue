@@ -3,8 +3,10 @@
     <div class="flex flex-row items-start w-full">
       <!-- Left Side: Brand Icon (spans two rows) -->
       <div class="flex flex-col items-center justify-start mr-3" role="presentation">
-        <NuxtImg src="/markdown.webp" alt="ChainPaper Markdown" loading="eager" fetchpriority="high" sizes="72px"
-          class="w-18 h-auto object-contain flex items-center justify-center" />
+        <client-only>
+          <NuxtImg v-if="!isNarrow" src="/markdown.webp" alt="ChainPaper Markdown" loading="eager" fetchpriority="high"
+            sizes="72px" class="w-18 h-auto object-contain flex items-center justify-center" />
+        </client-only>
       </div>
       <!-- Right Side: Two rows -->
       <div class="flex flex-col self-center flex-1">
@@ -184,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, nextTick, onMounted, defineAsyncComponent } from 'vue'
+  import { ref, nextTick, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
   import { storeToRefs } from 'pinia'
   import {
     Edit3, Command, FileText, FolderOpen, Save, Download,
@@ -563,12 +565,28 @@
 
   // detect platform on client to show correct modifier icon in shortcuts
   const isMac = ref(false)
+  // hide the left brand image on very narrow screens (mobile)
+  const isNarrow = ref(false)
+
+  function updateIsNarrow() {
+    if (typeof window === 'undefined') return
+    isNarrow.value = window.innerWidth < 475
+  }
+
   onMounted(() => {
     try {
       isMac.value = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)
     } catch (e) {
       isMac.value = false
     }
+
+    // initial check and listen for resizes on client
+    updateIsNarrow()
+    if (typeof window !== 'undefined') window.addEventListener('resize', updateIsNarrow)
+  })
+
+  onUnmounted(() => {
+    if (typeof window !== 'undefined') window.removeEventListener('resize', updateIsNarrow)
   })
 
   function startEditingTitle() {
