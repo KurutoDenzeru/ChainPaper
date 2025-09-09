@@ -195,7 +195,7 @@
   import { storeToRefs } from 'pinia'
   import {
     Edit3, Command, FileText, FolderOpen, Save, Download,
-    Undo2, Redo2, Scissors, Copy, Clipboard, Search, Bold, Italic, Underline,
+  Undo2, Redo2, Scissors, Copy, Clipboard, Bold, Italic, Underline,
     Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
     Type, Highlighter,
     List, ListOrdered, Quote, Link, Image, Table, AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -230,7 +230,7 @@
     (e: 'copy'): void
     (e: 'paste'): void
     (e: 'select-all'): void
-    (e: 'toggle-find'): void
+
     (e: 'set-zoom', level: number | 'fit'): void
     (e: 'insert-table', rows?: number, cols?: number, header?: boolean): void
     (e: 'insert-image'): void
@@ -304,7 +304,7 @@
         { type: 'item', label: 'Paste', emit: 'paste', icon: Clipboard, shortcut: { mac: ['Command'], key: 'V', pc: 'Ctrl' } },
         { type: 'separator' },
         { type: 'item', label: 'Select All', emit: 'select-all', shortcut: { mac: ['Command'], key: 'A', pc: 'Ctrl' } },
-        { type: 'item', label: 'Find', emit: 'toggle-find', icon: Search, shortcut: { mac: ['Command'], key: 'F', pc: 'Ctrl' } }
+
       ]
     },
     {
