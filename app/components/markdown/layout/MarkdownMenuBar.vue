@@ -12,20 +12,20 @@
       <div class="flex flex-col self-center flex-1">
         <!-- First Row: Document Title Input -->
         <div class="flex items-center gap-2 mb-1" role="presentation">
-          <div v-if="!isEditingTitle" @click="startEditingTitle" @keydown.enter="startEditingTitle" role="button"
-            tabindex="0" aria-label="Edit document title"
-            class="flex items-center gap-2 px-3 rounded hover:bg-gray-100 cursor-pointer transition-colors">
+          <button v-if="!isEditingTitle" type="button" @click="startEditingTitle"
+            :aria-expanded="isEditingTitle" aria-label="Edit document title" aria-controls="doc-title-input"
+            class="flex items-center gap-2 px-3 rounded hover:bg-gray-100 cursor-pointer transition-colors bg-transparent border-0">
             <!-- render title reactively to show updates -->
             <span class="text-lg text-gray-900 font-medium -ml-2">{{ title ||
               'Untitled Markdown' }}</span>
             <Edit3 class="w-4 h-4 text-gray-600" />
             <span v-if="isDirty" class="text-orange-500">•</span>
-          </div>
+          </button>
           <client-only>
             <div v-if="isEditingTitle" class="flex items-center gap-2">
-              <Input ref="titleInput" v-model="editingTitle" @blur="saveTitle" @keyup.enter="saveTitle"
-                @keyup.escape="cancelEdit" class="text-lg bg-transparent border-2 rounded-md outline-none px-1 min-w-48"
-                :placeholder="'Untitled Markdown'" />
+        <Input id="doc-title-input" ref="titleInput" v-model="editingTitle" @blur="saveTitle" @keyup.enter="saveTitle"
+          @keyup.escape="cancelEdit" class="text-lg bg-transparent border-2 rounded-md outline-none px-1 min-w-48"
+          :placeholder="'Untitled Markdown'" />
             </div>
           </client-only>
         </div>
