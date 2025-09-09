@@ -12,15 +12,18 @@
       <div class="flex flex-col self-center flex-1">
         <!-- First Row: Document Title Input -->
         <div class="flex items-center gap-2 mb-1" role="presentation">
-          <button v-if="!isEditingTitle" type="button" @click="startEditingTitle"
-            :aria-expanded="isEditingTitle" aria-label="Edit document title" aria-controls="doc-title-input"
-            class="flex items-center gap-2 px-3 rounded hover:bg-gray-100 cursor-pointer transition-colors bg-transparent border-0">
-            <!-- render title reactively to show updates -->
-            <span class="text-lg text-gray-900 font-medium -ml-2">{{ title ||
-              'Untitled Markdown' }}</span>
-            <Edit3 class="w-4 h-4 text-gray-600" />
-            <span v-if="isDirty" class="text-orange-500">•</span>
-          </button>
+          <div v-if="!isEditingTitle" class="flex items-center gap-2 px-3 rounded">
+            <!-- Visible document title (non-interactive) -->
+            <span class="text-lg text-gray-900 font-medium -ml-2">{{ title || 'Untitled Markdown' }}</span>
+
+            <!-- Edit button: icon-only, clearly labeled for assistive tech -->
+            <button type="button" @click="startEditingTitle" aria-label="Edit document title"
+              class="inline-flex items-center justify-center p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-1">
+              <Edit3 aria-hidden="true" class="w-4 h-4 text-gray-600" />
+            </button>
+
+            <span v-if="isDirty" aria-hidden="true" class="text-orange-500">•</span>
+          </div>
           <client-only>
             <div v-if="isEditingTitle" class="flex items-center gap-2">
         <Input id="doc-title-input" ref="titleInput" v-model="editingTitle" @blur="saveTitle" @keyup.enter="saveTitle"
