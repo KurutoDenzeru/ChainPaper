@@ -19,6 +19,7 @@
             <!-- Edit button: icon-only, clearly labeled for assistive tech -->
             <button type="button" @click="startEditingTitle" aria-label="Edit document title"
               class="inline-flex items-center justify-center p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-1">
+              <span class="sr-only">Edit document title</span>
               <Edit3 aria-hidden="true" class="w-4 h-4 text-gray-600" />
             </button>
 
@@ -26,9 +27,10 @@
           </div>
           <client-only>
             <div v-if="isEditingTitle" class="flex items-center gap-2">
-        <Input id="doc-title-input" ref="titleInput" v-model="editingTitle" @blur="saveTitle" @keyup.enter="saveTitle"
-          @keyup.escape="cancelEdit" class="text-lg bg-transparent border-2 rounded-md outline-none px-1 min-w-48"
-          :placeholder="'Untitled Markdown'" />
+              <Input id="doc-title-input" ref="titleInput" v-model="editingTitle" @blur="saveTitle"
+                @keyup.enter="saveTitle" @keyup.escape="cancelEdit"
+                class="text-lg bg-transparent border-2 rounded-md outline-none px-1 min-w-48"
+                :placeholder="'Untitled Markdown'" />
             </div>
           </client-only>
         </div>
