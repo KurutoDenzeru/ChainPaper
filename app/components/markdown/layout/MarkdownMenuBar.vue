@@ -625,6 +625,14 @@
   function newDoc() {
     // reset store to create a fresh document
     store.reset()
+    // Clear persisted session so a page refresh doesn't restore the previous doc
+    try {
+      if (typeof localStorage !== 'undefined') localStorage.removeItem('chainpaper_current_doc')
+      // mark this session as a new session so the auto-restore on page load is skipped
+      if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('chainpaper_new_session', '1')
+    } catch (e) {
+      // ignore (SSR or blocked storage)
+    }
   }
 
   function onExportDialogUpdate(v: boolean) {

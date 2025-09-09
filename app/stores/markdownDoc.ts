@@ -47,7 +47,7 @@ export const useMarkdownDocStore = defineStore('markdownDoc', () => {
 
   function setTitle(t: string) { title.value = t; isDirty.value = true }
   function setContent(c: string, push = true) { content.value = c; isDirty.value = true; if (push) pushHistory(c) }
-  function reset() { title.value = 'Untitled Markdown'; content.value = ''; isDirty.value = false; history.value = ['']; historyIndex.value = 0 }
+  function reset() { title.value = 'Untitled Markdown'; content.value = ''; isDirty.value = false; history.value = ['']; historyIndex.value = 0; attachments.value = {} }
   function markSaved() { isDirty.value = false }
 
   function setAutoSaveEnabled(v: boolean) {

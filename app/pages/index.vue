@@ -265,23 +265,30 @@
 
     // Restore saved document if available
     try {
-      const savedDoc = localStorage.getItem('chainpaper_current_doc')
-      if (savedDoc) {
-        const data = JSON.parse(savedDoc)
-        // Only restore if the store is in its default state
-        if (store.title === 'Untitled Markdown' && !store.content.trim()) {
-          store.setTitle(data.title || 'Untitled Markdown')
-          store.setContent(data.content || '', false) // Don't push to history
-          store.markSaved() // Mark as saved since we just loaded it
+      // Skip restore if user explicitly started a new document during this session
+      const newSessionFlag = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('chainpaper_new_session') : null
+      if (!newSessionFlag) {
+        const savedDoc = localStorage.getItem('chainpaper_current_doc')
+        if (savedDoc) {
+          const data = JSON.parse(savedDoc)
+          // Only restore if the store is in its default state
+          if (store.title === 'Untitled Markdown' && !store.content.trim()) {
+            store.setTitle(data.title || 'Untitled Markdown')
+            store.setContent(data.content || '', false) // Don't push to history
+            store.markSaved() // Mark as saved since we just loaded it
 
-          // Show toast notification after a short delay to ensure UI is ready
-          setTimeout(() => {
-            toast.info('Document restored', {
-              description: `Restored "${data.title || 'Untitled'}" from previous session`,
-              duration: 3000
-            })
-          }, 1000)
+            // Show toast notification after a short delay to ensure UI is ready
+            setTimeout(() => {
+              toast.info('Document restored', {
+                description: `Restored "${data.title || 'Untitled'}" from previous session`,
+                duration: 3000
+              })
+            }, 1000)
+          }
         }
+      } else {
+        // Remove flag so subsequent loads in this session may restore later if desired
+        try { if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('chainpaper_new_session') } catch (_) { }
       }
     } catch (error) {
       console.warn('Could not restore saved document:', error)
