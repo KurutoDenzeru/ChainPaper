@@ -299,10 +299,12 @@ character_count: ${characterCount.value}
 
   // Auto-save functionality (client-only)
   let autoSaveInterval: number | null = null
+  // store the watch stopper so it can be cleaned up on unmount
+  let stopAutoSaveWatch: (() => void) | null = null
 
   onMounted(() => {
     // Watch the autoSave toggle and create/clear interval on the client
-    const stop = watch(autoSave, (enabled) => {
+    stopAutoSaveWatch = watch(autoSave, (enabled) => {
       if (enabled) {
         // Ensure any previous interval is cleared
         if (autoSaveInterval) {
@@ -320,14 +322,17 @@ character_count: ${characterCount.value}
         }
       }
     }, { immediate: true })
+  })
 
-    // Clean up when component unmounts
-    onUnmounted(() => {
-      if (autoSaveInterval) {
-        clearInterval(autoSaveInterval)
-        autoSaveInterval = null
-      }
-      stop()
-    })
+  // Clean up when component unmounts (registered at top-level to avoid nested hooks)
+  onUnmounted(() => {
+    if (autoSaveInterval) {
+      clearInterval(autoSaveInterval)
+      autoSaveInterval = null
+    }
+    if (stopAutoSaveWatch) {
+      stopAutoSaveWatch()
+      stopAutoSaveWatch = null
+    }
   })
 </script>
