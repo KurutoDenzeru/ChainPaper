@@ -11,52 +11,53 @@
         </DialogDescription>
       </DialogHeader>
 
+
       <div class="space-y-6">
-        <!-- Export Options -->
         <!-- Export Options -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Button variant="outline" :class="[
             'h-24 flex flex-col items-center gap-2 p-4 transition-all',
             exportFormat === 'markdown'
-              ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50'
-              : 'hover:ring-1 hover:ring-gray-300'
+              ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50 dark:bg-blue-900 dark:ring-blue-400 dark:border-blue-400'
+              : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600 dark:bg-gray-800'
           ]" @click="exportAsMarkdown">
-            <FileText class="w-8 h-8 text-blue-600" />
+            <FileText class="w-8 h-8 text-blue-600 dark:text-blue-300" />
             <div class="text-center">
-              <div class="font-medium">Markdown</div>
-              <div class="text-xs text-gray-600">.md file</div>
+              <div class="font-medium dark:text-gray-100">Markdown</div>
+              <div class="text-xs text-gray-600 dark:text-gray-300">.md file</div>
             </div>
           </Button>
 
           <Button variant="outline" :class="[
             'h-24 flex flex-col items-center gap-2 p-4 transition-all',
             exportFormat === 'html'
-              ? 'ring-2 ring-orange-500 border-orange-500 bg-orange-50'
-              : 'hover:ring-1 hover:ring-gray-300'
+              ? 'ring-2 ring-orange-500 border-orange-500 bg-orange-50 dark:bg-orange-900 dark:ring-orange-400 dark:border-orange-400'
+              : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600 dark:bg-gray-800'
           ]" @click="exportAsHTML">
-            <Globe class="w-8 h-8 text-orange-600" />
+            <Globe class="w-8 h-8 text-orange-600 dark:text-orange-300" />
             <div class="text-center">
-              <div class="font-medium">HTML</div>
-              <div class="text-xs text-gray-600">.html file</div>
+              <div class="font-medium dark:text-gray-100">HTML</div>
+              <div class="text-xs text-gray-600 dark:text-gray-300">.html file</div>
             </div>
           </Button>
 
           <Button variant="outline" :class="[
             'h-24 flex flex-col items-center gap-2 p-4 transition-all',
             exportFormat === 'json'
-              ? 'ring-2 ring-purple-500 border-purple-500 bg-purple-50'
-              : 'hover:ring-1 hover:ring-gray-300'
+              ? 'ring-2 ring-purple-500 border-purple-500 bg-purple-50 dark:bg-purple-900 dark:ring-purple-400 dark:border-purple-400'
+              : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600 dark:bg-gray-800'
           ]" @click="exportAsJSON">
-            <FileDown class="w-8 h-8 text-purple-600" />
+            <FileDown class="w-8 h-8 text-purple-600 dark:text-purple-300" />
             <div class="text-center">
-              <div class="font-medium">JSON</div>
-              <div class="text-xs text-gray-600">.json file</div>
+              <div class="font-medium dark:text-gray-100">JSON</div>
+              <div class="text-xs text-gray-600 dark:text-gray-300">.json file</div>
             </div>
           </Button>
         </div>
 
         <!-- Status Message -->
-        <div v-if="statusMessage" class="p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-600">
+        <div v-if="statusMessage"
+          class="p-3 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded text-sm text-blue-600 dark:text-blue-200">
           {{ statusMessage }}
         </div>
       </div>
@@ -66,8 +67,9 @@
           <Button variant="outline" @click="close" class="flex-1">
             Cancel
           </Button>
-          <Button @click="performExport" :disabled="!exportFormat" class="flex-1">
-            <Download class="w-4 h-4 mr-2" />
+          <Button @click="performExport" :disabled="!exportFormat"
+            class="flex-1 bg-green-600 hover:bg-green-700 text-white hover:text-white border-none dark:bg-green-500 dark:hover:bg-green-600">
+            <Download class="w-4 h-4 mr-2 text-white" />
             Export
           </Button>
         </div>
