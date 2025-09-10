@@ -129,14 +129,14 @@
 
       <DialogFooter>
         <div class="flex gap-2 w-full">
+          <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">
+            Close
+          </Button>
           <Button variant="outline"
             class="w-1/2 bg-green-600 hover:bg-green-700 text-white hover:text-white border-none dark:bg-green-500 dark:hover:bg-green-600"
             @click="exportStats">
             <Download class="w-4 h-4 mr-2 text-white" />
             Export Stats
-          </Button>
-          <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">
-            Close
           </Button>
         </div>
       </DialogFooter>
