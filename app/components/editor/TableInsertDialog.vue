@@ -1,12 +1,12 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-3xl">
+    <DialogContent class="!max-w-3xl bg-white dark:bg-gray-900">
       <DialogHeader>
-        <DialogTitle class="flex items-center gap-2">
-          <Table class="w-5 h-5 text-blue-600" />
+        <DialogTitle class="flex items-center gap-2 dark:text-gray-100">
+          <Table class="w-5 h-5 text-green-600 dark:text-green-300" />
           Insert Table
         </DialogTitle>
-        <DialogDescription>
+        <DialogDescription class="dark:text-gray-300">
           Create a table by selecting the size or entering custom dimensions.
         </DialogDescription>
       </DialogHeader>
@@ -17,26 +17,25 @@
           <div class="w-1/2">
             <div class="space-y-3">
               <div class="flex items-center gap-2">
-                <Grid3x3 class="w-4 h-4 text-gray-600" />
-                <span class="text-sm font-medium text-gray-900">Quick Selection</span>
+                <Grid3x3 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Quick Selection</span>
               </div>
 
               <div class="flex flex-col items-center space-y-3">
                 <!-- Grid selector -->
-                <div class="grid gap-1 p-3 border rounded-lg bg-gray-50/50"
+                <div class="grid gap-1 p-3 border rounded-lg bg-gray-50/50 dark:bg-gray-800 dark:border-gray-700"
                   :style="{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }" @mouseleave="resetSelection">
                   <div v-for="(cell, index) in gridCells" :key="index" :class="[
-                    'w-5 h-5 border border-gray-300 cursor-pointer transition-all duration-150 rounded-sm',
-                    {
-                      'bg-blue-500 border-blue-600 shadow-sm': cell.row <= selectedRows && cell.col <= selectedCols,
-                      'bg-white hover:bg-blue-100 hover:border-blue-300': !(cell.row <= selectedRows && cell.col <= selectedCols)
-                    }
+                    'w-5 h-5 border border-gray-300 dark:border-gray-600 cursor-pointer transition-all duration-150 rounded-sm',
+                    cell.row <= selectedRows && cell.col <= selectedCols
+                      ? 'bg-green-500 border-green-600 shadow-sm dark:bg-green-600 dark:border-green-400'
+                      : 'bg-white hover:bg-green-100 hover:border-green-300 dark:bg-gray-900 dark:hover:bg-green-900 dark:hover:border-green-400'
                   ]" @mouseenter="updateSelection(cell.row, cell.col)"
                     @click="insertTable(selectedRows, selectedCols)" />
                 </div>
 
                 <!-- Status text -->
-                <div class="flex items-center gap-2 text-sm text-gray-700">
+                <div class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <Table class="w-4 h-4" />
                   <span class="font-medium">{{ selectedRows }} rows × {{ selectedCols }} columns</span>
                 </div>
@@ -48,29 +47,34 @@
           <div class="w-1/2">
             <div class="space-y-4">
               <div class="flex items-center gap-2">
-                <Settings class="w-4 h-4 text-gray-600" />
-                <span class="text-sm font-medium text-gray-900">Custom Dimensions</span>
+                <Settings class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Custom Dimensions</span>
               </div>
 
               <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2">
-                  <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     <Grid class="w-4 h-4" />
                     Rows
                   </label>
-                  <Input v-model.number="customRows" type="number" min="1" max="50" class="text-center" placeholder="3" />
+                  <Input v-model.number="customRows" type="number" min="1" max="50" class="text-center"
+                    placeholder="3" />
                 </div>
                 <div class="space-y-2">
-                  <label class="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     <Grid class="w-4 h-4" />
                     Columns
                   </label>
-                  <Input v-model.number="customCols" type="number" min="1" max="20" class="text-center" placeholder="3" />
+                  <Input v-model.number="customCols" type="number" min="1" max="20" class="text-center"
+                    placeholder="3" />
                 </div>
               </div>
               <div class="mt-4">
-                <div class="text-xs text-gray-500 bg-gray-50 rounded p-2 border">
-                  <strong>Note:</strong> The quick selection grid only shows up to <span class="font-bold">8 × 8</span> cells for preview, but you can generate tables up to <span class="font-bold">50 rows × 20 columns</span> using Custom Dimensions.
+                <div
+                  class="text-xs text-gray-500 bg-gray-50 rounded p-2 border dark:text-gray-400 dark:bg-gray-800 dark:border-gray-700">
+                  <strong>Note:</strong> The quick selection grid only shows up to <span class="font-bold">8 × 8</span>
+                  cells for preview, but you can generate tables up to <span class="font-bold">50 rows × 20
+                    columns</span> using Custom Dimensions.
                 </div>
               </div>
             </div>
@@ -83,8 +87,9 @@
           <X class="w-4 h-4 mr-2" />
           Cancel
         </Button>
-        <Button @click="insertCustomTable" class="w-1/2 bg-blue-600 hover:bg-blue-700">
-          <Plus class="w-4 h-4 mr-2" />
+        <Button @click="insertCustomTable"
+          class="w-1/2 bg-green-600 hover:bg-green-700 text-white border-none dark:bg-green-500 dark:hover:bg-green-600 dark:text-white">
+          <Plus class="w-4 h-4 mr-2 text-white" />
           Insert Table
         </Button>
       </DialogFooter>
@@ -191,9 +196,9 @@
     const validCols = Math.max(1, Math.min(20, cols))
 
     const options: TableOptions = {
-  header: true,
-  borders: false,
-  striped: false
+      header: true,
+      borders: false,
+      striped: false
     }
 
     emit('insert-table', validRows, validCols, options)
