@@ -3,7 +3,7 @@
     <DialogContent class="!max-w-3xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <Hash class="w-5 h-5 text-blue-600" />
+          <Hash class="w-5 h-5 text-green-600" />
           Markdown Document Statistics
         </DialogTitle>
         <DialogDescription>
