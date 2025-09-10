@@ -20,11 +20,10 @@
               <p>{{ mode === 'source' ? 'Switch to Reader View' : 'Switch to Source View' }}</p>
             </TooltipContent>
           </Tooltip>
-          <div class="h-6 w-px bg-gray-300 mx-1"></div>
         </div>
 
         <!-- View Controls -->
-  <div class="h-6 w-px bg-gray-300 mx-1"></div>
+        <div class="h-6 w-px bg-gray-300 mx-1"></div>
 
         <!-- Undo/Redo -->
         <Tooltip>
@@ -916,7 +915,7 @@
   }>()
 
   const emit = defineEmits([
-  'toggle-menubar',
+    'toggle-menubar',
     'format-bold', 'format-italic', 'format-underline', 'format-strikethrough',
     'format-superscript', 'format-subscript',
     'toggle-bullet-list', 'toggle-ordered-list', 'toggle-blockquote',
