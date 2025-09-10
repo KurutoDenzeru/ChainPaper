@@ -49,7 +49,19 @@
                       {{ item.label }}
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <!-- ...existing code for submenus... -->
+                      <template v-for="(sub, sidx) in (item as any).items" :key="menu.label + '-sub-' + sidx">
+                        <MenubarSeparator v-if="sub.type === 'separator'" />
+                        <MenubarItem v-else @click="handleMenuEmit(sub)" class="flex items-center justify-between min-w-[220px]">
+                          <div class="flex items-center gap-2">
+                            <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600 dark:text-gray-300" v-if="getIcon(sub)" />
+                            <span>{{ sub.label }}</span>
+                          </div>
+                          <MenubarShortcut v-if="getShortcut(sub)">
+                            <!-- reuse shortcut rendering if present -->
+                            <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 dark:bg-gray-700 text-xs font-medium mr-1">{{ getShortcut(sub)?.pc || getShortcut(sub)?.key || '' }}</span>
+                          </MenubarShortcut>
+                        </MenubarItem>
+                      </template>
                     </MenubarSubContent>
                   </MenubarSub>
                   <MenubarItem v-else class="flex items-center justify-between min-w-[250px]"

@@ -92,11 +92,11 @@
               </PopoverTrigger>
               <PopoverContent class="w-32 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
                 <div class="flex flex-col">
-                  <button class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 font-medium" @click="selectZoom('fit')">
+                  <button class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-medium" @click="selectZoom('fit')">
                     Fit
                   </button>
-                  <div class="border-t my-1" />
-                  <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                  <div class="border-t my-1 border-gray-100 dark:border-gray-700" />
+                  <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100"
                     @click="selectZoom(opt)">
                     {{ opt }}%
                   </button>
