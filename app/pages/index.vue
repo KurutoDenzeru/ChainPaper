@@ -1,6 +1,8 @@
 <template>
+
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
     <div ref="topFixed" class="fixed inset-x-1 top-1 z-50 pointer-events-none">
+
       <div class="pointer-events-auto">
         <MenuBar v-if="showMenuBar" @word-count="showWordDialog = true" @insert-link="insertLink"
           @insert-image="insertImage" @insert-table="insertTable" @set-heading="handleSetHeading"
@@ -14,6 +16,7 @@
           @set-highlight="applyHighlight" @toggle-toolbar="showToolbar = $event"
           @toggle-statusbar="showStatusBar = $event" @cut="handleCut" @copy="handleCopy" @paste="handlePaste" />
       </div>
+
       <div class="mt-2 pointer-events-auto" v-if="showToolbar">
         <EditorToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
           @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
@@ -27,6 +30,7 @@
           @set-text-color="applyColor" @set-highlight="applyHighlight" @update:mode="v => mode = v"
           @toggle-menubar="onToggleMenubar" />
       </div>
+
     </div>
     <div :style="{ height: topPad + 'px' }" aria-hidden="true" />
     <main class="flex-1 p-6 pb-24 flex items-center justify-center">
@@ -53,17 +57,23 @@
         </div>
       </div>
     </main>
+
     <Footer v-if="showStatusBar" :wordCount="wordCount" :characterCount="stats.charsWithSpaces" :mode="mode"
       :zoom="zoom" @set-zoom="setZoom" @word-count="showWordDialog = true" @toggle-mode="toggleMode" />
+
     <WordCountDialog :open="showWordDialog" :stats="stats" @update:open="v => showWordDialog = v" />
+
     <LinkInsertDialog :open="linkDialogOpen" :selectedText="linkDialogSelectedText"
       @update:open="v => linkDialogOpen = v" @insert="handleLinkInsert" />
+
     <ImageInsertDialog :open="imageDialogOpen" @update:open="v => imageDialogOpen = v" @insert="handleImageInsert" />
+
     <Toaster :theme="pageTheme" />
   </div>
+
 </template>
+
 <script setup lang="ts">
-  // --- Cut, Copy, Paste handlers for document area ---
   function handleCut() {
     if (mode.value === 'source') {
       const ta = getActiveTextarea(); if (!ta) return
@@ -211,17 +221,23 @@
   }
   import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
   import { storeToRefs } from 'pinia'
-  import { useEditorModeStore } from '@/stores/editorMode'
-  import MenuBar from '~/components/layout/MenuBar.vue'
-  import EditorToolbar from '~/components/layout/EditorToolbar.vue'
-  import Footer from '~/components/layout/StickyFooter.vue'
-  import WordCountDialog from '~/components/dialogs/WordCountDialog.vue'
-  import LinkInsertDialog from '~/components/dialogs/LinkInsertDialog.vue'
-  import { insertLink as domInsertLink } from '@/lib/editor-formatting'
-  import { Toaster } from '@/components/ui/sonner'
   import { toast } from 'vue-sonner'
   import 'vue-sonner/style.css'
+
+  // Libraries
+  import 'katex/dist/katex.min.css'
+  import { useEditorModeStore } from '@/stores/editorMode'
+  import { insertLink as domInsertLink } from '@/lib/editor-formatting'
+
+  // Components
+  import { Toaster } from '@/components/ui/sonner'
+  import MenuBar from '~/components/layout/MenuBar.vue'
   import { ScrollArea } from '@/components/ui/scroll-area'
+  import Footer from '~/components/layout/StickyFooter.vue'
+  import EditorToolbar from '~/components/layout/EditorToolbar.vue'
+  import WordCountDialog from '~/components/dialogs/WordCountDialog.vue'
+  import LinkInsertDialog from '~/components/dialogs/LinkInsertDialog.vue'
+
   // Lazy load markdown-it plugins only when needed
   let MarkdownIt: any
   let katexPlugin: any
@@ -923,7 +939,8 @@
     // Add KaTeX support for math rendering if available
     if (katexPlugin && typeof katexPlugin === 'function') {
       try {
-        md.use(katexPlugin)
+        // Allow KaTeX to be lenient and not throw on minor parse errors.
+        md.use(katexPlugin, { throwOnError: false, errorColor: '#cc0000', strict: false })
       } catch (e) {
         console.warn('Failed to load KaTeX plugin:', e)
       }
@@ -1028,6 +1045,14 @@
             alignment === 'justify' ? 'text-justify' : 'text-left'
         return `<div class="${alignClass}">\n\n${content.trim()}\n\n</div>`
       })
+
+      // Normalize common LaTeX environments that KaTeX expects inside math
+      // KaTeX supports `aligned` inside display math but not always `align`.
+      // Convert \begin{align} / \begin{align*} -> \begin{aligned}
+      // and corresponding \end tokens.
+      processedContent = processedContent
+        .replace(/\\begin\{align\*?\}/g, '\\begin{aligned}')
+        .replace(/\\end\{align\*?\}/g, '\\end{aligned}')
 
       return md.render(processedContent)
     } catch {
