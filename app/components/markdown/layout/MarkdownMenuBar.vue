@@ -66,6 +66,30 @@
               </MenubarContent>
             </MenubarMenu>
           </template>
+
+          <!-- Theme selector -->
+          <div class="ml-3">
+            <Popover>
+              <PopoverTrigger as-child>
+                <button class="inline-flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" aria-label="Theme selector">
+                  <component :is="theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor" class="w-4 h-4 text-gray-600" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent class="p-2 w-44">
+                <div class="flex flex-col">
+                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50" @click="setTheme('system')">
+                    <Monitor class="w-4 h-4" /> System
+                  </button>
+                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50" @click="setTheme('light')">
+                    <Sun class="w-4 h-4" /> Light
+                  </button>
+                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50" @click="setTheme('dark')">
+                    <Moon class="w-4 h-4" /> Dark
+                  </button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
     </div>
@@ -110,8 +134,11 @@
     Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info, Indent, Outdent,
     Superscript, Subscript, Sigma, SquareSigma, Minus, Smile
   } from 'lucide-vue-next'
+  // Theme icons
+  import { Sun, Moon, Monitor } from 'lucide-vue-next'
   import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from '@/components/ui/menubar'
   import { Input } from '@/components/ui/input'
+  import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   // Lazy-load dialog components to reduce initial bundle and improve LCP
   const TableInsertDialog = defineAsyncComponent(() => import('@/components/editor/TableInsertDialog.vue'))
   const EmojiInsertDialog = defineAsyncComponent(() => import('@/components/editor/EmojiInsertDialog.vue'))
@@ -202,6 +229,36 @@
   const showTableDialog = ref(false)
   const showEmojiDialog = ref(false)
   const exportInitialFormat = ref<'markdown' | 'html' | 'json' | 'pdf' | null>(null)
+
+  // Theme handling: 'light' | 'dark' | 'system'
+  const theme = ref<'light' | 'dark' | 'system'>('system')
+  let mediaMatcher: MediaQueryList | null = null
+
+  function applyTheme(t: 'light' | 'dark' | 'system') {
+    try {
+      if (t === 'dark') {
+        document.documentElement.classList.add('dark')
+      } else if (t === 'light') {
+        document.documentElement.classList.remove('dark')
+      } else {
+        // system preference
+        const prefersDark = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false
+        if (prefersDark) document.documentElement.classList.add('dark')
+        else document.documentElement.classList.remove('dark')
+      }
+    } catch (e) {
+      // ignore (SSR or restricted)
+    }
+    theme.value = t
+    try {
+      if (t === 'system') localStorage.removeItem('chainpaper_theme')
+      else localStorage.setItem('chainpaper_theme', t)
+    } catch (e) {}
+  }
+
+  function setTheme(t: 'light' | 'dark' | 'system') {
+    applyTheme(t)
+  }
 
   // Markdown-specific menu data
   const menus = ref([
@@ -531,10 +588,36 @@
     // initial check and listen for resizes on client
     updateIsNarrow()
     if (typeof window !== 'undefined') window.addEventListener('resize', updateIsNarrow)
+
+    // Restore theme preference
+    try {
+      const saved = localStorage.getItem('chainpaper_theme')
+      if (saved === 'light' || saved === 'dark') applyTheme(saved as 'light' | 'dark')
+      else applyTheme('system')
+    } catch (e) {
+      applyTheme('system')
+    }
+
+    // Listen for system theme changes when in 'system' mode
+    try {
+      if (typeof window !== 'undefined' && window.matchMedia) {
+        mediaMatcher = window.matchMedia('(prefers-color-scheme: dark)')
+        const handler = () => { if (theme.value === 'system') applyTheme('system') }
+        // modern API
+        if ((mediaMatcher as any).addEventListener) mediaMatcher.addEventListener('change', handler)
+        else (mediaMatcher as any).addListener(handler)
+      }
+    } catch (e) {}
   })
 
   onUnmounted(() => {
     if (typeof window !== 'undefined') window.removeEventListener('resize', updateIsNarrow)
+    try {
+      if (mediaMatcher) {
+        if ((mediaMatcher as any).removeEventListener) (mediaMatcher as any).removeEventListener('change', () => {})
+        else (mediaMatcher as any).removeListener(() => {})
+      }
+    } catch (e) {}
   })
 
   function startEditingTitle() {
