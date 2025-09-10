@@ -1,5 +1,5 @@
 <template>
-  <Menubar class="px-2 sm:px-4 py-9 bg-white border border-gray-200 rounded-lg shadow-sm text-gray-600">
+  <Menubar class="px-2 sm:px-4 py-9 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm text-gray-600 dark:text-gray-200">
     <div class="flex flex-row items-start w-full">
       <!-- Left Side: Brand Icon (spans two rows) -->
       <div class="flex flex-col items-center justify-start mr-3" role="presentation">
@@ -12,15 +12,15 @@
       <div class="flex flex-col self-center flex-1">
         <!-- First Row: Document Title Input -->
         <div class="flex items-center gap-2 mb-1" role="presentation">
-          <div v-if="!isEditingTitle" class="flex items-center gap-2 px-3 rounded">
+            <div v-if="!isEditingTitle" class="flex items-center gap-2 px-3 rounded">
             <!-- Visible document title (non-interactive) -->
-            <span class="text-lg text-gray-900 font-medium -ml-2">{{ title || 'Untitled Markdown' }}</span>
+            <span class="text-lg text-gray-900 dark:text-white font-medium -ml-2">{{ title || 'Untitled Markdown' }}</span>
 
             <!-- Edit button: icon-only, clearly labeled for assistive tech -->
-            <button type="button" @click="startEditingTitle" aria-label="Edit document title"
-              class="inline-flex items-center justify-center p-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-1">
+              <button type="button" @click="startEditingTitle" aria-label="Edit document title"
+              class="inline-flex items-center justify-center p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-1">
               <span class="sr-only">Edit document title</span>
-              <Edit3 aria-hidden="true" class="w-4 h-4 text-gray-600" />
+              <Edit3 aria-hidden="true" class="w-4 h-4 text-gray-600 dark:text-gray-300" />
             </button>
 
             <span v-if="isDirty" aria-hidden="true" class="text-orange-500">•</span>
@@ -29,7 +29,7 @@
             <div v-if="isEditingTitle" class="flex items-center gap-2">
               <Input id="doc-title-input" ref="titleInput" v-model="editingTitle" @blur="saveTitle"
                 @keyup.enter="saveTitle" @keyup.escape="cancelEdit"
-                class="text-lg bg-transparent border-2 rounded-md outline-none px-1 min-w-48"
+                class="text-lg bg-transparent border-2 border-gray-200 dark:border-gray-700 rounded-md outline-none px-1 min-w-48 text-gray-900 dark:text-white"
                 :placeholder="'Untitled Markdown'" />
             </div>
           </client-only>
@@ -45,7 +45,7 @@
                   <!-- Checkbox items removed; now using buttons for toolbar/statusbar/preview -->
                   <MenubarSub v-else-if="item.type === 'sub'">
                     <MenubarSubTrigger class="flex items-center gap-2">
-                      <component :is="(item as any).icon" class="w-4 h-4 text-gray-600" v-if="(item as any).icon" />
+                      <component :is="(item as any).icon" class="w-4 h-4 text-gray-600 dark:text-gray-300" v-if="(item as any).icon" />
                       {{ item.label }}
                     </MenubarSubTrigger>
                     <MenubarSubContent>
@@ -55,7 +55,7 @@
                   <MenubarItem v-else class="flex items-center justify-between min-w-[250px]"
                     :disabled="isDisabled(item)" @click="handleMenuEmit(item)">
                     <div class="flex items-center gap-2">
-                      <component :is="getIcon(item)" class="w-4 h-4 text-gray-600" v-if="getIcon(item)" />
+                      <component :is="getIcon(item)" class="w-4 h-4 text-gray-600 dark:text-gray-300" v-if="getIcon(item)" />
                       <span>{{ item.label }}</span>
                     </div>
                     <MenubarShortcut v-if="getShortcut(item)">
@@ -71,19 +71,19 @@
           <div class="ml-3">
             <Popover>
               <PopoverTrigger as-child>
-                <button class="inline-flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" aria-label="Theme selector">
-                  <component :is="theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor" class="w-4 h-4 text-gray-600" />
+                <button class="inline-flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Theme selector">
+                  <component :is="theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor" class="w-4 h-4 text-gray-600 dark:text-gray-200" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent class="p-2 w-44">
+              <PopoverContent class="p-2 w-44 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
                 <div class="flex flex-col">
-                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50" @click="setTheme('system')">
+                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700" @click="setTheme('system')">
                     <Monitor class="w-4 h-4" /> System
                   </button>
-                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50" @click="setTheme('light')">
+                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700" @click="setTheme('light')">
                     <Sun class="w-4 h-4" /> Light
                   </button>
-                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50" @click="setTheme('dark')">
+                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700" @click="setTheme('dark')">
                     <Moon class="w-4 h-4" /> Dark
                   </button>
                 </div>

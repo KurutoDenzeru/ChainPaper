@@ -1,7 +1,7 @@
 <template>
   <TooltipProvider>
     <div
-      class="flex items-center justify-between px-4 sm:px-4 py-1 rounded-xl bg-white border border-gray-200 gap-1 sm:gap-2 overflow-x-auto shadow-sm">
+      class="flex items-center justify-between px-4 sm:px-4 py-1 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 gap-1 sm:gap-2 overflow-x-auto shadow-sm text-gray-700 dark:text-gray-200">
       <!-- Always Visible Controls -->
       <div class="flex gap-1 flex-shrink-0 items-center">
         <!-- Mode label + toggle (farthest left) -->
@@ -23,7 +23,7 @@
         </div>
 
         <!-- View Controls -->
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+  <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
         <!-- Undo/Redo -->
         <Tooltip>
@@ -52,18 +52,18 @@
 
       <!-- Desktop Layout: Show all controls on large screens -->
       <div class="hidden lg:flex gap-1 flex-1 items-center">
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+  <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
         <!-- Headings (popover dropdown) -->
         <Popover>
           <PopoverTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16"
               title="Heading Styles" aria-label="Heading styles">
-              <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600" />
+              <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600 dark:text-gray-300" />
               <ChevronDown class="w-3 h-3 text-gray-500" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="w-40 p-2">
+          <PopoverContent class="w-40 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
             <div class="flex flex-col">
               <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
                 @click="setHeading('p')">
@@ -105,7 +105,7 @@
           </PopoverContent>
         </Popover>
 
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+  <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
         <!-- Zoom controls -->
         <div class="flex items-center gap-1 ml-1">
@@ -126,12 +126,12 @@
                 class="w-20 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 tabindex="0">
                 <span class="sr-only" id="editor-zoom-label">Zoom percentage</span>
-                <Input id="editor-zoom-input" type="number" v-model="zoomModel" class="w-20 text-center h-8 rounded"
+                <Input id="editor-zoom-input" type="number" v-model="zoomModel" class="w-20 text-center h-8 rounded bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100"
                   aria-labelledby="editor-zoom-label" aria-label="Zoom percentage" role="spinbutton" aria-valuemin="50"
                   aria-valuemax="200" :aria-valuenow="isFit ? 100 : zoomPercent" />
               </button>
             </PopoverTrigger>
-            <PopoverContent class="w-32 p-2">
+            <PopoverContent class="w-32 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
               <div class="flex flex-col">
                 <button class="text-left px-2 py-1 rounded hover:bg-gray-100 font-medium"
                   @click="selectZoom('fit')">Fit</button>
@@ -154,7 +154,7 @@
           </Tooltip>
         </div>
 
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+  <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
         <!-- Basic Formatting -->
         <Tooltip>
@@ -213,7 +213,7 @@
               </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="w-64 p-3">
+          <PopoverContent class="w-64 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
             <div class="grid grid-cols-8 gap-2">
               <button v-for="c in textColors" :key="c" :title="c"
                 class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
@@ -226,8 +226,8 @@
             <div class="mt-3 border-t pt-3">
               <div class="text-xs text-gray-500 mb-2">Custom color</div>
               <div class="flex items-center gap-2">
-                <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer" @input="onCustomTextColor" />
-                <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb"
+                <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700" @input="onCustomTextColor" />
+                <input type="text" class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100" placeholder="#rrggbb"
                   @change="onCustomTextColorText" />
               </div>
             </div>
@@ -245,7 +245,7 @@
               </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="w-64 p-3">
+            <PopoverContent class="w-64 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
             <div class="grid grid-cols-8 gap-2">
               <button v-for="c in highlightColors" :key="c" :title="c"
                 class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
@@ -258,8 +258,8 @@
             <div class="mt-3 border-t pt-3">
               <div class="text-xs text-gray-500 mb-2">Custom highlight</div>
               <div class="flex items-center gap-2">
-                <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer" @input="onCustomHighlight" />
-                <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb"
+                <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700" @input="onCustomHighlight" />
+                <input type="text" class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100" placeholder="#rrggbb"
                   @change="onCustomHighlightText" />
               </div>
             </div>
@@ -522,7 +522,7 @@
         <Popover>
           <PopoverTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
-              <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600" />
+              <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600 dark:text-gray-300" />
               <ChevronDown class="w-3 h-3 text-gray-500" />
             </Button>
           </PopoverTrigger>
@@ -641,43 +641,43 @@
                   <SelectContent>
                     <SelectItem value="0">
                       <div class="flex items-center gap-2">
-                        <FileText class="w-4 h-4 text-gray-600" />
+                        <FileText class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                         <span>Paragraph</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="1">
                       <div class="flex items-center gap-2">
-                        <Heading1 class="w-4 h-4 text-gray-600" />
+                        <Heading1 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                         <span>Heading 1</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="2">
                       <div class="flex items-center gap-2">
-                        <Heading2 class="w-4 h-4 text-gray-600" />
+                        <Heading2 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                         <span>Heading 2</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="3">
                       <div class="flex items-center gap-2">
-                        <Heading3 class="w-4 h-4 text-gray-600" />
+                        <Heading3 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                         <span>Heading 3</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="4">
                       <div class="flex items-center gap-2">
-                        <Heading4 class="w-4 h-4 text-gray-600" />
+                        <Heading4 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                         <span>Heading 4</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="5">
                       <div class="flex items-center gap-2">
-                        <Heading5 class="w-4 h-4 text-gray-600" />
+                        <Heading5 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                         <span>Heading 5</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="6">
                       <div class="flex items-center gap-2">
-                        <Heading6 class="w-4 h-4 text-gray-600" />
+                        <Heading6 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                         <span>Heading 6</span>
                       </div>
                     </SelectItem>
@@ -700,25 +700,25 @@
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('format-superscript')">
-                    <Superscript class="w-4 h-4 text-gray-600" />
+                    <Superscript class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Superscript</span>
                   </button>
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('format-subscript')">
-                    <Subscript class="w-4 h-4 text-gray-600" />
+                    <Subscript class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Subscript</span>
                   </button>
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('toggle-blockquote')">
-                    <Quote class="w-4 h-4 text-gray-600" />
+                    <Quote class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Quote</span>
                   </button>
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors col-span-2"
                     @click="$emit('insert-code-block')">
-                    <Code2 class="w-4 h-4 text-gray-600" />
+                    <Code2 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Code Block</span>
                   </button>
                 </div>
@@ -733,7 +733,7 @@
                 <!-- Text Color -->
                 <div class="space-y-2">
                   <div class="flex items-center gap-2">
-                    <Type class="w-4 h-4 text-gray-600" />
+                    <Type class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm font-medium text-gray-700">Text Color</span>
                   </div>
                   <div class="grid grid-cols-8 gap-1.5">
@@ -756,7 +756,7 @@
                 <!-- Highlight Color -->
                 <div class="space-y-2">
                   <div class="flex items-center gap-2">
-                    <Highlighter class="w-4 h-4 text-gray-600" />
+                    <Highlighter class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm font-medium text-gray-700">Highlight</span>
                   </div>
                   <div class="grid grid-cols-8 gap-1.5">
@@ -798,36 +798,36 @@
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('indent')">
-                    <Indent class="w-4 h-4 text-gray-600" />
+                    <Indent class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Indent</span>
                   </button>
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('unindent')">
-                    <Outdent class="w-4 h-4 text-gray-600" />
+                    <Outdent class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Unindent</span>
                   </button>
                 </div>
 
                 <!-- Alignment -->
                 <div class="space-y-2 mt-3">
-                  <div class="text-xs font-medium text-gray-600">Alignment</div>
+                  <div class="text-xs font-medium text-gray-600 dark:text-gray-300">Alignment</div>
                   <div class="grid grid-cols-4 gap-1">
                     <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
                       @click="setAlign('left')">
-                      <AlignLeft class="w-4 h-4 text-gray-600" />
+                      <AlignLeft class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     </button>
                     <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
                       @click="setAlign('center')">
-                      <AlignCenter class="w-4 h-4 text-gray-600" />
+                      <AlignCenter class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     </button>
                     <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
                       @click="setAlign('right')">
-                      <AlignRight class="w-4 h-4 text-gray-600" />
+                      <AlignRight class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     </button>
                     <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
                       @click="setAlign('justify')">
-                      <AlignJustify class="w-4 h-4 text-gray-600" />
+                      <AlignJustify class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     </button>
                   </div>
                 </div>
@@ -842,49 +842,49 @@
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-link')">
-                    <Link class="w-4 h-4 text-gray-600" />
+                    <Link class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Link</span>
                   </button>
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-image')">
-                    <ImageIcon class="w-4 h-4 text-gray-600" />
+                    <ImageIcon class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Image</span>
                   </button>
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="showTableDialog = true">
-                    <Table class="w-4 h-4 text-gray-600" />
+                    <Table class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Table</span>
                   </button>
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-horizontal-line')">
-                    <Minus class="w-4 h-4 text-gray-600" />
+                    <Minus class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Divider</span>
                   </button>
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-math')">
-                    <Sigma class="w-4 h-4 text-gray-600" />
+                    <Sigma class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Math</span>
                   </button>
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-mathblock')">
-                    <SquareSigma class="w-4 h-4 text-gray-600" />
+                    <SquareSigma class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Math Block</span>
                   </button>
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="$emit('insert-footnote')">
-                    <FootnoteIcon class="w-4 h-4 text-gray-600" />
+                    <FootnoteIcon class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Footnote</span>
                   </button>
                   <button
                     class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
                     @click="showEmojiDialog = true">
-                    <Smile class="w-4 h-4 text-gray-600" />
+                    <Smile class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                     <span class="text-sm">Emoji</span>
                   </button>
                 </div>
