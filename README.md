@@ -1,4 +1,4 @@
-![ChainPaper](public/openGraph.png)
+![ChainPaper](public/OpenGraph.webp)
 
 # ChainPaper - Trustless Whitepaper
 
@@ -41,8 +41,8 @@
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/KurutoDenzeru/password-forge.git
-cd password-forge
+git clone https://github.com/KurutoDenzeru/ChainPaper.git
+cd ChainPaper
 ```
 
 ### 2. Install dependencies
