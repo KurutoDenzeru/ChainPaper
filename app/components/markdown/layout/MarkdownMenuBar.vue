@@ -42,11 +42,7 @@
               <MenubarContent>
                 <template v-for="(item, idx) in menu.items" :key="menu.label + '-' + idx">
                   <MenubarSeparator v-if="item.type === 'separator'" />
-                  <MenubarCheckboxItem v-else-if="item.type === 'checkbox' && item.label !== 'Preview Mode'" v-model:checked="getBinding(item).value"
-                    class="flex items-center gap-2">
-                    <component :is="getIcon(item)" class="w-4 h-4 text-gray-600" v-if="getIcon(item)" />
-                    {{ item.label }}
-                  </MenubarCheckboxItem>
+                  <!-- Checkbox items removed; now using buttons for toolbar/statusbar/preview -->
                   <MenubarSub v-else-if="item.type === 'sub'">
                     <MenubarSubTrigger class="flex items-center gap-2">
                       <component :is="(item as any).icon" class="w-4 h-4 text-gray-600" v-if="(item as any).icon" />
@@ -107,7 +103,7 @@
   import { useEditorModeStore } from '@/stores/editorMode'
   import {
     Edit3, Command, FileText, FolderOpen, Save, Download,
-  Undo2, Redo2, Scissors, Copy, Clipboard, Bold, Italic, Underline,
+    Undo2, Redo2, Scissors, Copy, Clipboard, Bold, Italic, Underline,
     Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
     Type, Highlighter,
     List, ListOrdered, Quote, Link, Image, Table, AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -173,6 +169,8 @@
     (e: 'show-about'): void
     (e: 'show-documentation'): void
     (e: 'toggle-preview'): void
+    (e: 'toggle-toolbar', value: boolean): void
+    (e: 'toggle-statusbar', value: boolean): void
     (e: 'set-text-color', color: string): void
     (e: 'set-highlight', color: string): void
   }>()
@@ -312,9 +310,9 @@
     {
       label: 'View',
       items: [
-        { type: 'checkbox', label: 'Show Toolbar', bind: 'showToolbar', icon: Wrench },
-        { type: 'checkbox', label: 'Show Status Bar', bind: 'showStatusBar', icon: BarChart3 },
-        { type: 'checkbox', label: 'Preview Mode', bind: 'showPreview', emit: 'toggle-preview', icon: previewModeIcon.value },
+        { type: 'button', label: 'Show Toolbar', emit: 'toggle-toolbar', icon: Wrench },
+        { type: 'button', label: 'Show Status Bar', emit: 'toggle-statusbar', icon: BarChart3 },
+        { type: 'button', label: 'Preview Mode', emit: 'toggle-preview', icon: previewModeIcon.value },
         { type: 'separator' },
         {
           type: 'sub', label: 'Zoom', icon: ZoomIn, items: [
@@ -348,18 +346,23 @@
     }
   ])
 
-  // bindings for checkbox menu items
-  const bindings: Record<string, { value: any }> = {
-    showToolbar: { value: showToolbar },
-    showStatusBar: { value: showStatusBar },
-    showPreview: { value: showPreview }
-  }
+  // No bindings or MenubarCheckboxItem needed for buttons
 
   // Generic emitter for menu items
   function handleMenuEmit(item: any) {
-    // Special handling for Preview Mode (View > Preview Mode)
+    // Special handling for View menu buttons
     if (item.emit === 'toggle-preview') {
       showPreview.value = !showPreview.value
+      return
+    }
+    if (item.emit === 'toggle-toolbar') {
+      showToolbar.value = !showToolbar.value
+      emit('toggle-toolbar', showToolbar.value)
+      return
+    }
+    if (item.emit === 'toggle-statusbar') {
+      showStatusBar.value = !showStatusBar.value
+      emit('toggle-statusbar', showStatusBar.value)
       return
     }
     if (item.emit === 'insert-image') {
@@ -475,10 +478,7 @@
     return false
   }
 
-  function getBinding(item: any) {
-    if (!item || !item.bind) return { value: false }
-    return bindings[item.bind] ?? { value: false }
-  }
+  // No getBinding needed for buttons
 
   function getShortcut(item: any) {
     return (item as any).shortcut

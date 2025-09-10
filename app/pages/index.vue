@@ -10,9 +10,10 @@
           @format-strikethrough="applyStrike" @format-superscript="applySuperscript" @format-subscript="applySubscript"
           @toggle-bullet-list="applyBulletList" @toggle-ordered-list="applyOrderedList"
           @toggle-blockquote="applyBlockquote" @indent="applyIndent" @unindent="applyUnindent" @undo="onUndo"
-          @redo="onRedo" @set-text-color="applyColor" @set-highlight="applyHighlight" />
+          @redo="onRedo" @set-text-color="applyColor" @set-highlight="applyHighlight"
+          @toggle-toolbar="showToolbar = $event" @toggle-statusbar="showStatusBar = $event" />
       </div>
-      <div class="mt-2 pointer-events-auto">
+      <div class="mt-2 pointer-events-auto" v-if="showToolbar">
         <MarkdownToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
           @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
           @format-strikethrough="applyStrike" @format-superscript="applySuperscript" @format-subscript="applySubscript"
@@ -44,8 +45,8 @@
         </div>
       </div>
     </main>
-    <MarkdownFooter :wordCount="wordCount" :characterCount="stats.charsWithSpaces" :mode="mode" :zoom="zoom"
-      @set-zoom="setZoom" @word-count="showWordDialog = true" @toggle-mode="toggleMode" />
+    <MarkdownFooter v-if="showStatusBar" :wordCount="wordCount" :characterCount="stats.charsWithSpaces" :mode="mode"
+      :zoom="zoom" @set-zoom="setZoom" @word-count="showWordDialog = true" @toggle-mode="toggleMode" />
     <MarkdownWordCountDialog :open="showWordDialog" :stats="stats" @update:open="v => showWordDialog = v" />
     <LinkInsertDialog :open="linkDialogOpen" :selectedText="linkDialogSelectedText"
       @update:open="v => linkDialogOpen = v" @insert="handleLinkInsert" />
@@ -54,6 +55,9 @@
   </div>
 </template>
 <script setup lang="ts">
+  // Toolbar and status bar visibility state
+  const showToolbar = ref(true)
+  const showStatusBar = ref(true)
   // Initialize SEO and OpenGraph meta tags
   useSeo()
 
