@@ -1,18 +1,18 @@
 <template>
   <div class="min-h-screen bg-gray-50 flex flex-col">
-    <div class="fixed inset-x-1 top-1 z-50 pointer-events-none">
+    <div ref="topFixed" class="fixed inset-x-1 top-1 z-50 pointer-events-none">
       <div class="pointer-events-auto">
-        <MarkdownMenuBar @word-count="showWordDialog = true" @insert-link="insertLink" @insert-image="insertImage"
-          @insert-table="insertTable" @set-heading="handleSetHeading" @insert-code-block="insertCodeBlockBlock"
-          @insert-math="insertMath" @insert-mathblock="insertMathblock" @insert-horizontal-line="insertHorizontalLine"
-          @insert-footnote="insertFootnote" @insert-emoji="insertEmoji" @set-alignment="setAlignmentComment"
-          @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
-          @format-strikethrough="applyStrike" @format-superscript="applySuperscript" @format-subscript="applySubscript"
-          @toggle-bullet-list="applyBulletList" @toggle-ordered-list="applyOrderedList"
-          @toggle-blockquote="applyBlockquote" @indent="applyIndent" @unindent="applyUnindent" @undo="onUndo"
-          @redo="onRedo" @set-text-color="applyColor" @set-highlight="applyHighlight"
-          @toggle-toolbar="showToolbar = $event" @toggle-statusbar="showStatusBar = $event" @cut="handleCut"
-          @copy="handleCopy" @paste="handlePaste" />
+        <MarkdownMenuBar v-if="showMenuBar" @word-count="showWordDialog = true" @insert-link="insertLink"
+          @insert-image="insertImage" @insert-table="insertTable" @set-heading="handleSetHeading"
+          @insert-code-block="insertCodeBlockBlock" @insert-math="insertMath" @insert-mathblock="insertMathblock"
+          @insert-horizontal-line="insertHorizontalLine" @insert-footnote="insertFootnote" @insert-emoji="insertEmoji"
+          @set-alignment="setAlignmentComment" @format-bold="applyBold" @format-italic="applyItalic"
+          @format-underline="applyUnderline" @format-strikethrough="applyStrike" @format-superscript="applySuperscript"
+          @format-subscript="applySubscript" @toggle-bullet-list="applyBulletList"
+          @toggle-ordered-list="applyOrderedList" @toggle-blockquote="applyBlockquote" @indent="applyIndent"
+          @unindent="applyUnindent" @undo="onUndo" @redo="onRedo" @set-text-color="applyColor"
+          @set-highlight="applyHighlight" @toggle-toolbar="showToolbar = $event"
+          @toggle-statusbar="showStatusBar = $event" @cut="handleCut" @copy="handleCopy" @paste="handlePaste" />
       </div>
       <div class="mt-2 pointer-events-auto" v-if="showToolbar">
         <MarkdownToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
@@ -24,7 +24,8 @@
           @insert-mathblock="insertMathblock" @insert-horizontal-line="insertHorizontalLine"
           @insert-footnote="insertFootnote" @insert-emoji="insertEmoji" @insert-table="insertTable"
           @set-heading="handleSetHeading" @set-alignment="setAlignmentComment" @set-zoom="setZoom"
-          @set-text-color="applyColor" @set-highlight="applyHighlight" @update:mode="v => mode = v" />
+          @set-text-color="applyColor" @set-highlight="applyHighlight" @update:mode="v => mode = v"
+          @toggle-menubar="onToggleMenubar" />
       </div>
     </div>
     <div :style="{ height: topPad + 'px' }" aria-hidden="true" />
@@ -317,6 +318,27 @@
     transform: `scale(${zoom.value / 100})`,
   }))
 
+  // ref for the top fixed container and whether the menu bar is shown
+  const topFixed = ref<HTMLElement | null>(null)
+  const showMenuBar = ref(true)
+
+  function measureTopPad() {
+    try {
+      if (!topFixed.value) return
+      const h = Math.ceil(topFixed.value.getBoundingClientRect().height || 0)
+      topPad.value = Math.max(48, h + 8)
+    } catch (e) {
+      topPad.value = 140
+    }
+  }
+
+  function onToggleMenubar(collapsed: boolean) {
+    // toolbar emits collapsed state; showMenuBar should be inverse
+    showMenuBar.value = !collapsed
+    try { localStorage.setItem('chainpaper_menubar_collapsed', collapsed ? 'true' : 'false') } catch (_) { }
+    nextTick(() => measureTopPad())
+  }
+
   // wheel + ctrl/command zoom
   function onWheel(e: WheelEvent) {
     if (!(e.ctrlKey || e.metaKey)) return
@@ -377,6 +399,15 @@
         loadMarkdownPlugins()
       }, 2000) // Load after 2 seconds of page load
     }
+
+    // Restore menubar collapsed state from localStorage
+    try {
+      const saved = localStorage.getItem('chainpaper_menubar_collapsed')
+      if (saved === 'true') showMenuBar.value = false
+    } catch (e) { }
+
+    // Measure top padding after DOM settled
+    nextTick(() => measureTopPad())
   })
 
   onUnmounted(() => {

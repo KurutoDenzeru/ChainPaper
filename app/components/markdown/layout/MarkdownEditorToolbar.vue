@@ -496,6 +496,22 @@
         </Tooltip>
 
         <!-- (mode toggle removed here; labeled control exists at far left) -->
+
+        <!-- Collapse/Expand Menubar Button (at the end) -->
+        <div class="ml-auto flex items-center">
+          <Tooltip>
+            <TooltipTrigger as-child>
+              <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="toggleMenubarCollapse"
+                :aria-label="menubarCollapsed ? 'Expand Menu Bar' : 'Collapse Menu Bar'">
+                <ChevronDown v-if="menubarCollapsed" class="w-4 h-4" />
+                <ChevronUp v-else class="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <span>{{ menubarCollapsed ? 'Expand Menu Bar' : 'Collapse Menu Bar' }}</span>
+            </TooltipContent>
+          </Tooltip>
+        </div>
       </div>
 
       <!-- Medium screens: Show essential formatting -->
@@ -898,7 +914,25 @@
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
   import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
   import EmojiInsertDialog from '@/components/editor/EmojiInsertDialog.vue'
-  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma, Smile, FileText as FootnoteIcon, Check } from 'lucide-vue-next'
+  import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, ChevronUp, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma, Smile, FileText as FootnoteIcon, Check } from 'lucide-vue-next'
+  // Menubar collapse state (persisted in localStorage)
+  const menubarCollapsed = ref(false)
+  onMounted(() => {
+    try {
+      const saved = localStorage.getItem('chainpaper_menubar_collapsed')
+      menubarCollapsed.value = saved === 'true'
+    } catch { }
+  })
+  watch(menubarCollapsed, v => {
+    try {
+      localStorage.setItem('chainpaper_menubar_collapsed', v ? 'true' : 'false')
+    } catch { }
+    emit('toggle-menubar', v)
+  })
+
+  function toggleMenubarCollapse() {
+    menubarCollapsed.value = !menubarCollapsed.value
+  }
 
   interface ActiveState { bold: boolean; italic: boolean; underline: boolean; strike: boolean; bullet: boolean; ordered: boolean }
   const props = defineProps<{
