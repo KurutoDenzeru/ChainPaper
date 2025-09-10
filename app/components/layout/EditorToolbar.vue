@@ -912,8 +912,8 @@
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-  import TableInsertDialog from '@/components/editor/TableInsertDialog.vue'
-  import EmojiInsertDialog from '@/components/editor/EmojiInsertDialog.vue'
+  import TableInsertDialog from '~/components/dialogs/TableInsertDialog.vue'
+  import EmojiInsertDialog from '~/components/dialogs/EmojiInsertDialog.vue'
   import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, ChevronUp, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma, Smile, FileText as FootnoteIcon, Check } from 'lucide-vue-next'
   // Menubar collapse state (persisted in localStorage)
   const menubarCollapsed = ref(false)

@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
     <div ref="topFixed" class="fixed inset-x-1 top-1 z-50 pointer-events-none">
       <div class="pointer-events-auto">
-        <MarkdownMenuBar v-if="showMenuBar" @word-count="showWordDialog = true" @insert-link="insertLink"
+        <MenuBar v-if="showMenuBar" @word-count="showWordDialog = true" @insert-link="insertLink"
           @insert-image="insertImage" @insert-table="insertTable" @set-heading="handleSetHeading"
           @insert-code-block="insertCodeBlockBlock" @insert-math="insertMath" @insert-mathblock="insertMathblock"
           @insert-horizontal-line="insertHorizontalLine" @insert-footnote="insertFootnote" @insert-emoji="insertEmoji"
@@ -15,7 +15,7 @@
           @toggle-statusbar="showStatusBar = $event" @cut="handleCut" @copy="handleCopy" @paste="handlePaste" />
       </div>
       <div class="mt-2 pointer-events-auto" v-if="showToolbar">
-        <MarkdownToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
+        <EditorToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
           @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
           @format-strikethrough="applyStrike" @format-superscript="applySuperscript" @format-subscript="applySubscript"
           @toggle-bullet-list="applyBulletList" @toggle-ordered-list="applyOrderedList"
@@ -53,9 +53,9 @@
         </div>
       </div>
     </main>
-    <MarkdownFooter v-if="showStatusBar" :wordCount="wordCount" :characterCount="stats.charsWithSpaces" :mode="mode"
+    <Footer v-if="showStatusBar" :wordCount="wordCount" :characterCount="stats.charsWithSpaces" :mode="mode"
       :zoom="zoom" @set-zoom="setZoom" @word-count="showWordDialog = true" @toggle-mode="toggleMode" />
-    <MarkdownWordCountDialog :open="showWordDialog" :stats="stats" @update:open="v => showWordDialog = v" />
+    <WordCountDialog :open="showWordDialog" :stats="stats" @update:open="v => showWordDialog = v" />
     <LinkInsertDialog :open="linkDialogOpen" :selectedText="linkDialogSelectedText"
       @update:open="v => linkDialogOpen = v" @insert="handleLinkInsert" />
     <ImageInsertDialog :open="imageDialogOpen" @update:open="v => imageDialogOpen = v" @insert="handleImageInsert" />
@@ -132,7 +132,7 @@
   // Initialize SEO and OpenGraph meta tags
   useSeo()
 
-  import ImageInsertDialog from '@/components/editor/ImageInsertDialog.vue'
+  import ImageInsertDialog from '~/components/dialogs/ImageInsertDialog.vue'
   const imageDialogOpen = ref(false)
 
   function handleImageInsert(src: string, name: string, previewDataUri?: string) {
@@ -212,11 +212,11 @@
   import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
   import { storeToRefs } from 'pinia'
   import { useEditorModeStore } from '@/stores/editorMode'
-  import MarkdownMenuBar from '@/components/markdown/layout/MarkdownMenuBar.vue'
-  import MarkdownToolbar from '~/components/markdown/layout/MarkdownEditorToolbar.vue'
-  import MarkdownFooter from '@/components/markdown/layout/MarkdownStickyFooter.vue'
-  import MarkdownWordCountDialog from '@/components/markdown/dialogs/MarkdownWordCountDialog.vue'
-  import LinkInsertDialog from '@/components/editor/LinkInsertDialog.vue'
+  import MenuBar from '~/components/layout/MenuBar.vue'
+  import EditorToolbar from '~/components/layout/EditorToolbar.vue'
+  import Footer from '~/components/layout/StickyFooter.vue'
+  import WordCountDialog from '~/components/dialogs/WordCountDialog.vue'
+  import LinkInsertDialog from '~/components/dialogs/LinkInsertDialog.vue'
   import { insertLink as domInsertLink } from '@/lib/editor-formatting'
   import { Toaster } from '@/components/ui/sonner'
   import { toast } from 'vue-sonner'

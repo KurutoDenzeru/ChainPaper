@@ -38,7 +38,7 @@
                 <p>Click to view detailed word count statistics</p>
               </TooltipContent>
             </Tooltip>
-            <MarkdownWordCountDialog :open="showWordCountDialog"
+            <WordCountDialog :open="showWordCountDialog"
               :stats="{ words: wordCount, characters: characterCount }" @update:open="v => showWordCountDialog = v" />
             <div class="hidden sm:flex items-center gap-2 text-gray-500 dark:text-gray-400">•</div>
             <Tooltip>
@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-  import MarkdownWordCountDialog from '~/components/markdown/dialogs/MarkdownWordCountDialog.vue'
+  import WordCountDialog from '~/components/dialogs/WordCountDialog.vue'
   const showWordCountDialog = ref(false)
   import { ref, computed, watch } from 'vue'
   import { Minus, Plus, BookOpen, Edit } from 'lucide-vue-next'

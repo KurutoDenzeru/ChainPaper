@@ -109,18 +109,18 @@
   </Menubar>
 
   <!-- Dialogs -->
-  <MarkdownWordCountDialog :open="showWordCountDialog" @update:open="showWordCountDialog = $event" />
+  <WordCountDialog :open="showWordCountDialog" @update:open="showWordCountDialog = $event" />
 
-  <MarkdownAuthProofDialog :open="showAuthProofDialog" @update:open="showAuthProofDialog = $event" />
+  <AuthProofDialog :open="showAuthProofDialog" @update:open="showAuthProofDialog = $event" />
 
-  <MarkdownExportDialog :open="showExportDialog" :initialFormat="exportInitialFormat"
+  <ExportDialog :open="showExportDialog" :initialFormat="exportInitialFormat"
     @update:open="onExportDialogUpdate" />
 
-  <MarkdownSaveDialog :open="showSaveDialog" @update:open="showSaveDialog = $event" />
+  <SaveDialog :open="showSaveDialog" @update:open="showSaveDialog = $event" />
 
-  <MarkdownAboutDialog :open="showAboutDialog" @update:open="showAboutDialog = $event" />
+  <AboutDialog :open="showAboutDialog" @update:open="showAboutDialog = $event" />
 
-  <MarkdownGuideDialog :open="showGuideDialog" @update:open="showGuideDialog = $event" />
+  <GuideDialog :open="showGuideDialog" @update:open="showGuideDialog = $event" />
 
   <!-- Table Insert Dialog -->
   <TableInsertDialog :open="showTableDialog" @update:open="showTableDialog = $event"
@@ -139,28 +139,28 @@
   import { storeToRefs } from 'pinia'
   import { useEditorModeStore } from '@/stores/editorMode'
   import {
-    Edit3, Command, FileText, FolderOpen, Save, Download,
+    Edit3, FileText, FolderOpen, Save, Download,
     Undo2, Redo2, Scissors, Copy, Clipboard, Bold, Italic, Underline,
     Strikethrough, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
     Type, Highlighter,
     List, ListOrdered, Quote, Link, Image, Table, AlignLeft, AlignCenter, AlignRight, AlignJustify,
-    Code2, Wrench, BarChart3, Eye, ZoomIn, Hash, Shield, BookOpen, Info, Indent, Outdent,
+    Code2, Wrench, BarChart3, ZoomIn, Hash, Shield, BookOpen, Info, Indent, Outdent,
     Superscript, Subscript, Sigma, SquareSigma, Minus, Smile
   } from 'lucide-vue-next'
   // Theme icons
   import { Sun, Moon, Monitor } from 'lucide-vue-next'
-  import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from '@/components/ui/menubar'
+  import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from '@/components/ui/menubar'
   import { Input } from '@/components/ui/input'
   import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
   // Lazy-load dialog components to reduce initial bundle and improve LCP
-  const TableInsertDialog = defineAsyncComponent(() => import('@/components/editor/TableInsertDialog.vue'))
-  const EmojiInsertDialog = defineAsyncComponent(() => import('@/components/editor/EmojiInsertDialog.vue'))
-  const MarkdownWordCountDialog = defineAsyncComponent(() => import('../dialogs/MarkdownWordCountDialog.vue'))
-  const MarkdownAuthProofDialog = defineAsyncComponent(() => import('../dialogs/MarkdownAuthProofDialog.vue'))
-  const MarkdownExportDialog = defineAsyncComponent(() => import('../dialogs/MarkdownExportDialog.vue'))
-  const MarkdownSaveDialog = defineAsyncComponent(() => import('../dialogs/MarkdownSaveDialog.vue'))
-  const MarkdownAboutDialog = defineAsyncComponent(() => import('../dialogs/MarkdownAboutDialog.vue'))
-  const MarkdownGuideDialog = defineAsyncComponent(() => import('../dialogs/MarkdownGuideDialog.vue'))
+  const TableInsertDialog = defineAsyncComponent(() => import('~/components/dialogs/TableInsertDialog.vue'))
+  const EmojiInsertDialog = defineAsyncComponent(() => import('~/components/dialogs/EmojiInsertDialog.vue'))
+  const WordCountDialog = defineAsyncComponent(() => import('../dialogs/WordCountDialog.vue'))
+  const AuthProofDialog = defineAsyncComponent(() => import('../dialogs/AuthProofDialog.vue'))
+  const ExportDialog = defineAsyncComponent(() => import('../dialogs/ExportDialog.vue'))
+  const SaveDialog = defineAsyncComponent(() => import('../dialogs/SaveDialog.vue'))
+  const AboutDialog = defineAsyncComponent(() => import('../dialogs/AboutDialog.vue'))
+  const GuideDialog = defineAsyncComponent(() => import('../dialogs/GuideDialog.vue'))
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
   const store = useMarkdownDocStore()
