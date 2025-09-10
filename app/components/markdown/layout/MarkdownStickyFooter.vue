@@ -3,7 +3,7 @@
     <div class="w-full mx-auto pointer-events-auto px-4">
       <TooltipProvider>
         <div
-          class="flex items-center justify-between bg-white border border-gray-200 rounded-lg shadow-sm h-12 px-4 md:h-10">
+          class="flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm h-12 px-4 md:h-10 text-gray-700 dark:text-gray-200">
           <!-- Left: Mode toggle + Word Count / Character Count -->
           <div class="flex items-center gap-4 text-xs text-gray-600">
             <!-- Mode label + toggle (far left) -->
@@ -23,7 +23,7 @@
                   <p>{{ mode === 'source' ? 'Switch to Reader View' : 'Switch to Source View' }}</p>
                 </TooltipContent>
               </Tooltip>
-              <div class="h-6 w-px bg-gray-300 mx-1"></div>
+              <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
             </div>
 
             <Tooltip>
@@ -31,7 +31,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer"
                   @click="showWordCountDialog = true">
                   <span class="font-medium">Words</span>
-                  <span class="text-gray-800">{{ wordCount || 0 }}</span>
+                  <span class="text-gray-800 dark:text-gray-100">{{ wordCount || 0 }}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -46,7 +46,7 @@
                 <div class="hidden sm:flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer"
                   @click="showWordCountDialog = true">
                   <span class="font-medium">Characters</span>
-                  <span class="text-gray-800">{{ characterCount || 0 }}</span>
+                  <span class="text-gray-800 dark:text-gray-100">{{ characterCount || 0 }}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -68,9 +68,9 @@
             <Tooltip>
               <TooltipTrigger as-child>
                 <Button type="button" @click="changeZoom(-25)"
-                  class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
+                  class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600"
                   aria-label="Zoom out">
-                  <Minus class="w-4 h-4 text-gray-600" />
+                  <Minus class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -84,19 +84,19 @@
                   class="w-16 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   tabindex="0">
                   <!-- Provide accessible name and spinbutton semantics for screen readers -->
-                  <Input type="number" class="w-16 text-center text-sm rounded-md border border-gray-200 px-2 py-1"
+                  <Input type="number" class="w-16 text-center text-sm rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-gray-800 dark:text-gray-100"
                     v-model="zoomModel" min="50" max="200" placeholder="100" aria-label="Zoom percentage"
                     role="spinbutton" aria-valuemin="50" aria-valuemax="200"
                     :aria-valuenow="isFit ? 100 : zoomPercent" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent class="w-32 p-2">
+              <PopoverContent class="w-32 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
                 <div class="flex flex-col">
-                  <button class="text-left px-2 py-1 rounded hover:bg-gray-100 font-medium" @click="selectZoom('fit')">
+                  <button class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 font-medium" @click="selectZoom('fit')">
                     Fit
                   </button>
                   <div class="border-t my-1" />
-                  <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-gray-100"
+                  <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
                     @click="selectZoom(opt)">
                     {{ opt }}%
                   </button>

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
     <div ref="topFixed" class="fixed inset-x-1 top-1 z-50 pointer-events-none">
       <div class="pointer-events-auto">
         <MarkdownMenuBar v-if="showMenuBar" @word-count="showWordDialog = true" @insert-link="insertLink"
@@ -34,7 +34,7 @@
         <!-- viewport with scroll/pinch handling -->
         <div ref="pageViewport" class="overflow-auto w-full flex justify-center items-center min-h-[60vh]">
           <!-- inner page that is scaled via transform; size = Letter 8.5in x 11in -->
-          <div ref="pageInner" :style="pageInnerStyle" class="bg-white border border-gray-200 rounded-lg shadow-sm m-6">
+          <div ref="pageInner" :style="pageInnerStyle" class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm m-6">
             <div class="w-full h-full">
               <textarea v-if="mode === 'source'" ref="textareaEl" v-model="content"
                 class="w-full h-full outline-none resize-none font-mono text-sm p-6" placeholder="Write Markdown..."
