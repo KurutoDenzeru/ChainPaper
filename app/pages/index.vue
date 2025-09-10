@@ -32,16 +32,22 @@
     <main class="flex-1 p-6 pb-24 flex items-center justify-center">
       <div class="w-full flex justify-center items-center">
         <!-- viewport with scroll/pinch handling -->
-        <div ref="pageViewport" class="overflow-auto w-full flex justify-center items-center min-h-[60vh]">
+        <div ref="pageViewport"
+          :class="[mode === 'source' ? 'overflow-auto' : 'overflow-hidden', 'w-full flex justify-center items-center min-h-[60vh]']">
           <!-- inner page that is scaled via transform; size = Letter 8.5in x 11in -->
-          <div ref="pageInner" :style="pageInnerStyle" class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm m-6">
+          <div ref="pageInner" :style="pageInnerStyle"
+            class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm m-6">
             <div class="w-full h-full">
               <textarea v-if="mode === 'source'" ref="textareaEl" v-model="content"
                 class="w-full h-full outline-none resize-none font-mono text-sm p-6" placeholder="Write Markdown..."
                 @input="recount" @keydown="handleKeydown" />
-              <div v-else
-                class="prose prose-gray max-w-none overflow-auto h-full p-6 prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg prose-h6:text-base"
-                v-html="renderedHtml" />
+              <div v-else class="h-full">
+                <ScrollArea class="h-full">
+                  <div
+                    class="prose prose-gray max-w-none h-full p-6 prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg prose-h6:text-base"
+                    v-html="renderedHtml" />
+                </ScrollArea>
+              </div>
             </div>
           </div>
         </div>
@@ -53,7 +59,7 @@
     <LinkInsertDialog :open="linkDialogOpen" :selectedText="linkDialogSelectedText"
       @update:open="v => linkDialogOpen = v" @insert="handleLinkInsert" />
     <ImageInsertDialog :open="imageDialogOpen" @update:open="v => imageDialogOpen = v" @insert="handleImageInsert" />
-  <Toaster :theme="pageTheme" />
+    <Toaster :theme="pageTheme" />
   </div>
 </template>
 <script setup lang="ts">
@@ -215,6 +221,7 @@
   import { Toaster } from '@/components/ui/sonner'
   import { toast } from 'vue-sonner'
   import 'vue-sonner/style.css'
+  import { ScrollArea } from '@/components/ui/scroll-area'
   // Lazy load markdown-it plugins only when needed
   let MarkdownIt: any
   let katexPlugin: any
@@ -415,7 +422,7 @@
   const computePageTheme = () => {
     try {
       if (typeof document !== 'undefined' && document.documentElement.classList.contains('dark')) return 'dark'
-    } catch (e) {}
+    } catch (e) { }
     return 'light'
   }
   pageTheme.value = computePageTheme()
@@ -429,7 +436,7 @@
     try {
       const stored = localStorage.getItem('chainpaper_theme')
       if (!stored || stored === 'system') pageTheme.value = ev.matches ? 'dark' : 'light'
-    } catch (e) {}
+    } catch (e) { }
   }
   if (typeof window !== 'undefined') {
     window.addEventListener('storage', onThemeStorage)
