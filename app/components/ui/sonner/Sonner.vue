@@ -64,6 +64,16 @@
   <Sonner class="toaster group" v-bind="props" :theme="computedTheme" :style="{
     '--normal-bg': 'var(--popover)',
     '--normal-text': 'var(--popover-foreground)',
-    '--normal-border': 'var(--border)'
+    '--normal-border': 'var(--border)',
+    /* custom variable used to override Sonner's built-in description color */
+    '--sn-description': 'var(--popover-foreground)'
   }" />
 </template>
+
+<style>
+
+  /* Ensure toast description text uses our app color variables and updates with theme changes */
+  .toaster [data-description] {
+    color: var(--sn-description) !important;
+  }
+</style>
