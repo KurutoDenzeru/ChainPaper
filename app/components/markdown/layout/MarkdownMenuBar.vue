@@ -36,17 +36,6 @@
         </div>
         <!-- Second Row: Menu Items -->
         <div class="flex items-center gap-1">
-          <!-- Preview Mode Button -->
-          <button
-            class="inline-flex items-center gap-2 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
-            @click="showPreview = !showPreview"
-            :aria-pressed="showPreview"
-            :title="showPreview ? 'Switch to Source Mode' : 'Switch to Reader Mode'"
-          >
-            <component :is="previewModeIcon" class="w-5 h-5" />
-            <span>{{ showPreview ? 'Reader' : 'Source' }}</span>
-          </button>
-          <!-- ...existing menu bar code... -->
           <template v-for="(menu, mi) in menus" :key="menu.label + mi">
             <MenubarMenu>
               <MenubarTrigger>{{ menu.label }}</MenubarTrigger>
