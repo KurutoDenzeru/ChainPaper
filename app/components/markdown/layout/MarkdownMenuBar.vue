@@ -350,6 +350,19 @@
 
   // Generic emitter for menu items
   function handleMenuEmit(item: any) {
+    // Cut, Copy, Paste
+    if (item.emit === 'cut') {
+      emit('cut')
+      return
+    }
+    if (item.emit === 'copy') {
+      emit('copy')
+      return
+    }
+    if (item.emit === 'paste') {
+      emit('paste')
+      return
+    }
     // Special handling for View menu buttons
     if (item.emit === 'toggle-preview') {
       showPreview.value = !showPreview.value

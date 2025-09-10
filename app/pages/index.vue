@@ -11,7 +11,8 @@
           @toggle-bullet-list="applyBulletList" @toggle-ordered-list="applyOrderedList"
           @toggle-blockquote="applyBlockquote" @indent="applyIndent" @unindent="applyUnindent" @undo="onUndo"
           @redo="onRedo" @set-text-color="applyColor" @set-highlight="applyHighlight"
-          @toggle-toolbar="showToolbar = $event" @toggle-statusbar="showStatusBar = $event" />
+          @toggle-toolbar="showToolbar = $event" @toggle-statusbar="showStatusBar = $event" @cut="handleCut"
+          @copy="handleCopy" @paste="handlePaste" />
       </div>
       <div class="mt-2 pointer-events-auto" v-if="showToolbar">
         <MarkdownToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
@@ -55,6 +56,69 @@
   </div>
 </template>
 <script setup lang="ts">
+  // --- Cut, Copy, Paste handlers for document area ---
+  function handleCut() {
+    if (mode.value === 'source') {
+      const ta = getActiveTextarea(); if (!ta) return
+      const { start, end, value } = getSelection(ta)
+      if (start === end) return // nothing selected
+      const selected = value.slice(start, end)
+      // Copy to clipboard
+      navigator.clipboard.writeText(selected)
+      // Remove selected text
+      replaceRange(ta, start, end, '')
+    } else {
+      // Reader mode: use window selection
+      const sel = window.getSelection()
+      if (!sel || sel.rangeCount === 0) return
+      const selected = sel.toString()
+      if (!selected) return
+      navigator.clipboard.writeText(selected)
+      // Remove selected text from DOM
+      const range = sel.getRangeAt(0)
+      range.deleteContents()
+      sel.removeAllRanges()
+    }
+  }
+
+  function handleCopy() {
+    if (mode.value === 'source') {
+      const ta = getActiveTextarea(); if (!ta) return
+      const { start, end, value } = getSelection(ta)
+      if (start === end) return // nothing selected
+      const selected = value.slice(start, end)
+      navigator.clipboard.writeText(selected)
+    } else {
+      const sel = window.getSelection()
+      if (!sel || sel.rangeCount === 0) return
+      const selected = sel.toString()
+      if (!selected) return
+      navigator.clipboard.writeText(selected)
+    }
+  }
+
+  function handlePaste() {
+    if (mode.value === 'source') {
+      const ta = getActiveTextarea(); if (!ta) return
+      navigator.clipboard.readText().then(text => {
+        const { start, end } = getSelection(ta)
+        replaceRange(ta, start, end, text)
+      })
+    } else {
+      // Reader mode: paste at selection
+      navigator.clipboard.readText().then(text => {
+        const sel = window.getSelection()
+        if (!sel || sel.rangeCount === 0) return
+        const range = sel.getRangeAt(0)
+        range.deleteContents()
+        range.insertNode(document.createTextNode(text))
+        // Move cursor after inserted text
+        range.setStartAfter(range.endContainer)
+        range.collapse(true)
+        sel.removeAllRanges(); sel.addRange(range)
+      })
+    }
+  }
   // Toolbar and status bar visibility state
   const showToolbar = ref(true)
   const showStatusBar = ref(true)
