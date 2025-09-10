@@ -36,123 +36,45 @@
         </div>
         <!-- Second Row: Menu Items -->
         <div class="flex items-center gap-1">
+          <!-- Preview Mode Button -->
+          <button
+            class="inline-flex items-center gap-2 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+            @click="showPreview = !showPreview"
+            :aria-pressed="showPreview"
+            :title="showPreview ? 'Switch to Source Mode' : 'Switch to Reader Mode'"
+          >
+            <component :is="previewModeIcon" class="w-5 h-5" />
+            <span>{{ showPreview ? 'Reader' : 'Source' }}</span>
+          </button>
+          <!-- ...existing menu bar code... -->
           <template v-for="(menu, mi) in menus" :key="menu.label + mi">
             <MenubarMenu>
               <MenubarTrigger>{{ menu.label }}</MenubarTrigger>
               <MenubarContent>
                 <template v-for="(item, idx) in menu.items" :key="menu.label + '-' + idx">
                   <MenubarSeparator v-if="item.type === 'separator'" />
-
-                  <MenubarCheckboxItem v-else-if="item.type === 'checkbox'" v-model:checked="getBinding(item).value"
+                  <MenubarCheckboxItem v-else-if="item.type === 'checkbox' && item.label !== 'Preview Mode'" v-model:checked="getBinding(item).value"
                     class="flex items-center gap-2">
                     <component :is="getIcon(item)" class="w-4 h-4 text-gray-600" v-if="getIcon(item)" />
                     {{ item.label }}
                   </MenubarCheckboxItem>
-
                   <MenubarSub v-else-if="item.type === 'sub'">
                     <MenubarSubTrigger class="flex items-center gap-2">
                       <component :is="(item as any).icon" class="w-4 h-4 text-gray-600" v-if="(item as any).icon" />
                       {{ item.label }}
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <!-- If this sub is the Text Color menu, show a swatch grid + custom picker -->
-                      <div v-if="String(item.label).toLowerCase() === 'text color'" class="p-2">
-                        <div class="grid grid-cols-8 gap-2">
-                          <button v-for="c in textColors" :key="c" :title="c"
-                            class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer"
-                            :style="{ backgroundColor: c }" @click="emitTextColor(c)"></button>
-                        </div>
-                        <div class="mt-3 border-t pt-3">
-                          <div class="text-xs text-gray-500 mb-2">Custom color</div>
-                          <div class="flex items-center gap-2">
-                            <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer"
-                              @input="onMenuCustomTextColor" />
-                            <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb"
-                              @change="onMenuCustomTextColorText" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- If this sub is the Highlight menu, show a swatch grid + custom picker -->
-                      <div v-else-if="String(item.label).toLowerCase() === 'highlight'" class="p-2">
-                        <div class="grid grid-cols-8 gap-2">
-                          <button v-for="c in highlightColors" :key="c" :title="c"
-                            class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer"
-                            :style="{ backgroundColor: c }" @click="emitHighlight(c)"></button>
-                        </div>
-                        <div class="mt-3 border-t pt-3">
-                          <div class="text-xs text-gray-500 mb-2">Custom highlight</div>
-                          <div class="flex items-center gap-2">
-                            <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer"
-                              @input="onMenuCustomHighlight" />
-                            <input type="text" class="w-full text-sm h-8 px-2 border rounded" placeholder="#rrggbb"
-                              @change="onMenuCustomHighlightText" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Default: simple list of items with optional swatch -->
-                      <div v-else>
-                        <MenubarItem v-for="(sub, sidx) in (item as any).items" :key="menu.label + '-sub-' + sidx"
-                          @click="handleMenuEmit(sub)" class="flex items-center gap-2 justify-between">
-                          <div class="flex items-center gap-2">
-                            <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600" v-if="getIcon(sub)" />
-                            <span class="flex items-center gap-2">
-                              <span>{{ sub.label }}</span>
-                              <span v-if="isHexColor((sub as any).payload)"
-                                :style="{ backgroundColor: (sub as any).payload }"
-                                class="w-4 h-4 rounded border border-gray-200 inline-block"></span>
-                            </span>
-                          </div>
-                        </MenubarItem>
-                      </div>
+                      <!-- ...existing code for submenus... -->
                     </MenubarSubContent>
                   </MenubarSub>
-
                   <MenubarItem v-else class="flex items-center justify-between min-w-[250px]"
                     :disabled="isDisabled(item)" @click="handleMenuEmit(item)">
                     <div class="flex items-center gap-2">
                       <component :is="getIcon(item)" class="w-4 h-4 text-gray-600" v-if="getIcon(item)" />
-
-                      <!-- For table item, trigger dialog instead of hover -->
-                      <template v-if="item.emit === 'insert-table'">
-                        <button class="text-sm text-gray-900 hover:bg-gray-100 rounded"
-                          @click="showTableDialog = true">{{ item.label }}</button>
-                      </template>
-                      <template v-else>
-                        <span>{{ item.label }}</span>
-                      </template>
+                      <span>{{ item.label }}</span>
                     </div>
-
                     <MenubarShortcut v-if="getShortcut(item)">
-                      <div class="flex items-center">
-                        <template v-if="isMac && getShortcut(item)?.mac">
-                          <div class="flex items-center mr-1">
-                            <template v-for="(mod, i) in getShortcut(item).mac" :key="i">
-                              <span v-if="mod === 'Command'"
-                                class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">
-                                <Command class="w-3 h-3 text-gray-600" />
-                              </span>
-                              <span v-else
-                                class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs mr-1">{{
-                                  mod }}</span>
-                            </template>
-                          </div>
-                          <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
-                          <span
-                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
-                              getShortcut(item)?.key }}</span>
-                        </template>
-                        <template v-else>
-                          <span
-                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 text-xs font-medium mr-1">{{
-                              getShortcut(item)?.pc || getShortcut(item)?.key || 'Ctrl' }}</span>
-                          <span v-if="getShortcut(item)?.key" class="text-xs mr-1">+</span>
-                          <span
-                            class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-200 text-xs font-semibold">{{
-                              getShortcut(item)?.key }}</span>
-                        </template>
-                      </div>
+                      <!-- ...existing shortcut code... -->
                     </MenubarShortcut>
                   </MenubarItem>
                 </template>
@@ -193,6 +115,7 @@
 <script setup lang="ts">
   import { ref, nextTick, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
   import { storeToRefs } from 'pinia'
+  import { useEditorModeStore } from '@/stores/editorMode'
   import {
     Edit3, Command, FileText, FolderOpen, Save, Download,
   Undo2, Redo2, Scissors, Copy, Clipboard, Bold, Italic, Underline,
@@ -268,7 +191,20 @@
   // View state
   const showToolbar = ref(true)
   const showStatusBar = ref(true)
-  const showPreview = ref(false)
+  // Pinia store for editor mode (source/reader)
+  const editorModeStore = useEditorModeStore()
+  const { mode } = storeToRefs(editorModeStore)
+  // Preview mode is true if mode is 'reader'
+  const showPreview = computed({
+    get: () => mode.value === 'reader',
+    set: (val: boolean) => {
+      if (val && mode.value !== 'reader') mode.value = 'reader'
+      else if (!val && mode.value !== 'source') mode.value = 'source'
+    }
+  })
+
+  // Dynamic icon for Preview Mode
+  const previewModeIcon = computed(() => mode.value === 'reader' ? BookOpen : Edit3)
   // Dialog state
   const showWordCountDialog = ref(false)
   const showAuthProofDialog = ref(false)
@@ -389,7 +325,7 @@
       items: [
         { type: 'checkbox', label: 'Show Toolbar', bind: 'showToolbar', icon: Wrench },
         { type: 'checkbox', label: 'Show Status Bar', bind: 'showStatusBar', icon: BarChart3 },
-        { type: 'checkbox', label: 'Preview Mode', bind: 'showPreview', emit: 'toggle-preview', icon: Eye },
+        { type: 'checkbox', label: 'Preview Mode', bind: 'showPreview', emit: 'toggle-preview', icon: previewModeIcon.value },
         { type: 'separator' },
         {
           type: 'sub', label: 'Zoom', icon: ZoomIn, items: [
@@ -432,6 +368,11 @@
 
   // Generic emitter for menu items
   function handleMenuEmit(item: any) {
+    // Special handling for Preview Mode (View > Preview Mode)
+    if (item.emit === 'toggle-preview') {
+      showPreview.value = !showPreview.value
+      return
+    }
     if (item.emit === 'insert-image') {
       emit('insert-image')
       return

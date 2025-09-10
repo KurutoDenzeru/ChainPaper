@@ -136,6 +136,7 @@
   }
   import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
   import { storeToRefs } from 'pinia'
+  import { useEditorModeStore } from '@/stores/editorMode'
   import MarkdownMenuBar from '@/components/markdown/layout/MarkdownMenuBar.vue'
   import MarkdownToolbar from '~/components/markdown/layout/MarkdownEditorToolbar.vue'
   import MarkdownFooter from '@/components/markdown/layout/MarkdownStickyFooter.vue'
@@ -229,7 +230,9 @@
   const zoom = ref(100)
   const topPad = ref(140)
   const showWordDialog = ref(false)
-  const mode = ref<'source' | 'reader'>('source')
+  // Use Pinia store for mode
+  const editorModeStore = useEditorModeStore()
+  const { mode } = storeToRefs(editorModeStore)
 
   // page dimensions (Letter) at 96 DPI: 8.5in * 96 = 816px, 11in * 96 = 1056px
   const DPI = 96
