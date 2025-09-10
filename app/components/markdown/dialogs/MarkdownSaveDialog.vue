@@ -11,44 +11,23 @@
         </DialogDescription>
       </DialogHeader>
 
+
       <div class="space-y-6">
-        <!-- Save Options -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Button variant="outline" class="h-24 flex flex-col items-center gap-2 p-4" @click="saveToLocal">
-            <HardDrive class="w-8 h-8 text-blue-600" />
-            <div class="text-center">
-              <div class="font-medium">Local Storage</div>
-              <div class="text-xs text-gray-600">Browser storage</div>
-            </div>
-          </Button>
-
-          <Button variant="outline" class="h-24 flex flex-col items-center gap-2 p-4" @click="downloadFile">
-            <Download class="w-8 h-8 text-green-600" />
-            <div class="text-center">
-              <div class="font-medium">Download File</div>
-              <div class="text-xs text-gray-600">.md file</div>
-            </div>
-          </Button>
-        </div>
-
-        <!-- Save Settings -->
+        <!-- Save Settings (only auto-save toggle) -->
         <div class="space-y-4">
           <h4 class="font-semibold text-gray-900">Save Options</h4>
-
           <div class="space-y-3">
             <div class="flex items-center space-x-2">
               <Checkbox id="auto-save" v-model:checked="autoSave" />
               <Label for="auto-save">Enable auto-save every 30 seconds</Label>
             </div>
-
-            <!-- Metadata always included; backup option removed -->
           </div>
         </div>
 
-        <!-- File Name Input -->
+        <!-- File Name Input (two-way bound to document title) -->
         <div class="space-y-2">
           <Label for="filename">File Name</Label>
-          <Input id="filename" v-model="filename" placeholder="Enter filename..." class="w-full" />
+          <Input id="filename" v-model="store.title" class="w-full" placeholder="Enter file name..." />
         </div>
 
         <!-- Document Info -->
@@ -89,7 +68,7 @@
           <Button variant="outline" @click="$emit('update:open', false)" class="flex-1">
             Cancel
           </Button>
-          <Button @click="handleSave" :disabled="!filename.trim()" class="flex-1">
+          <Button @click="handleSave" class="flex-1">
             <Save class="w-4 h-4 mr-2" />
             Save Document
           </Button>
@@ -138,9 +117,11 @@
       get: () => store.autoSaveEnabled,
       set: (v: boolean) => store.setAutoSaveEnabled(v)
     })
-  // We always include metadata in saves/exports now.
-  // The backup option has been removed.
-  const filename = ref('')
+  // Always use the current document title as filename (even if Untitled Markdown)
+  const computedFilename = computed(() => {
+    const t = store.title?.trim() || 'Untitled Markdown'
+    return sanitizeFilename(t)
+  })
   const statusMessage = ref('')
   const errorMessage = ref('')
 
@@ -155,19 +136,8 @@
     return new Date().toLocaleString()
   })
 
-  // Watch for store title changes to update filename
-  watch(() => store.title, (newTitle) => {
-    if (newTitle && newTitle !== 'Untitled Markdown') {
-      filename.value = sanitizeFilename(newTitle)
-    }
-  }, { immediate: true })
 
-  // Also watch for dialog open to refresh filename
-  watch(() => props.open, (isOpen) => {
-    if (isOpen && store.title && store.title !== 'Untitled Markdown') {
-      filename.value = sanitizeFilename(store.title)
-    }
-  })
+  // No need to watch for title changes; computedFilename is always up to date
 
   // Methods
   function sanitizeFilename(title: string): string {
@@ -179,6 +149,8 @@
       || 'untitled'
   }
 
+
+  // Only save to local storage, always using computedFilename
   async function saveToLocal(silent = false) {
     try {
       if (!silent) {
@@ -189,19 +161,13 @@
       const saveData = {
         title: store.title,
         content: store.content,
-        filename: filename.value || sanitizeFilename(store.title || 'untitled'),
+        filename: computedFilename.value,
         savedAt: new Date().toISOString(),
-          metadata: {
-            wordCount: wordCount.value,
-            characterCount: characterCount.value,
-            createdAt: new Date().toISOString()
-          }
+    // Removed metadata block as it is no longer used
       }
 
-  // Backup option removed; do not create extra backups here.
-
       // Save to main storage
-      const storageKey = `chainpaper_doc_${filename.value || 'untitled'}`
+      const storageKey = `chainpaper_doc_${computedFilename.value}`
       localStorage.setItem(storageKey, JSON.stringify(saveData))
 
       // Also save as current document for auto-restoration
@@ -236,61 +202,8 @@
     }
   }
 
-  async function downloadFile() {
-    try {
-      statusMessage.value = 'Preparing download...'
-      errorMessage.value = ''
 
-      let content = store.content
-
-      // Always include metadata
-      const metadata = `---
-title: ${store.title}
-date: ${new Date().toISOString()}
-word_count: ${wordCount.value}
-character_count: ${characterCount.value}
----
-
-`
-      content = metadata + content
-
-      // Append persisted cryptographic proof (if present) to the markdown file
-      try {
-        const proofRaw = localStorage.getItem('chainpaper_current_proof')
-        if (proofRaw) {
-          // store as an HTML comment so it won't render in markdown
-          content += `\n\n<!-- Cryptographic Proof: ${proofRaw} -->\n`
-        }
-      } catch (e) {
-        // ignore localStorage failures
-      }
-
-      // Create and download file
-      const blob = new Blob([content], { type: 'text/markdown' })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `${filename.value || 'untitled'}.md`
-      link.click()
-      URL.revokeObjectURL(url)
-
-      statusMessage.value = 'File downloaded successfully!'
-      toast.success('Download complete!', {
-        description: `Downloaded "${filename.value || 'untitled'}.md"`
-      })
-
-      setTimeout(() => {
-        statusMessage.value = ''
-      }, 3000)
-
-    } catch (error: any) {
-      const message = `Download failed: ${error.message}`
-      errorMessage.value = message
-      toast.error('Download failed', {
-        description: message
-      })
-    }
-  }
+  // Download functionality removed
 
   async function handleSave() {
     // Default to local storage save
