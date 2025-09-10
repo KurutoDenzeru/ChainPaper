@@ -5,10 +5,10 @@
         <div
           class="flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm h-12 px-4 md:h-10 text-gray-700 dark:text-gray-200">
           <!-- Left: Mode toggle + Word Count / Character Count -->
-          <div class="flex items-center gap-4 text-xs text-gray-600">
+          <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-300">
             <!-- Mode label + toggle (far left) -->
             <div class="flex items-center gap-2">
-              <span class="text-xs font-medium">Mode:</span>
+              <span class="text-xs font-medium text-gray-800 dark:text-gray-100">Mode:</span>
               <Tooltip>
                 <TooltipTrigger as-child>
                   <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="toggleMode"
@@ -40,7 +40,7 @@
             </Tooltip>
             <MarkdownWordCountDialog :open="showWordCountDialog"
               :stats="{ words: wordCount, characters: characterCount }" @update:open="v => showWordCountDialog = v" />
-            <div class="hidden sm:flex items-center gap-2">•</div>
+            <div class="hidden sm:flex items-center gap-2 text-gray-500 dark:text-gray-400">•</div>
             <Tooltip>
               <TooltipTrigger as-child>
                 <div class="hidden sm:flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer"
@@ -107,9 +107,9 @@
             <Tooltip>
               <TooltipTrigger as-child>
                 <Button type="button" @click="changeZoom(25)"
-                  class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
+                  class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600"
                   aria-label="Zoom in">
-                  <Plus class="w-4 h-4 text-gray-600" />
+                  <Plus class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
