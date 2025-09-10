@@ -53,7 +53,7 @@
     <LinkInsertDialog :open="linkDialogOpen" :selectedText="linkDialogSelectedText"
       @update:open="v => linkDialogOpen = v" @insert="handleLinkInsert" />
     <ImageInsertDialog :open="imageDialogOpen" @update:open="v => imageDialogOpen = v" @insert="handleImageInsert" />
-    <Toaster />
+  <Toaster :theme="pageTheme" />
   </div>
 </template>
 <script setup lang="ts">
@@ -409,6 +409,36 @@
     // Measure top padding after DOM settled
     nextTick(() => measureTopPad())
   })
+
+  // Compute page theme for Toaster (light | dark)
+  const pageTheme = ref<'light' | 'dark'>('light')
+  const computePageTheme = () => {
+    try {
+      if (typeof document !== 'undefined' && document.documentElement.classList.contains('dark')) return 'dark'
+    } catch (e) {}
+    return 'light'
+  }
+  pageTheme.value = computePageTheme()
+
+  // Keep in sync with localStorage or system preference changes
+  const onThemeStorage = (e: StorageEvent) => {
+    if (e.key === 'chainpaper_theme') pageTheme.value = computePageTheme()
+  }
+  const onPrefChange = (ev: MediaQueryListEvent) => {
+    // only update when user hasn't explicitly chosen light/dark (localStorage not set)
+    try {
+      const stored = localStorage.getItem('chainpaper_theme')
+      if (!stored || stored === 'system') pageTheme.value = ev.matches ? 'dark' : 'light'
+    } catch (e) {}
+  }
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', onThemeStorage)
+    const mm = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')
+    if (mm) {
+      if (typeof mm.addEventListener === 'function') mm.addEventListener('change', onPrefChange)
+      else mm.addListener(onPrefChange as any)
+    }
+  }
 
   onUnmounted(() => {
     if (pageViewport.value) pageViewport.value.removeEventListener('wheel', onWheel)
