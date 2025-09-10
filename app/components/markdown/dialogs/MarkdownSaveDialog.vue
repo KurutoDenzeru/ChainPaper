@@ -3,7 +3,7 @@
     <DialogContent class="max-w-2xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <Save class="w-5 h-5 text-blue-600" />
+          <Save class="w-5 h-5 text-green-600" />
           Save Markdown Document
         </DialogTitle>
         <DialogDescription>
@@ -11,54 +11,57 @@
         </DialogDescription>
       </DialogHeader>
 
-
       <div class="space-y-6">
         <!-- Save Settings (only auto-save toggle) -->
         <div class="space-y-4">
-          <h4 class="font-semibold text-gray-900">Save Options</h4>
+          <h4 class="font-semibold text-gray-900 dark:text-gray-100">Save Options</h4>
           <div class="space-y-3">
             <div class="flex items-center space-x-2">
               <Checkbox id="auto-save" v-model:checked="autoSave" />
-              <Label for="auto-save">Enable auto-save every 30 seconds</Label>
+              <Label for="auto-save" class="text-gray-700 dark:text-gray-200">Enable auto-save every 30 seconds</Label>
             </div>
           </div>
         </div>
 
         <!-- File Name Input (two-way bound to document title) -->
         <div class="space-y-2">
-          <Label for="filename">File Name</Label>
-          <Input id="filename" v-model="store.title" class="w-full" placeholder="Enter file name..." />
+          <Label for="filename" class="text-gray-700 dark:text-gray-200">File Name</Label>
+          <Input id="filename" v-model="store.title"
+            class="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700"
+            placeholder="Enter file name..." />
         </div>
 
         <!-- Document Info -->
-        <div class="bg-gray-50 p-4 rounded-lg space-y-2">
-          <h4 class="font-semibold text-gray-900">Document Information</h4>
+        <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-2">
+          <h4 class="font-semibold text-gray-900 dark:text-gray-100">Document Information</h4>
           <div class="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span class="text-gray-600">Title:</span>
-              <span class="ml-2 font-medium">{{ store.title || 'Untitled' }}</span>
+              <span class="text-gray-600 dark:text-gray-300">Title:</span>
+              <span class="ml-2 font-medium dark:text-gray-100">{{ store.title || 'Untitled' }}</span>
             </div>
             <div>
-              <span class="text-gray-600">Word Count:</span>
-              <span class="ml-2 font-medium">{{ wordCount }}</span>
+              <span class="text-gray-600 dark:text-gray-300">Word Count:</span>
+              <span class="ml-2 font-medium dark:text-gray-100">{{ wordCount }}</span>
             </div>
             <div>
-              <span class="text-gray-600">Characters:</span>
-              <span class="ml-2 font-medium">{{ characterCount }}</span>
+              <span class="text-gray-600 dark:text-gray-300">Characters:</span>
+              <span class="ml-2 font-medium dark:text-gray-100">{{ characterCount }}</span>
             </div>
             <div>
-              <span class="text-gray-600">Last Modified:</span>
-              <span class="ml-2 font-medium">{{ lastModified }}</span>
+              <span class="text-gray-600 dark:text-gray-300">Last Modified:</span>
+              <span class="ml-2 font-medium dark:text-gray-100">{{ lastModified }}</span>
             </div>
           </div>
         </div>
 
         <!-- Status Message -->
-        <div v-if="statusMessage" class="p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-600">
+        <div v-if="statusMessage"
+          class="p-3 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded text-sm text-blue-600 dark:text-blue-200">
           {{ statusMessage }}
         </div>
 
-        <div v-if="errorMessage" class="p-3 bg-red-50 border border-red-200 rounded text-sm text-red-600">
+        <div v-if="errorMessage"
+          class="p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded text-sm text-red-600 dark:text-red-200">
           {{ errorMessage }}
         </div>
       </div>
@@ -68,8 +71,9 @@
           <Button variant="outline" @click="$emit('update:open', false)" class="flex-1">
             Cancel
           </Button>
-          <Button @click="handleSave" class="flex-1">
-            <Save class="w-4 h-4 mr-2" />
+          <Button @click="handleSave"
+            class="flex-1 bg-green-600 hover:bg-green-700 text-white hover:text-white border-none dark:bg-green-500 dark:hover:bg-green-600">
+            <Save class="w-4 h-4 mr-2 text-white" />
             Save Document
           </Button>
         </div>
@@ -92,11 +96,7 @@
   import { Input } from '@/components/ui/input'
   import { Checkbox } from '@/components/ui/checkbox'
   import { Label } from '@/components/ui/label'
-  import {
-    Save,
-    HardDrive,
-    Download
-  } from 'lucide-vue-next'
+  import { Save } from 'lucide-vue-next'
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
   import { toast } from 'vue-sonner'
 
@@ -112,11 +112,11 @@
   const store = useMarkdownDocStore()
 
   // State
-    // Bind autoSave directly to the Pinia store so preference persists across sessions
-    const autoSave = computed({
-      get: () => store.autoSaveEnabled,
-      set: (v: boolean) => store.setAutoSaveEnabled(v)
-    })
+  // Bind autoSave directly to the Pinia store so preference persists across sessions
+  const autoSave = computed({
+    get: () => store.autoSaveEnabled,
+    set: (v: boolean) => store.setAutoSaveEnabled(v)
+  })
   // Always use the current document title as filename (even if Untitled Markdown)
   const computedFilename = computed(() => {
     const t = store.title?.trim() || 'Untitled Markdown'
@@ -163,7 +163,7 @@
         content: store.content,
         filename: computedFilename.value,
         savedAt: new Date().toISOString(),
-    // Removed metadata block as it is no longer used
+        // Removed metadata block as it is no longer used
       }
 
       // Save to main storage
