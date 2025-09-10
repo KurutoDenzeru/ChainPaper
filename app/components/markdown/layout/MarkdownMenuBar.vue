@@ -8,6 +8,7 @@
             sizes="72px" class="w-18 h-auto object-contain flex items-center justify-center" />
         </client-only>
       </div>
+
       <!-- Right Side: Two rows -->
       <div class="flex flex-col self-center flex-1">
         <!-- First Row: Document Title Input -->
@@ -78,31 +79,31 @@
               </MenubarContent>
             </MenubarMenu>
           </template>
-
-          <!-- Theme selector -->
-          <div class="ml-3">
-            <Popover>
-              <PopoverTrigger as-child>
-                <button class="inline-flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Theme selector">
-                  <component :is="theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor" class="w-4 h-4 text-gray-600 dark:text-gray-200" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent class="p-2 w-44 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
-                <div class="flex flex-col">
-                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700" @click="setTheme('system')">
-                    <Monitor class="w-4 h-4" /> System
-                  </button>
-                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700" @click="setTheme('light')">
-                    <Sun class="w-4 h-4" /> Light
-                  </button>
-                  <button class="flex items-center gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700" @click="setTheme('dark')">
-                    <Moon class="w-4 h-4" /> Dark
-                  </button>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
         </div>
+      </div>
+
+      <!-- Theme selector (moved out of Menubar menus) -->
+      <div class="flex items-center self-center ml-3">
+        <Popover>
+          <PopoverTrigger as-child>
+            <Button variant="outline" class="inline-flex items-center gap-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm" aria-label="Theme selector">
+              <component :is="theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor" class="w-4 h-4 text-gray-600 dark:text-gray-200" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent class="p-2 w-44 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+            <div class="flex flex-col items-start">
+              <Button variant="ghost"  class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left" @click="setTheme('system')">
+                <Monitor class="w-4 h-4" /> System
+              </Button>
+              <Button variant="ghost" class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left" @click="setTheme('light')">
+                <Sun class="w-4 h-4" /> Light
+              </Button>
+              <Button variant="ghost" class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left" @click="setTheme('dark')">
+                <Moon class="w-4 h-4" /> Dark
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   </Menubar>
@@ -204,9 +205,9 @@
     (e: 'spell-check'): void
     (e: 'word-count'): void
     (e: 'verify-authorship'): void
-    (e: 'show-shortcuts'): void
-    (e: 'show-about'): void
-    (e: 'show-documentation'): void
+  (e: 'show-shortcuts'): void
+  (e: 'show-about'): void
+  (e: 'show-documentation'): void
     (e: 'toggle-preview'): void
     (e: 'toggle-toolbar', value: boolean): void
     (e: 'toggle-statusbar', value: boolean): void
