@@ -19,7 +19,7 @@
     "clsx": "^2.1.1",
     "emoji-datasource-apple": "^15.1.2",
     "katex": "^0.16.22",
-    "lucide-vue-next": "^0.543.0",
+    "lucide-vue-next": "^0.544.0",
     "markdown-it": "^14.1.0",
     "markdown-it-emoji": "^3.0.0",
     "markdown-it-footnote": "^4.0.0",
