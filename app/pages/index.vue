@@ -390,6 +390,14 @@
           // Only restore if the store is in its default state
           if (store.title === 'Untitled Markdown' && !store.content.trim()) {
             store.setTitle(data.title || 'Untitled Markdown')
+            // Restore attachments first so content expansion of ![[name]] works
+            try {
+              if (data.attachments && typeof data.attachments === 'object') {
+                store.setAttachments(data.attachments)
+              }
+            } catch (e) {
+              // ignore attachment restore errors
+            }
             store.setContent(data.content || '', false) // Don't push to history
             store.markSaved() // Mark as saved since we just loaded it
 

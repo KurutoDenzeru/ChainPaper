@@ -77,6 +77,12 @@ export const useMarkdownDocStore = defineStore('markdownDoc', () => {
     if (attachments.value[name]) { delete attachments.value[name]; isDirty.value = true }
   }
 
+  // Replace the attachments map (used when restoring a saved document)
+  function setAttachments(obj: Record<string, string> | null) {
+    attachments.value = obj && typeof obj === 'object' ? { ...obj } : {}
+    isDirty.value = true
+  }
+
   const canUndo = computed(() => historyIndex.value > 0)
   const canRedo = computed(() => historyIndex.value < history.value.length - 1)
 
@@ -113,7 +119,7 @@ export const useMarkdownDocStore = defineStore('markdownDoc', () => {
     }
   }
 
-  return { title, content, isDirty, user, attachments, canUndo, canRedo, setTitle, setContent, reset, markSaved, undo, redo, exportJSON, createHash, createProof, verifyProof, addAttachment, getAttachment, removeAttachment, autoSaveEnabled, setAutoSaveEnabled }
+  return { title, content, isDirty, user, attachments, canUndo, canRedo, setTitle, setContent, reset, markSaved, undo, redo, exportJSON, createHash, createProof, verifyProof, addAttachment, getAttachment, removeAttachment, setAttachments, autoSaveEnabled, setAutoSaveEnabled }
 })
 
 export default useMarkdownDocStore

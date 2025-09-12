@@ -196,3 +196,13 @@ table.table-striped tbody tr:nth-child(odd) {
 .prose .table-striped table tbody tr:hover {
   @apply bg-gray-100;
 }
+
+/* Ensure images and videos inside rendered prose scale to container */
+.prose img,
+.prose video {
+  max-width: 50%;
+  height: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}

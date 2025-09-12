@@ -161,6 +161,7 @@
       const saveData = {
         title: store.title,
         content: store.content,
+        attachments: store.attachments || {},
         filename: computedFilename.value,
         savedAt: new Date().toISOString(),
         // Removed metadata block as it is no longer used
