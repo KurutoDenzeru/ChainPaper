@@ -1080,6 +1080,26 @@
 
   // Handle auto-continuation of lists when Enter is pressed
   function handleKeydown(event: KeyboardEvent) {
+    // Support Ctrl/Cmd+Z for undo and Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y for redo while in source mode.
+    // This ensures the app-level undo/redo (Pinia store) is used instead of relying on the textarea native stack,
+    // which can get out of sync because we programmatically set textarea value via the store.
+    const key = (event.key || '').toLowerCase()
+    const isMod = event.ctrlKey || event.metaKey
+    if (isMod && key === 'z' && mode.value === 'source') {
+      event.preventDefault()
+      if (event.shiftKey) {
+        onRedo()
+      } else {
+        onUndo()
+      }
+      return
+    }
+    if (isMod && key === 'y' && mode.value === 'source') {
+      event.preventDefault()
+      onRedo()
+      return
+    }
+
     if (event.key !== 'Enter' || mode.value !== 'source') return
 
     const ta = event.target as HTMLTextAreaElement
