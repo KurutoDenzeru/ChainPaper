@@ -132,6 +132,9 @@
 
   <!-- Hidden file input used for importing files (markdown, html, json) -->
   <input ref="fileInput" type="file" accept=".md,.markdown,.json,.html,text/*" class="hidden" @change="onFileChange" />
+
+  <!-- Welcome Dialog (new users) -->
+  <WelcomeDialog :open="showWelcomeDialog" @update:open="showWelcomeDialog = $event" @select-template="handleWelcomeSelect" />
 </template>
 
 <script setup lang="ts">
@@ -161,6 +164,7 @@
   const SaveDialog = defineAsyncComponent(() => import('../dialogs/SaveDialog.vue'))
   const AboutDialog = defineAsyncComponent(() => import('../dialogs/AboutDialog.vue'))
   const GuideDialog = defineAsyncComponent(() => import('../dialogs/GuideDialog.vue'))
+  const WelcomeDialog = defineAsyncComponent(() => import('../dialogs/WelcomeDialog.vue'))
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
   const store = useMarkdownDocStore()
@@ -205,9 +209,9 @@
     (e: 'spell-check'): void
     (e: 'word-count'): void
     (e: 'verify-authorship'): void
-  (e: 'show-shortcuts'): void
-  (e: 'show-about'): void
-  (e: 'show-documentation'): void
+    (e: 'show-shortcuts'): void
+    (e: 'show-about'): void
+    (e: 'show-documentation'): void
     (e: 'toggle-preview'): void
     (e: 'toggle-toolbar', value: boolean): void
     (e: 'toggle-statusbar', value: boolean): void
@@ -239,6 +243,7 @@
   const showSaveDialog = ref(false)
   const showAboutDialog = ref(false)
   const showGuideDialog = ref(false)
+  const showWelcomeDialog = ref(false)
   const showTableDialog = ref(false)
   const showEmojiDialog = ref(false)
   const exportInitialFormat = ref<'markdown' | 'html' | 'json' | 'pdf' | null>(null)
@@ -278,7 +283,7 @@
     {
       label: 'File',
       items: [
-        { type: 'item', label: 'New Markdown', emit: 'new-document', icon: FileText, shortcut: { mac: ['Command'], key: 'N', pc: 'Ctrl' } },
+        { type: 'item', label: 'New File', emit: 'new-document', icon: FileText, shortcut: { mac: ['Command'], key: 'N', pc: 'Ctrl' } },
         { type: 'item', label: 'Open', emit: 'open-document', icon: FolderOpen, shortcut: { mac: ['Command'], key: 'O', pc: 'Ctrl' } },
         { type: 'separator' },
         { type: 'item', label: 'Save', emit: 'save-document', icon: Save, shortcut: { mac: ['Command'], key: 'S', pc: 'Ctrl' } },
@@ -456,7 +461,7 @@
     if (!item.emit) return
 
     if (item.emit === 'new-document') {
-      newDoc()
+      openNewFile()
       return
     }
 
@@ -805,5 +810,54 @@
     } catch (err) {
       console.error('Failed to import file', err)
     }
+  }
+
+  // Open new file flow: show welcome dialog for first-time users, otherwise create new doc
+  function openNewFile() {
+    try {
+      // if user has seen welcome before, create new doc immediately
+      const seen = typeof localStorage !== 'undefined' ? localStorage.getItem('chainpaper_seen_welcome') : null
+      if (seen) {
+        newDoc()
+        return
+      }
+    } catch (e) {
+      // ignore and show welcome
+    }
+    // show welcome dialog
+    showWelcomeDialog.value = true
+  }
+
+  // Handle template selection from welcome dialog
+  async function handleWelcomeSelect(template: string) {
+    if (template === 'blank') {
+      newDoc()
+    } else if (template === 'welcome') {
+      try {
+        const res = await fetch('/welcome_to_chainpaper_2025-09-12.json')
+        if (res.ok) {
+          const obj = await res.json()
+          if (obj && typeof obj === 'object') {
+            // load title and content
+            store.setTitle(obj.title || 'Welcome to ChainPaper')
+            // content might be HTML or markdown; prefer content field as-is
+            store.setContent(typeof obj.content === 'string' ? obj.content : '')
+          }
+        }
+      } catch (e) {
+        // fallback to new doc
+        newDoc()
+      }
+    } else if (template === 'whitepaper') {
+      // example whitepaper starter
+      store.setTitle('Whitepaper')
+      store.setContent('# Whitepaper\n\nStart your whitepaper here...')
+    } else if (template === 'research') {
+      store.setTitle('Research Paper')
+      store.setContent('# Research Paper\n\nAbstract\n\nIntroduction\n')
+    }
+
+    // mark that user has seen welcome so it won't auto-show next time
+    try { if (typeof localStorage !== 'undefined') localStorage.setItem('chainpaper_seen_welcome', '1') } catch (e) {}
   }
 </script>
