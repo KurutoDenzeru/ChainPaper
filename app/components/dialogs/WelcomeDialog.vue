@@ -20,8 +20,8 @@
             <p class="text-gray-700 dark:text-gray-200 mt-1">Choose a template to begin.</p>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button @click="selectTemplate('blank')"
+          <div class="p-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button ref="blankBtn" @click="selectTemplate('blank')"
               class="w-full text-left group border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex flex-col items-start hover:bg-blue-50 dark:hover:bg-gray-800 transition cursor-pointer">
               <FileText class="w-6 h-6 text-blue-500 mb-2" />
               <span class="font-semibold text-gray-900 dark:text-white">Blank Document</span>
@@ -50,7 +50,7 @@
             </button>
           </div>
 
-          <div class="w-full mt-6">
+          <div class="w-full mt-6 p-1">
             <Button class="w-full" variant="outline" @click="$emit('update:open', false)">Close</Button>
           </div>
         </div>
@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-  import { defineProps, defineEmits } from 'vue'
+  import { defineProps, defineEmits, ref, watch, nextTick } from 'vue'
   import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
   import { Button } from '@/components/ui/button'
   import { FileText, BookOpen, Scroll, FlaskConical, Sparkles } from 'lucide-vue-next'
@@ -70,6 +70,21 @@
     (e: 'update:open', v: boolean): void
     (e: 'select-template', template: string): void
   }>()
+
+  const blankBtn = ref<HTMLButtonElement | null>(null)
+
+  // When the dialog opens, prevent the first template button from receiving initial focus
+  // by temporarily removing it from the tab order. Restore shortly after so it remains tabbable.
+  watch(() => props.open, async (open) => {
+    if (!open) return
+    try {
+      if (blankBtn.value) blankBtn.value.setAttribute('tabindex', '-1')
+    } catch (e) {}
+    await nextTick()
+    setTimeout(() => {
+      try { blankBtn.value?.removeAttribute('tabindex') } catch (e) {}
+    }, 50)
+  })
 
   function selectTemplate(template: string) {
     emit('select-template', template)

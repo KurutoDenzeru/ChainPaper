@@ -644,6 +644,15 @@
         else (mediaMatcher as any).addListener(handler)
       }
     } catch (e) { }
+
+    // Show welcome dialog for first-time users (unless they've seen it)
+    try {
+      const seen = typeof localStorage !== 'undefined' ? localStorage.getItem('chainpaper_seen_welcome') : null
+      if (!seen) {
+        // delay slightly so the UI can finish mounting
+        setTimeout(() => { showWelcomeDialog.value = true }, 120)
+      }
+    } catch (e) {}
   })
 
   onUnmounted(() => {

@@ -42,9 +42,9 @@
           <div ref="pageInner" :style="pageInnerStyle"
             class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm m-6">
             <div class="w-full h-full">
-              <textarea v-if="mode === 'source'" ref="textareaEl" v-model="content"
+              <textarea v-if="mode === 'source'" ref="textareaEl" :value="content"
                 class="w-full h-full outline-none resize-none font-mono text-sm p-6" placeholder="Write Markdown..."
-                @input="recount" @keydown="handleKeydown" />
+                @input="onSourceInput" @keydown="handleKeydown" />
               <div v-else class="h-full">
                 <ScrollArea class="h-full">
                   <div
@@ -1134,6 +1134,15 @@
     }
   }
 
+  // Ensure edits go through the store so history snapshots are recorded for undo/redo
+  function onSourceInput(e: Event) {
+    const ta = e.target as HTMLTextAreaElement | null
+    if (!ta) return
+    const val = ta.value
+    try { store.setContent(val) } catch (err) { console.warn('Failed to set content', err) }
+    recount()
+  }
+
   onMounted(() => { textareaEl.value = document.querySelector('textarea') })
 
   // Link dialog state
@@ -1321,14 +1330,14 @@
 
     tbody tr:hover td {
       /* subtle hover that adapts via .dark override below */
-      background-color: rgba(0,0,0,0.03);
+      background-color: rgba(0, 0, 0, 0.03);
       color: black;
     }
 
     /* Prefer a subtle light hover in dark mode for readability */
     /* In dark mode ensure hover background remains subtle but text becomes dark for readability */
     .dark :deep(.prose) tbody tr:hover td {
-      background-color: rgba(255,255,255,0.04) !important;
+      background-color: rgba(255, 255, 255, 0.04) !important;
       color: #0f172a !important;
     }
 
