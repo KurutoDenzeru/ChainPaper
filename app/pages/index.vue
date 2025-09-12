@@ -1296,6 +1296,40 @@
       margin: 2rem 0;
     }
 
+    /* Table styling that follows theme variables so dark mode is legible */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      color: var(--foreground);
+    }
+
+    th,
+    td {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--foreground);
+      background: transparent;
+    }
+
+    thead th {
+      background: var(--muted);
+      color: var(--muted-foreground);
+      font-weight: 600;
+    }
+
+    tbody tr:hover td {
+      /* subtle hover that adapts via .dark override below */
+      background-color: rgba(0,0,0,0.03);
+      color: black;
+    }
+
+    /* Prefer a subtle light hover in dark mode for readability */
+    .dark :deep(.prose) tbody tr:hover td {
+      background-color: rgba(255,255,255,0.02);
+    }
+
     /* Alignment classes */
     .text-left {
       text-align: left;
