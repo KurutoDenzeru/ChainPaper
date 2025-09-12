@@ -1326,8 +1326,10 @@
     }
 
     /* Prefer a subtle light hover in dark mode for readability */
+    /* In dark mode ensure hover background remains subtle but text becomes dark for readability */
     .dark :deep(.prose) tbody tr:hover td {
-      background-color: rgba(255,255,255,0.02);
+      background-color: rgba(255,255,255,0.04) !important;
+      color: #0f172a !important;
     }
 
     /* Alignment classes */
