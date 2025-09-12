@@ -1,5 +1,6 @@
 <template>
-  <Menubar class="px-2 sm:px-4 py-9 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm text-gray-600 dark:text-gray-200">
+  <Menubar
+    class="px-2 sm:px-4 py-9 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm text-gray-600 dark:text-gray-200">
     <div class="flex flex-row items-start w-full">
       <!-- Left Side: Brand Icon (spans two rows) -->
       <div class="flex flex-col items-center justify-start mr-3" role="presentation">
@@ -13,12 +14,13 @@
       <div class="flex flex-col self-center flex-1">
         <!-- First Row: Document Title Input -->
         <div class="flex items-center gap-2 mb-1" role="presentation">
-            <div v-if="!isEditingTitle" class="flex items-center gap-2 px-3 rounded">
+          <div v-if="!isEditingTitle" class="flex items-center gap-2 px-3 rounded">
             <!-- Visible document title (non-interactive) -->
-            <span class="text-lg text-gray-900 dark:text-white font-medium -ml-2">{{ title || 'Untitled Markdown' }}</span>
+            <span class="text-lg text-gray-900 dark:text-white font-medium -ml-2">{{ title || 'Untitled Markdown'
+              }}</span>
 
             <!-- Edit button: icon-only, clearly labeled for assistive tech -->
-              <button type="button" @click="startEditingTitle" aria-label="Edit document title"
+            <button type="button" @click="startEditingTitle" aria-label="Edit document title"
               class="inline-flex items-center justify-center p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-1">
               <span class="sr-only">Edit document title</span>
               <Edit3 aria-hidden="true" class="w-4 h-4 text-gray-600 dark:text-gray-300" />
@@ -46,20 +48,25 @@
                   <!-- Checkbox items removed; now using buttons for toolbar/statusbar/preview -->
                   <MenubarSub v-else-if="item.type === 'sub'">
                     <MenubarSubTrigger class="flex items-center gap-2">
-                      <component :is="(item as any).icon" class="w-4 h-4 text-gray-600 dark:text-gray-300" v-if="(item as any).icon" />
+                      <component :is="(item as any).icon" class="w-4 h-4 text-gray-600 dark:text-gray-300"
+                        v-if="(item as any).icon" />
                       {{ item.label }}
                     </MenubarSubTrigger>
                     <MenubarSubContent>
                       <template v-for="(sub, sidx) in (item as any).items" :key="menu.label + '-sub-' + sidx">
                         <MenubarSeparator v-if="sub.type === 'separator'" />
-                        <MenubarItem v-else @click="handleMenuEmit(sub)" class="flex items-center justify-between min-w-[220px]">
+                        <MenubarItem v-else @click="handleMenuEmit(sub)"
+                          class="flex items-center justify-between min-w-[220px]">
                           <div class="flex items-center gap-2">
-                            <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600 dark:text-gray-300" v-if="getIcon(sub)" />
+                            <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600 dark:text-gray-300"
+                              v-if="getIcon(sub)" />
                             <span>{{ sub.label }}</span>
                           </div>
                           <MenubarShortcut v-if="getShortcut(sub)">
                             <!-- reuse shortcut rendering if present -->
-                            <span class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 dark:bg-gray-700 text-xs font-medium mr-1">{{ getShortcut(sub)?.pc || getShortcut(sub)?.key || '' }}</span>
+                            <span
+                              class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 dark:bg-gray-700 text-xs font-medium mr-1">{{
+                                getShortcut(sub)?.pc || getShortcut(sub)?.key || '' }}</span>
                           </MenubarShortcut>
                         </MenubarItem>
                       </template>
@@ -68,7 +75,8 @@
                   <MenubarItem v-else class="flex items-center justify-between min-w-[250px]"
                     :disabled="isDisabled(item)" @click="handleMenuEmit(item)">
                     <div class="flex items-center gap-2">
-                      <component :is="getIcon(item)" class="w-4 h-4 text-gray-600 dark:text-gray-300" v-if="getIcon(item)" />
+                      <component :is="getIcon(item)" class="w-4 h-4 text-gray-600 dark:text-gray-300"
+                        v-if="getIcon(item)" />
                       <span>{{ item.label }}</span>
                     </div>
                     <MenubarShortcut v-if="getShortcut(item)">
@@ -86,19 +94,29 @@
       <div class="flex items-center self-center ml-3">
         <Popover>
           <PopoverTrigger as-child>
-            <Button variant="outline" class="inline-flex items-center gap-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm" aria-label="Theme selector">
-              <component :is="theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor" class="w-4 h-4 text-gray-600 dark:text-gray-200" />
+            <Button variant="outline"
+              class="inline-flex items-center gap-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"
+              aria-label="Theme selector">
+              <component :is="theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor"
+                class="w-4 h-4 text-gray-600 dark:text-gray-200" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="p-2 w-44 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+          <PopoverContent
+            class="p-2 w-44 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
             <div class="flex flex-col items-start">
-              <Button variant="ghost"  class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left" @click="setTheme('system')">
+              <Button variant="ghost"
+                class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left"
+                @click="setTheme('system')">
                 <Monitor class="w-4 h-4" /> System
               </Button>
-              <Button variant="ghost" class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left" @click="setTheme('light')">
+              <Button variant="ghost"
+                class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left"
+                @click="setTheme('light')">
                 <Sun class="w-4 h-4" /> Light
               </Button>
-              <Button variant="ghost" class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left" @click="setTheme('dark')">
+              <Button variant="ghost"
+                class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left"
+                @click="setTheme('dark')">
                 <Moon class="w-4 h-4" /> Dark
               </Button>
             </div>
@@ -113,8 +131,7 @@
 
   <AuthProofDialog :open="showAuthProofDialog" @update:open="showAuthProofDialog = $event" />
 
-  <ExportDialog :open="showExportDialog" :initialFormat="exportInitialFormat"
-    @update:open="onExportDialogUpdate" />
+  <ExportDialog :open="showExportDialog" :initialFormat="exportInitialFormat" @update:open="onExportDialogUpdate" />
 
   <SaveDialog :open="showSaveDialog" @update:open="showSaveDialog = $event" />
 
@@ -134,7 +151,8 @@
   <input ref="fileInput" type="file" accept=".md,.markdown,.json,.html,text/*" class="hidden" @change="onFileChange" />
 
   <!-- Welcome Dialog (new users) -->
-  <WelcomeDialog :open="showWelcomeDialog" @update:open="showWelcomeDialog = $event" @select-template="handleWelcomeSelect" />
+  <WelcomeDialog :open="showWelcomeDialog" @update:open="showWelcomeDialog = $event"
+    @select-template="handleWelcomeSelect" />
 </template>
 
 <script setup lang="ts">
@@ -271,7 +289,7 @@
     try {
       if (t === 'system') localStorage.removeItem('chainpaper_theme')
       else localStorage.setItem('chainpaper_theme', t)
-    } catch (e) {}
+    } catch (e) { }
   }
 
   function setTheme(t: 'light' | 'dark' | 'system') {
@@ -625,17 +643,17 @@
         if ((mediaMatcher as any).addEventListener) mediaMatcher.addEventListener('change', handler)
         else (mediaMatcher as any).addListener(handler)
       }
-    } catch (e) {}
+    } catch (e) { }
   })
 
   onUnmounted(() => {
     if (typeof window !== 'undefined') window.removeEventListener('resize', updateIsNarrow)
     try {
       if (mediaMatcher) {
-        if ((mediaMatcher as any).removeEventListener) (mediaMatcher as any).removeEventListener('change', () => {})
-        else (mediaMatcher as any).removeListener(() => {})
+        if ((mediaMatcher as any).removeEventListener) (mediaMatcher as any).removeEventListener('change', () => { })
+        else (mediaMatcher as any).removeListener(() => { })
       }
-    } catch (e) {}
+    } catch (e) { }
   })
 
   function startEditingTitle() {
@@ -815,9 +833,9 @@
   // Open new file flow: show welcome dialog for first-time users, otherwise create new doc
   function openNewFile() {
     try {
-      // if user has seen welcome before, create new doc immediately
-      const seen = typeof localStorage !== 'undefined' ? localStorage.getItem('chainpaper_seen_welcome') : null
-      if (seen) {
+      // Only skip the welcome dialog if the user explicitly opted out
+      const optOut = typeof localStorage !== 'undefined' ? localStorage.getItem('chainpaper_seen_welcome_optout') : null
+      if (optOut === '1') {
         newDoc()
         return
       }
@@ -858,6 +876,6 @@
     }
 
     // mark that user has seen welcome so it won't auto-show next time
-    try { if (typeof localStorage !== 'undefined') localStorage.setItem('chainpaper_seen_welcome', '1') } catch (e) {}
+    try { if (typeof localStorage !== 'undefined') localStorage.setItem('chainpaper_seen_welcome', '1') } catch (e) { }
   }
 </script>
