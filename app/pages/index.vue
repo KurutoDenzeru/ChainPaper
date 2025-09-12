@@ -1268,18 +1268,26 @@
     }
 
     code {
-      background-color: #f3f4f6;
+      /* Use theme-aware variables so inline code adapts to light/dark themes
+         --muted provides a subtle background and --muted-foreground the readable text
+         --border gives a gentle outline that also adapts in dark mode. */
+      background-color: var(--muted);
+      color: var(--muted-foreground);
       padding: 0.125rem 0.25rem;
       border-radius: 0.25rem;
       font-family: monospace;
+      border: 1px solid var(--border);
     }
 
     pre {
-      background-color: #f3f4f6;
+      /* Block code should also follow theme variables for BG and text color */
+      background-color: var(--muted);
+      color: var(--muted-foreground);
       padding: 1rem;
       border-radius: 0.5rem;
       overflow-x: auto;
       margin: 1rem 0;
+      border: 1px solid var(--border);
     }
 
     hr {

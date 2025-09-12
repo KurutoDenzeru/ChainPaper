@@ -163,7 +163,7 @@
         <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; }
             h1, h2, h3 { color: #333; }
-            code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
+            code { background: var(--muted, #f4f4f4); color: var(--muted-foreground, #111827); padding: 0.2em 0.4em; border-radius: 3px; }
             a { color: #0066cc; }
         </style>
     </head>
