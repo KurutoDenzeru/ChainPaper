@@ -1,6 +1,7 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-  <DialogContent class="max-w-md w-full p-6 flex flex-col items-center justify-center gap-4 bg-white dark:bg-gray-900">
+    <DialogContent
+      class="max-w-md w-full p-6 flex flex-col items-center justify-center gap-4 bg-white dark:bg-gray-900">
       <DialogHeader class="w-full flex flex-col items-start">
         <DialogTitle class="flex items-center gap-2 text-lg font-semibold text-left dark:text-gray-100">
           <ImageIcon class="w-5 h-5 text-green-600 dark:text-green-300" />
@@ -14,9 +15,8 @@
         class="w-full h-48 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer transition relative"
         :class="[
           isDragging ? 'border-blue-400 bg-blue-50 dark:border-blue-300 dark:bg-blue-950' :
-          (isHover ? 'border-gray-400 bg-gray-100 dark:border-gray-500 dark:bg-gray-800' : 'border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800')
-        ]"
-        @click="triggerFileInput" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave"
+            (isHover ? 'border-gray-400 bg-gray-100 dark:border-gray-500 dark:bg-gray-800' : 'border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800')
+        ]" @click="triggerFileInput" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave"
         @drop.prevent="handleDrop" @mouseenter="isHover = true" @mouseleave="isHover = false">
         <div v-if="!preview" class="flex flex-col items-center justify-center gap-2 text-gray-400 dark:text-gray-500">
           <ImageIcon class="w-10 h-10" />
@@ -33,16 +33,16 @@
         </div>
         <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
       </div>
-      <DialogFooter class="w-full flex gap-2 mt-4">
-        <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">Cancel</Button>
-        <Button
-          :disabled="!preview"
-          class="w-1/2 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white border-none dark:bg-green-500 dark:hover:bg-green-600 dark:text-white"
-          @click="insertImage"
-        >
-          <UploadCloud class="w-4 h-4" />
-          Insert
-        </Button>
+      <DialogFooter class="w-full p-0 mt-4">
+        <div class="flex w-full gap-2">
+          <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">Cancel</Button>
+          <Button :disabled="!preview"
+            class="w-1/2 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white border-none dark:bg-green-500 dark:hover:bg-green-600 dark:text-white"
+            @click="insertImage">
+            <UploadCloud class="w-4 h-4" />
+            Insert
+          </Button>
+        </div>
       </DialogFooter>
     </DialogContent>
   </Dialog>
