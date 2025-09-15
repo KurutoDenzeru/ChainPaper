@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-2xl">
+    <DialogContent class="!max-w-2xl sm:!max-w-2xl !max-w-full p-2 sm:p-6">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Smile class="h-5 w-5 text-green-600" /> Insert Emoji
@@ -8,18 +8,18 @@
         <DialogDescription>Choose an emoji to insert into your document</DialogDescription>
       </DialogHeader>
 
-      <div class="mt-4">
-        <div class="relative mb-4">
+      <div class="mt-2 sm:mt-4">
+        <div class="relative mb-3 sm:mb-4">
           <Search
             class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
           <Input v-model="searchQuery" placeholder="Search emojis..."
-            class="pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500" />
+            class="pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 text-base sm:text-base" />
         </div>
 
         <TooltipProvider>
           <div v-if="showSearch" class="mt-2">
             <div v-if="searchResults.length"
-              class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto py-2 px-2 emoji-scroll">
+              class="grid grid-cols-5 sm:grid-cols-8 gap-1 max-h-48 overflow-y-auto py-2 px-2 emoji-scroll">
               <Tooltip v-for="e in searchResults" :key="e.char">
                 <TooltipTrigger as-child>
                   <button :class="[
@@ -31,8 +31,9 @@
                     <span>{{ e.char }}</span>
                   </button>
                 </TooltipTrigger>
-                <TooltipContent class="whitespace-nowrap">{{ e.name }} <span class="text-muted-foreground ml-1">{{
-                  e.shortcode }}</span></TooltipContent>
+                <TooltipContent class="whitespace-nowrap" :portal="true">{{ e.name }} <span
+                    class="text-muted-foreground ml-1">{{
+                      e.shortcode }}</span></TooltipContent>
               </Tooltip>
             </div>
             <div v-else class="text-center text-gray-500 py-8">No emojis found</div>
@@ -63,7 +64,7 @@
 
               <TabsContent value="recent" class="mt-4">
                 <div v-if="filteredRecent.length"
-                  class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto py-2 px-2 emoji-scroll">
+                  class="grid grid-cols-5 sm:grid-cols-8 gap-1 max-h-48 overflow-y-auto py-2 px-2 emoji-scroll pointer-events-auto">
                   <Tooltip v-for="e in filteredRecent" :key="e.char">
                     <TooltipTrigger as-child>
                       <button :class="[
@@ -75,8 +76,9 @@
                         <span>{{ e.char }}</span>
                       </button>
                     </TooltipTrigger>
-                    <TooltipContent class="whitespace-nowrap">{{ e.name }} <span class="text-muted-foreground ml-1">{{
-                      e.shortcode }}</span></TooltipContent>
+                    <TooltipContent class="whitespace-nowrap" :portal="true">{{ e.name }} <span
+                        class="text-muted-foreground ml-1">{{
+                          e.shortcode }}</span></TooltipContent>
                   </Tooltip>
                 </div>
                 <div v-else class="text-center text-gray-500 py-8">No recently used emojis</div>
@@ -84,7 +86,7 @@
 
               <TabsContent v-for="cat in categoriesOrdered" :key="cat" :value="cat" class="mt-4">
                 <div v-if="getCategoryEmojis(cat).length"
-                  class="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto py-2 px-2 emoji-scroll">
+                  class="grid grid-cols-5 sm:grid-cols-8 gap-1 max-h-48 overflow-y-auto py-2 px-2 emoji-scroll pointer-events-auto">
                   <Tooltip v-for="e in getCategoryEmojis(cat)" :key="e.char">
                     <TooltipTrigger as-child>
                       <button :class="[
@@ -96,8 +98,9 @@
                         <span>{{ e.char }}</span>
                       </button>
                     </TooltipTrigger>
-                    <TooltipContent class="whitespace-nowrap">{{ e.name }} <span class="text-muted-foreground ml-1">{{
-                      e.shortcode }}</span></TooltipContent>
+                    <TooltipContent class="whitespace-nowrap" :portal="true">{{ e.name }} <span
+                        class="text-muted-foreground ml-1">{{
+                          e.shortcode }}</span></TooltipContent>
                   </Tooltip>
                 </div>
                 <div v-else class="text-center text-gray-500 py-8">No emojis in {{ categoryLabel(cat) }}</div>
@@ -107,12 +110,12 @@
         </TooltipProvider>
       </div>
 
-      <DialogFooter class="w-full flex items-center gap-3">
-        <div class="flex-1 text-sm text-gray-700 dark:text-gray-300">
+      <DialogFooter class="w-full flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-2">
+        <div class="flex-1 text-sm text-gray-700 dark:text-gray-300 mb-2 sm:mb-0">
           <span v-if="selectedEmoji">Selected: <span class="ml-2 text-2xl">{{ selectedEmoji.char }}</span> <span
               class="ml-2 font-medium">{{ selectedEmoji.name }}</span></span>
         </div>
-        <div class="flex gap-2 w-1/3">
+        <div class="flex gap-2 w-full sm:w-1/3">
           <Button variant="outline" class="flex-1" @click="$emit('update:open', false)">Cancel</Button>
           <Button
             class="flex-1 bg-green-600 hover:bg-green-700 text-white border-none dark:bg-green-500 dark:hover:bg-green-600"
@@ -175,7 +178,7 @@
     return Array.from(s)
   })
 
-  const preferredOrder = ['smileys', 'people', 'animals', 'food', 'activities', 'travel', 'objects', 'symbols', 'flags', 'nature']
+  const preferredOrder = ['smileys', 'people', 'animals', 'food', 'activities', 'travel', 'objects']
   const categoriesOrdered = computed(() => {
     const available = categories.value
     const head = preferredOrder.filter(p => available.includes(p))
@@ -222,10 +225,7 @@
       food: '🍎',
       activities: '⚽',
       travel: '✈️',
-      objects: '💡',
-      symbols: '❤️',
-      flags: '🇺🇸',
-      nature: '🌞'
+      objects: '💡'
     }
     return map[cat.toLowerCase()] || '📂'
   }
@@ -234,14 +234,11 @@
     const map: Record<string, string> = {
       smileys: 'Smileys & Emotion',
       people: 'People & Body',
-      animals: 'Animals & Nature',
+      animals: 'Animals',
       food: 'Food & Drink',
-      activities: 'Activities & Sports',
-      travel: 'Travel & Places',
-      objects: 'Objects',
-      symbols: 'Symbols',
-      flags: 'Flags',
-      nature: 'Nature'
+      activities: 'Activities',
+      travel: 'Travel',
+      objects: 'Objects'
     }
     return map[cat.toLowerCase()] || (cat.charAt(0).toUpperCase() + cat.slice(1))
   }
