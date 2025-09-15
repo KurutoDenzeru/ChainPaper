@@ -17,7 +17,7 @@
           <div v-if="!isEditingTitle" class="flex items-center gap-2 px-3 rounded">
             <!-- Visible document title (non-interactive) -->
             <span class="text-lg text-gray-900 dark:text-white font-medium -ml-2">{{ title || 'Untitled Markdown'
-              }}</span>
+            }}</span>
 
             <!-- Edit button: icon-only, clearly labeled for assistive tech -->
             <button type="button" @click="startEditingTitle" aria-label="Edit document title"
@@ -53,22 +53,69 @@
                       {{ item.label }}
                     </MenubarSubTrigger>
                     <MenubarSubContent>
-                      <template v-for="(sub, sidx) in (item as any).items" :key="menu.label + '-sub-' + sidx">
-                        <MenubarSeparator v-if="sub.type === 'separator'" />
-                        <MenubarItem v-else @click="handleMenuEmit(sub)"
-                          class="flex items-center justify-between min-w-[220px]">
+                      <!-- Special case: Text Color submenu -> render color grid + custom inputs (copied from EditorToolbar PopoverContent) -->
+                      <template v-if="item.label === 'Text Color'">
+                        <div class="px-3 py-2 w-[260px]">
                           <div class="flex items-center gap-2">
-                            <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600 dark:text-gray-300"
-                              v-if="getIcon(sub)" />
-                            <span>{{ sub.label }}</span>
+                            <Type class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Text Color</span>
                           </div>
-                          <MenubarShortcut v-if="getShortcut(sub)">
-                            <!-- reuse shortcut rendering if present -->
-                            <span
-                              class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 dark:bg-gray-700 text-xs font-medium mr-1">{{
-                                getShortcut(sub)?.pc || getShortcut(sub)?.key || '' }}</span>
-                          </MenubarShortcut>
-                        </MenubarItem>
+                          <div class="grid grid-cols-8 gap-1.5 mt-2">
+                            <button v-for="c in textColors" :key="c" :title="c"
+                              class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer shadow-sm"
+                              :style="{ backgroundColor: c }" @click="emitTextColor(c)">
+                            </button>
+                          </div>
+                          <div class="flex items-center gap-2 mt-2">
+                            <input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
+                              @input="onMenuCustomTextColor" />
+                            <input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
+                              placeholder="#rrggbb" @change="onMenuCustomTextColorText" />
+                          </div>
+                        </div>
+                      </template>
+
+                      <!-- Special case: Highlight submenu -> render color grid + custom inputs -->
+                      <template v-else-if="item.label === 'Highlight'">
+                        <div class="px-3 py-2 w-[260px]">
+                          <div class="flex items-center gap-2">
+                            <Highlighter class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Highlight</span>
+                          </div>
+                          <div class="grid grid-cols-8 gap-1.5 mt-2">
+                            <button v-for="c in highlightColors" :key="c" :title="c"
+                              class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer shadow-sm"
+                              :style="{ backgroundColor: c }" @click="emitHighlight(c)">
+                            </button>
+                          </div>
+                          <div class="flex items-center gap-2 mt-2">
+                            <input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
+                              @input="onMenuCustomHighlight" />
+                            <input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
+                              placeholder="#rrggbb" @change="onMenuCustomHighlightText" />
+                          </div>
+                        </div>
+                      </template>
+
+                      <!-- Default rendering for other submenu items -->
+                      <template v-else>
+                        <template v-for="(sub, sidx) in (item as any).items" :key="menu.label + '-sub-' + sidx">
+                          <MenubarSeparator v-if="sub.type === 'separator'" />
+                          <MenubarItem v-else @click="handleMenuEmit(sub)"
+                            class="flex items-center justify-between min-w-[220px]">
+                            <div class="flex items-center gap-2">
+                              <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600 dark:text-gray-300"
+                                v-if="getIcon(sub)" />
+                              <span>{{ sub.label }}</span>
+                            </div>
+                            <MenubarShortcut v-if="getShortcut(sub)">
+                              <!-- reuse shortcut rendering if present -->
+                              <span
+                                class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 dark:bg-gray-700 text-xs font-medium mr-1">{{
+                                  getShortcut(sub)?.pc || getShortcut(sub)?.key || '' }}</span>
+                            </MenubarShortcut>
+                          </MenubarItem>
+                        </template>
                       </template>
                     </MenubarSubContent>
                   </MenubarSub>
