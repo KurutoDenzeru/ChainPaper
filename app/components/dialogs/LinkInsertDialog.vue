@@ -3,7 +3,7 @@
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <LinkIcon class="w-5 h-5 text-gray-600" />
+          <LinkIcon class="w-5 h-5 text-green-600" />
           <span>Insert Link</span>
         </DialogTitle>
         <DialogDescription>
@@ -49,8 +49,14 @@
       </div>
 
       <DialogFooter>
-        <Button variant="outline" @click="handleCancel">Cancel</Button>
-        <Button @click="handleInsert" :disabled="!url.trim()">Insert Link</Button>
+        <div class="flex w-full gap-2">
+          <Button variant="outline" @click="handleCancel" class="w-1/2">Cancel</Button>
+          <Button @click="handleInsert" :disabled="!url.trim()"
+            class="w-1/2 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white border-none disabled:opacity-50 disabled:cursor-not-allowed">
+            <Link2 class="w-4 h-4" />
+            <span>Insert Link</span>
+          </Button>
+        </div>
       </DialogFooter>
     </DialogContent>
   </Dialog>
@@ -60,7 +66,7 @@
   import { ref, computed, watch, nextTick, onMounted } from 'vue'
   import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
   import { Button } from '@/components/ui/button'
-  import { Link as LinkIcon, Globe, Type as TypeIcon } from 'lucide-vue-next'
+  import { Link as LinkIcon, Link2, Globe, Type as TypeIcon } from 'lucide-vue-next'
   import { Input } from '@/components/ui/input'
   import { Label } from '@/components/ui/label'
   import { normalizeUrl, createLinkHtml, insertLink, type LinkInsertOptions } from '@/lib/editor-formatting'
