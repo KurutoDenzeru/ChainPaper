@@ -33,22 +33,22 @@
 
     </div>
     <div :style="{ height: topPad + 'px' }" aria-hidden="true" />
-    <main class="flex-1 p-6 pb-24 flex items-center justify-center">
+    <main class="flex-1 p-4 sm:p-6 pb-24 flex items-center justify-center">
       <div class="w-full flex justify-center items-center">
         <!-- viewport with scroll/pinch handling -->
         <div ref="pageViewport"
           :class="[mode === 'source' ? 'overflow-auto' : 'overflow-hidden', 'w-full flex justify-center items-center min-h-[60vh]']">
           <!-- inner page that is scaled via transform; size = Letter 8.5in x 11in -->
           <div ref="pageInner" :style="pageInnerStyle"
-            class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm m-6">
+            class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm m-2 sm:m-6">
             <div class="w-full h-full">
               <textarea v-if="mode === 'source'" ref="textareaEl" :value="content"
-                class="w-full h-full outline-none resize-none font-mono text-sm p-6" placeholder="Write Markdown..."
-                @input="onSourceInput" @keydown="handleKeydown" />
+                class="w-full h-full outline-none resize-none font-mono text-sm p-4 sm:p-6"
+                placeholder="Write Markdown..." @input="onSourceInput" @keydown="handleKeydown" />
               <div v-else class="h-full">
                 <ScrollArea class="h-full">
                   <div
-                    class="prose prose-gray max-w-none h-full p-6 prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg prose-h6:text-base"
+                    class="prose prose-gray max-w-none h-full p-4 sm:p-6 prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg prose-h6:text-base"
                     v-html="renderedHtml" />
                 </ScrollArea>
               </div>
