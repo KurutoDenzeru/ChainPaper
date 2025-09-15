@@ -3,7 +3,7 @@
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
     <div ref="topFixed" class="fixed inset-x-1 top-1 z-50 pointer-events-none">
 
-      <div class="pointer-events-auto">
+      <div class="mt-1 px-2 pointer-events-auto">
         <MenuBar v-if="showMenuBar" @word-count="showWordDialog = true" @insert-link="insertLink"
           @insert-image="insertImage" @insert-table="insertTable" @set-heading="handleSetHeading"
           @insert-code-block="insertCodeBlockBlock" @insert-math="insertMath" @insert-mathblock="insertMathblock"
@@ -17,7 +17,7 @@
           @toggle-statusbar="showStatusBar = $event" @cut="handleCut" @copy="handleCopy" @paste="handlePaste" />
       </div>
 
-      <div class="mt-2 pointer-events-auto" v-if="showToolbar">
+      <div class="mt-1 px-2 pointer-events-auto" v-if="showToolbar">
         <EditorToolbar :zoom="zoom" :canUndo="canUndo" :canRedo="canRedo" :mode="mode" @undo="onUndo" @redo="onRedo"
           @format-bold="applyBold" @format-italic="applyItalic" @format-underline="applyUnderline"
           @format-strikethrough="applyStrike" @format-superscript="applySuperscript" @format-subscript="applySubscript"
