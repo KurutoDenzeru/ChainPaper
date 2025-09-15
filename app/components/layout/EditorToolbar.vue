@@ -23,7 +23,7 @@
         </div>
 
         <!-- View Controls -->
-  <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
         <!-- Undo/Redo -->
         <Tooltip>
@@ -52,7 +52,7 @@
 
       <!-- Desktop Layout: Show all controls on large screens -->
       <div class="hidden lg:flex gap-1 flex-1 items-center">
-  <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
         <!-- Headings (popover dropdown) -->
         <Popover>
@@ -63,7 +63,8 @@
               <ChevronDown class="w-3 h-3 text-gray-500" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="w-40 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+          <PopoverContent
+            class="w-40 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
             <div class="flex flex-col">
               <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
                 @click="setHeading('p')">
@@ -105,7 +106,7 @@
           </PopoverContent>
         </Popover>
 
-  <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
         <!-- Zoom controls -->
         <div class="flex items-center gap-1 ml-1">
@@ -126,17 +127,21 @@
                 class="w-20 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 tabindex="0">
                 <span class="sr-only" id="editor-zoom-label">Zoom percentage</span>
-                <Input id="editor-zoom-input" type="number" v-model="zoomModel" class="w-20 text-center h-8 rounded bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100"
+                <Input id="editor-zoom-input" type="number" v-model="zoomModel"
+                  class="w-20 text-center h-8 rounded bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100"
                   aria-labelledby="editor-zoom-label" aria-label="Zoom percentage" role="spinbutton" aria-valuemin="50"
                   aria-valuemax="200" :aria-valuenow="isFit ? 100 : zoomPercent" />
               </button>
             </PopoverTrigger>
-            <PopoverContent class="w-32 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+            <PopoverContent
+              class="w-32 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
               <div class="flex flex-col">
-                <button class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-medium"
+                <button
+                  class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-medium"
                   @click="selectZoom('fit')">Fit</button>
                 <div class="border-t my-1 border-gray-100 dark:border-gray-700" />
-                <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100"
+                <button v-for="opt in zoomOptions" :key="opt"
+                  class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100"
                   @click="selectZoom(opt)">{{ opt }}%</button>
               </div>
             </PopoverContent>
@@ -154,7 +159,7 @@
           </Tooltip>
         </div>
 
-  <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
         <!-- Basic Formatting -->
         <Tooltip>
@@ -213,7 +218,8 @@
               </div>
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="w-64 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+          <PopoverContent
+            class="w-64 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
             <div class="grid grid-cols-8 gap-2">
               <button v-for="c in textColors" :key="c" :title="c"
                 class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
@@ -226,9 +232,12 @@
             <div class="mt-3 border-t pt-3">
               <div class="text-xs text-gray-500 mb-2">Custom color</div>
               <div class="flex items-center gap-2">
-                <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700" @input="onCustomTextColor" />
-                <input type="text" class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100" placeholder="#rrggbb"
-                  @change="onCustomTextColorText" />
+                <input type="color"
+                  class="w-10 h-8 p-0 border rounded cursor-pointer border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700"
+                  @input="onCustomTextColor" />
+                <input type="text"
+                  class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100"
+                  placeholder="#rrggbb" @change="onCustomTextColorText" />
               </div>
             </div>
           </PopoverContent>
@@ -245,7 +254,8 @@
               </div>
             </Button>
           </PopoverTrigger>
-            <PopoverContent class="w-64 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+          <PopoverContent
+            class="w-64 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
             <div class="grid grid-cols-8 gap-2">
               <button v-for="c in highlightColors" :key="c" :title="c"
                 class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
@@ -258,9 +268,12 @@
             <div class="mt-3 border-t pt-3">
               <div class="text-xs text-gray-500 mb-2">Custom highlight</div>
               <div class="flex items-center gap-2">
-                <input type="color" class="w-10 h-8 p-0 border rounded cursor-pointer border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700" @input="onCustomHighlight" />
-                <input type="text" class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100" placeholder="#rrggbb"
-                  @change="onCustomHighlightText" />
+                <input type="color"
+                  class="w-10 h-8 p-0 border rounded cursor-pointer border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700"
+                  @input="onCustomHighlight" />
+                <input type="text"
+                  class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100"
+                  placeholder="#rrggbb" @change="onCustomHighlightText" />
               </div>
             </div>
           </PopoverContent>
@@ -627,12 +640,14 @@
               <MoreHorizontal class="w-4 h-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="w-80 p-0 max-h-96 overflow-y-auto" align="end">
+          <PopoverContent
+            class="w-80 p-0 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm"
+            align="end">
             <div class="p-3 space-y-4">
               <!-- Text Styles Section -->
               <div class="space-y-2">
                 <div
-                  class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  class="px-1 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
                   Text Styles</div>
                 <Select @update:modelValue="handleHeadingChange">
                   <SelectTrigger class="w-full">
@@ -688,7 +703,7 @@
               <!-- Text Formatting Section -->
               <div class="space-y-2">
                 <div
-                  class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  class="px-1 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
                   Text Format</div>
                 <div class="grid grid-cols-2 gap-1">
                   <button
@@ -727,14 +742,14 @@
               <!-- Colors Section -->
               <div class="space-y-3">
                 <div
-                  class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  class="px-1 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
                   Colors</div>
 
                 <!-- Text Color -->
                 <div class="space-y-2">
                   <div class="flex items-center gap-2">
                     <Type class="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                    <span class="text-sm font-medium text-gray-700">Text Color</span>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Text Color</span>
                   </div>
                   <div class="grid grid-cols-8 gap-1.5">
                     <button v-for="c in textColors" :key="c" :title="c"
@@ -757,7 +772,7 @@
                 <div class="space-y-2">
                   <div class="flex items-center gap-2">
                     <Highlighter class="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                    <span class="text-sm font-medium text-gray-700">Highlight</span>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Highlight</span>
                   </div>
                   <div class="grid grid-cols-8 gap-1.5">
                     <button v-for="c in highlightColors" :key="c" :title="c"
@@ -780,7 +795,7 @@
               <!-- Lists & Layout Section -->
               <div class="space-y-2">
                 <div
-                  class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  class="px-1 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
                   Lists & Layout</div>
                 <div class="grid grid-cols-2 gap-1">
                   <button
@@ -836,7 +851,7 @@
               <!-- Insert Elements Section -->
               <div class="space-y-2">
                 <div
-                  class="px-1 py-1 text-xs font-semibold text-gray-700 uppercase tracking-wide border-b border-gray-200 pb-2">
+                  class="px-1 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
                   Insert</div>
                 <div class="grid grid-cols-2 gap-1">
                   <button
