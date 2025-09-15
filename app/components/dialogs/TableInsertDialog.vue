@@ -54,7 +54,7 @@
               <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2">
                   <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <Grid class="w-4 h-4" />
+                    <Rows2 class="w-4 h-4" />
                     Rows
                   </label>
                   <Input v-model.number="customRows" type="number" min="1" max="50" class="text-center"
@@ -62,7 +62,7 @@
                 </div>
                 <div class="space-y-2">
                   <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <Grid class="w-4 h-4" />
+                    <Columns2 class="w-4 h-4 min-w-4 min-h-4" />
                     Columns
                   </label>
                   <Input v-model.number="customCols" type="number" min="1" max="20" class="text-center"
@@ -82,16 +82,18 @@
         </div>
       </div>
 
-      <DialogFooter class="w-full flex gap-2">
-        <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">
-          <X class="w-4 h-4 mr-2" />
-          Cancel
-        </Button>
-        <Button @click="insertCustomTable"
-          class="w-1/2 bg-green-600 hover:bg-green-700 text-white border-none dark:bg-green-500 dark:hover:bg-green-600 dark:text-white">
-          <Plus class="w-4 h-4 mr-2 text-white" />
-          Insert Table
-        </Button>
+      <DialogFooter class="w-full p-0">
+        <div class="flex w-full gap-2">
+          <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">
+            <X class="w-4 h-4 mr-2" />
+            Cancel
+          </Button>
+          <Button @click="insertCustomTable"
+            class="w-1/2 bg-green-600 hover:bg-green-700 text-white border-none dark:bg-green-500 dark:hover:bg-green-600 dark:text-white">
+            <Plus class="w-4 h-4 mr-2 text-white" />
+            Insert Table
+          </Button>
+        </div>
       </DialogFooter>
     </DialogContent>
   </Dialog>
@@ -116,7 +118,9 @@
     Eye,
     X,
     Plus,
-    Grid
+    Grid,
+    Rows2,
+    Columns2
   } from 'lucide-vue-next'
 
   const props = defineProps<{
