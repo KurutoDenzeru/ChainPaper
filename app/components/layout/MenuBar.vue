@@ -17,7 +17,7 @@
           <div v-if="!isEditingTitle" class="flex items-center gap-2 px-3 rounded">
             <!-- Visible document title (non-interactive) -->
             <span class="text-lg text-gray-900 dark:text-white font-medium -ml-2">{{ title || 'Untitled Markdown'
-            }}</span>
+              }}</span>
 
             <!-- Edit button: icon-only, clearly labeled for assistive tech -->
             <button type="button" @click="startEditingTitle" aria-label="Edit document title"
@@ -90,8 +90,8 @@
         </div>
       </div>
 
-      <!-- Theme selector (moved out of Menubar menus) -->
-      <div class="flex items-center self-center ml-3">
+      <!-- Theme selector (moved out of Menubar menus) - hide on narrow/mobile screens -->
+      <div v-if="!isNarrow" class="flex items-center self-center ml-3">
         <Popover>
           <PopoverTrigger as-child>
             <Button variant="outline"
