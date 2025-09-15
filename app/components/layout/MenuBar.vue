@@ -17,7 +17,7 @@
           <div v-if="!isEditingTitle" class="flex items-center gap-2 px-3 rounded">
             <!-- Visible document title (non-interactive) -->
             <span class="text-lg text-gray-900 dark:text-white font-medium -ml-2">{{ title || 'Untitled Markdown'
-              }}</span>
+            }}</span>
 
             <!-- Edit button: icon-only, clearly labeled for assistive tech -->
             <button type="button" @click="startEditingTitle" aria-label="Edit document title"
@@ -408,6 +408,13 @@
         { type: 'button', label: 'Preview Mode', emit: 'toggle-preview', icon: previewModeIcon.value },
         { type: 'separator' },
         {
+          type: 'sub', label: 'Theme', icon: Monitor, items: [
+            { type: 'item', label: 'System', emit: 'set-theme', payload: 'system', icon: Monitor },
+            { type: 'item', label: 'Light', emit: 'set-theme', payload: 'light', icon: Sun },
+            { type: 'item', label: 'Dark', emit: 'set-theme', payload: 'dark', icon: Moon }
+          ]
+        },
+        {
           type: 'sub', label: 'Zoom', icon: ZoomIn, items: [
             { type: 'item', label: 'Fit Page', emit: 'set-zoom', payload: 'fit' },
             { type: 'separator' },
@@ -464,6 +471,10 @@
     if (item.emit === 'toggle-toolbar') {
       showToolbar.value = !showToolbar.value
       emit('toggle-toolbar', showToolbar.value)
+      return
+    }
+    if (item.emit === 'set-theme' && item.payload !== undefined) {
+      try { setTheme(item.payload as any) } catch (e) { }
       return
     }
     if (item.emit === 'toggle-statusbar') {
@@ -652,7 +663,7 @@
         // delay slightly so the UI can finish mounting
         setTimeout(() => { showWelcomeDialog.value = true }, 120)
       }
-    } catch (e) {}
+    } catch (e) { }
   })
 
   onUnmounted(() => {
