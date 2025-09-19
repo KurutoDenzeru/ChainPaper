@@ -17,7 +17,7 @@
           <div v-if="!isEditingTitle" class="flex items-center gap-2 px-3 rounded">
             <!-- Visible document title (non-interactive) -->
             <span class="text-lg text-gray-900 dark:text-white font-medium -ml-2">{{ title || 'Untitled Markdown'
-            }}</span>
+              }}</span>
 
             <!-- Edit button: icon-only, clearly labeled for assistive tech -->
             <button type="button" @click="startEditingTitle" aria-label="Edit document title"
@@ -61,15 +61,15 @@
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Text Color</span>
                           </div>
                           <div class="grid grid-cols-8 gap-1.5 mt-2">
-                            <button v-for="c in textColors" :key="c" :title="c"
+                            <Button v-for="c in textColors" :key="c" :title="c"
                               class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer shadow-sm"
                               :style="{ backgroundColor: c }" @click="emitTextColor(c)">
-                            </button>
+                            </Button>
                           </div>
                           <div class="flex items-center gap-2 mt-2">
-                            <input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
+                            <Input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
                               @input="onMenuCustomTextColor" />
-                            <input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
+                            <Input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
                               placeholder="#rrggbb" @change="onMenuCustomTextColorText" />
                           </div>
                         </div>
@@ -89,9 +89,9 @@
                             </button>
                           </div>
                           <div class="flex items-center gap-2 mt-2">
-                            <input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
+                            <Input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
                               @input="onMenuCustomHighlight" />
-                            <input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
+                            <Input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
                               placeholder="#rrggbb" @change="onMenuCustomHighlightText" />
                           </div>
                         </div>
@@ -127,7 +127,6 @@
                       <span>{{ item.label }}</span>
                     </div>
                     <MenubarShortcut v-if="getShortcut(item)">
-                      <!-- ...existing shortcut code... -->
                     </MenubarShortcut>
                   </MenubarItem>
                 </template>
