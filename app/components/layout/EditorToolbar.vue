@@ -66,38 +66,45 @@
           <PopoverContent
             class="w-40 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
             <div class="flex flex-col">
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 @click="setHeading('p')">
                 <FileText class="w-4 h-4" />
                 Paragraph
               </button>
-              <div class="border-t my-1" />
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <div class="border-t my-1 border-gray-200 dark:border-gray-700" />
+              <button
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 @click="setHeading('h1')">
                 <Heading1 class="w-4 h-4" />
                 Heading 1
               </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 @click="setHeading('h2')">
                 <Heading2 class="w-4 h-4" />
                 Heading 2
               </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 @click="setHeading('h3')">
                 <Heading3 class="w-4 h-4" />
                 Heading 3
               </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 @click="setHeading('h4')">
                 <Heading4 class="w-4 h-4" />
                 Heading 4
               </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 @click="setHeading('h5')">
                 <Heading5 class="w-4 h-4" />
                 Heading 5
               </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 @click="setHeading('h6')">
                 <Heading6 class="w-4 h-4" />
                 Heading 6
@@ -342,18 +349,27 @@
               <ChevronDown class="w-3 h-3 text-gray-500" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent class="w-36 p-2">
+          <PopoverContent
+            class="w-36 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
             <div class="flex flex-col">
-              <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlign('left')">
+              <button
+                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                @click="setAlign('left')">
                 <AlignLeft class="w-4 h-4" />Left
               </button>
-              <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlign('center')">
+              <button
+                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                @click="setAlign('center')">
                 <AlignCenter class="w-4 h-4" />Center
               </button>
-              <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlign('right')">
+              <button
+                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                @click="setAlign('right')">
                 <AlignRight class="w-4 h-4" />Right
               </button>
-              <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100" @click="setAlign('justify')">
+              <button
+                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                @click="setAlign('justify')">
                 <AlignJustify class="w-4 h-4" />Justify
               </button>
             </div>
