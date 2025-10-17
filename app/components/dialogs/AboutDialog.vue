@@ -21,8 +21,8 @@
           <div class="space-y-3">
             <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">Project Description</h3>
             <p class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
-              ✍️ Secure markdown platform for authorship assurance, crafted with Nuxt, Tailwind, and Shadcn for instant
-              preview and modern usability.
+              ✍️ Secure markdown platform for authorship assurance, crafted with Nuxt, Pinia, Tailwind, and Shadcn,
+              featuring cryptographic verification using SHA-256.
             </p>
           </div>
 

@@ -4,7 +4,7 @@ import type { SeoConfig } from '../../types/seo'
 // Default SEO configuration for ChainPaper
 const DEFAULT_CONFIG = {
   title: 'ChainPaper - Trustless Whitepaper Collaboration',
-  description: '✍️ Secure markdown platform for authorship assurance, crafted with Nuxt, Tailwind, and Shadcn for instant preview and modern usability.',
+  description: '✍️ Secure markdown platform for authorship assurance, crafted with Nuxt, Pinia, Tailwind, and Shadcn, featuring cryptographic verification using SHA-256.',
   ogImage: '/OpenGraph.webp',
   ogUrl: 'https://chainpaper.nuxt.dev/',
   twitterCard: 'summary_large_image' as const,
