@@ -131,11 +131,6 @@
 
 <script setup lang="ts">
   import { ref, computed, onMounted } from 'vue'
-  import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-  import { Button } from '@/components/ui/button'
-  import { Input } from '@/components/ui/input'
-  import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
   import { Smile, Search, Plus } from 'lucide-vue-next'
   import STATIC_EMOJIS from '@/lib/static-emojis'
 

@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-3xl bg-white dark:bg-gray-900">
+    <DialogContent class="max-w-3xl! bg-white dark:bg-gray-900">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2 dark:text-gray-100">
           <Table class="w-5 h-5 text-green-600 dark:text-green-300" />
@@ -102,23 +102,11 @@
 <script setup lang="ts">
   import { ref, computed, watch } from 'vue'
   import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter
-  } from '@/components/ui/dialog'
-  import { Button } from '@/components/ui/button'
-  import { Input } from '@/components/ui/input'
-  import {
     Table,
     Grid3x3,
     Settings,
-    Eye,
     X,
     Plus,
-    Grid,
     Rows2,
     Columns2
   } from 'lucide-vue-next'

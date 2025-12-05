@@ -134,16 +134,6 @@
 
 <script setup lang="ts">
   import { BookOpen, ExternalLink } from 'lucide-vue-next'
-  import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-  } from '@/components/ui/dialog'
-  import { Button } from '@/components/ui/button'
-  import { ScrollArea } from '@/components/ui/scroll-area'
 
   const props = defineProps<{
     open: boolean

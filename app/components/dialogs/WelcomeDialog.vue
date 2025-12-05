@@ -61,8 +61,6 @@
 
 <script setup lang="ts">
   import { defineProps, defineEmits, ref, watch, nextTick } from 'vue'
-  import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-  import { Button } from '@/components/ui/button'
   import { FileText, BookOpen, Scroll, FlaskConical, Sparkles } from 'lucide-vue-next'
 
   const props = defineProps<{ open: boolean }>()

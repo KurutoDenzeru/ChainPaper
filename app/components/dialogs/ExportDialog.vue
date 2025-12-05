@@ -80,9 +80,6 @@
 
 <script setup lang="ts">
   import { ref, computed } from 'vue'
-  import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-  import { Button } from '@/components/ui/button'
-  // Checkbox and Label removed: proof inclusion is always-on when available
   import {
     Download,
     FileText,

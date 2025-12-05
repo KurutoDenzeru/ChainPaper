@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-5xl max-h-[90vh] overflow-y-auto">
+    <DialogContent class="max-w-5xl! max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <FileSignature class="w-5 h-5 text-indigo-600" />
@@ -143,23 +143,6 @@
 
 <script setup lang="ts">
   import { ref, computed } from 'vue'
-  import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle
-  } from '@/components/ui/dialog'
-  import { Button } from '@/components/ui/button'
-  import { Textarea } from '@/components/ui/textarea'
-  import { Label } from '@/components/ui/label'
-  import { Badge } from '@/components/ui/badge'
-  import {
-    HoverCard,
-    HoverCardContent,
-    HoverCardTrigger
-  } from '@/components/ui/hover-card'
   import {
     Key,
     Download,

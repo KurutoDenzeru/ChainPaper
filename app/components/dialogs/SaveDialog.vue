@@ -84,20 +84,8 @@
 
 <script setup lang="ts">
   import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-  import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle
-  } from '@/components/ui/dialog'
-  import { Button } from '@/components/ui/button'
-  import { Input } from '@/components/ui/input'
-  import { Checkbox } from '@/components/ui/checkbox'
-  import { Label } from '@/components/ui/label'
-  import { Save } from 'lucide-vue-next'
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
+  import { Save } from 'lucide-vue-next'
   import { toast } from 'vue-sonner'
 
   interface Props {

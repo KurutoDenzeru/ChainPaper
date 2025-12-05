@@ -3,7 +3,7 @@
     <div
       class="flex items-center justify-between px-4 sm:px-4 py-1 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 gap-1 sm:gap-2 overflow-x-auto shadow-sm text-gray-700 dark:text-gray-200">
       <!-- Always Visible Controls -->
-      <div class="flex gap-1 flex-shrink-0 items-center">
+      <div class="flex gap-1 shrink-0 items-center">
         <!-- Mode label + toggle (farthest left) -->
         <div class="flex items-center gap-2">
           <Tooltip>
@@ -524,8 +524,6 @@
           </TooltipContent>
         </Tooltip>
 
-        <!-- (mode toggle removed here; labeled control exists at far left) -->
-
         <!-- Collapse/Expand Menubar Button (at the end) -->
         <div class="ml-auto flex items-center">
           <Tooltip>
@@ -649,7 +647,7 @@
       </div>
 
       <!-- More Options Dropdown (Only on medium and small screens) -->
-      <div class="flex lg:hidden gap-1 flex-shrink-0 items-center">
+      <div class="flex lg:hidden gap-1 shrink-0 items-center">
         <Popover>
           <PopoverTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 w-8 p-0" aria-label="More options">
@@ -938,13 +936,6 @@
 
 <script setup lang="ts">
   import { ref, computed, watch } from 'vue'
-  import { Button } from '@/components/ui/button'
-  import { Input } from '@/components/ui/input'
-  import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
-  import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-  import TableInsertDialog from '~/components/dialogs/TableInsertDialog.vue'
-  import EmojiInsertDialog from '~/components/dialogs/EmojiInsertDialog.vue'
   import { Bold, Italic, Underline, Strikethrough, Type, Highlighter, Undo2, Redo2, List, ListOrdered, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link, Image as ImageIcon, Code2, Table, Minus, Plus, MoreHorizontal, BookOpen, Edit, Heading, ChevronDown, ChevronUp, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6, FileText, Quote, Indent, Outdent, Superscript, Subscript, Sigma, SquareSigma, Smile, FileText as FootnoteIcon, Check } from 'lucide-vue-next'
   // Menubar collapse state (persisted in localStorage)
   const menubarCollapsed = ref(false)

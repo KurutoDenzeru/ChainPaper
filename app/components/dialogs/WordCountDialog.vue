@@ -149,15 +149,6 @@
 <script setup lang="ts">
   import { computed } from 'vue'
   import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle
-  } from '@/components/ui/dialog'
-  import { Button } from '@/components/ui/button'
-  import {
     Hash,
     FileText,
     Heading,
@@ -170,7 +161,6 @@
     Heading5,
     Heading6
   } from 'lucide-vue-next'
-  import { ScrollArea } from '@/components/ui/scroll-area'
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
   interface Props {

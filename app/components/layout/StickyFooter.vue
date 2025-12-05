@@ -124,14 +124,9 @@
 </template>
 
 <script setup lang="ts">
-  import WordCountDialog from '~/components/dialogs/WordCountDialog.vue'
   const showWordCountDialog = ref(false)
   import { ref, computed, watch } from 'vue'
   import { Minus, Plus, BookOpen, Edit } from 'lucide-vue-next'
-  import { Button } from '@/components/ui/button'
-  import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
-  import { Input } from '@/components/ui/input'
-  import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 
   // props for markdown editor specific data
   const props = defineProps<{

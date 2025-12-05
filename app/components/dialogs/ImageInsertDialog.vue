@@ -50,8 +50,6 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
-  import { Button } from '@/components/ui/button'
   import { Image as ImageIcon, UploadCloud, MoveHorizontal } from 'lucide-vue-next'
 
   const props = defineProps<{ open: boolean }>()
@@ -61,7 +59,6 @@
   const preview = ref<string | null>(null)
   const fileName = ref<string>('')
   const fileBlob = ref<Blob | null>(null)
-  const uploading = ref(false)
   const isDragging = ref(false)
   const isHover = ref(false)
 

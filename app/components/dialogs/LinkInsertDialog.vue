@@ -64,12 +64,8 @@
 
 <script setup lang="ts">
   import { ref, computed, watch, nextTick, onMounted } from 'vue'
-  import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-  import { Button } from '@/components/ui/button'
   import { Link as LinkIcon, Link2, Globe, Type as TypeIcon } from 'lucide-vue-next'
-  import { Input } from '@/components/ui/input'
-  import { Label } from '@/components/ui/label'
-  import { normalizeUrl, createLinkHtml, insertLink, type LinkInsertOptions } from '@/lib/editor-formatting'
+  import { normalizeUrl, createLinkHtml, type LinkInsertOptions } from '@/lib/editor-formatting'
 
   interface Props {
     open?: boolean
