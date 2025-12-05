@@ -29,6 +29,15 @@ export default defineNuxtConfig({
     disablePrefetchLinks: true
   },
 
+  components: {
+    dirs: [
+      '~/components',
+      '~/components/ui',
+      '~/components/dialogs',
+      '~/components/layouts',
+    ]
+  },
+
   app: {
     head: {
       title: 'ChainPaper - Trustless Whitepaper Collaboration',
