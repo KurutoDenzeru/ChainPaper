@@ -1,4 +1,6 @@
 import { useHead, useSeoMeta } from '#app'
+import { computed } from 'vue'
+import { useMarkdownDocStore } from '@/stores/markdownDoc'
 import type { SeoConfig } from '../../types/seo'
 
 // Default SEO configuration for ChainPaper
@@ -17,24 +19,46 @@ const DEFAULT_CONFIG = {
 
 export const useSeo = (config: SeoConfig = {}) => {
   const {
-    title = DEFAULT_CONFIG.title,
+    title: providedTitle,
     description = DEFAULT_CONFIG.description,
-    ogTitle = title,
+    ogTitle: providedOgTitle,
     ogDescription = description,
     ogImage = DEFAULT_CONFIG.ogImage,
     ogUrl = DEFAULT_CONFIG.ogUrl,
-    twitterTitle = title,
+    twitterTitle: providedTwitterTitle,
     twitterDescription = description,
     twitterImage = ogImage,
     twitterCard = DEFAULT_CONFIG.twitterCard,
     canonical = ogUrl
   } = config
 
+  // Get current document title from the store and form a computed SEO title
+  const docStore = useMarkdownDocStore()
+  const docTitle = computed(() => docStore.title)
+  const computedTitle = computed(() => {
+    // Respect an explicit `title` in config if provided
+    if (providedTitle && providedTitle.trim() && providedTitle !== 'Untitled Markdown') return providedTitle
+
+    // Use the document title if it isn't the default "Untitled Markdown"
+    if (docTitle.value && docTitle.value.trim() && docTitle.value !== 'Untitled Markdown') {
+      // Use short format: "<filename> — ChainPaper"
+      return `${docTitle.value.trim()} — ${DEFAULT_CONFIG.siteName}`
+    }
+
+    // Fallback to the default site title
+    return DEFAULT_CONFIG.title
+  })
+
+  // Backwards compatible intent: OG/Twitter titles default to computedTitle unless explicitly provided
+  const computedOgTitle = computed(() => providedOgTitle ?? computedTitle.value)
+  const computedTwitterTitle = computed(() => providedTwitterTitle ?? computedTitle.value)
+
   // Set up SEO meta tags using useSeoMeta
   useSeoMeta({
-    title,
+    // `useSeoMeta` accepts refs/computed values, so wire `computedTitle` directly to keep it reactive
+    title: computedTitle,
     description,
-    ogTitle,
+    ogTitle: computed(() => providedOgTitle ?? computedTitle.value),
     ogDescription,
     ogImage,
     ogUrl,
@@ -42,7 +66,7 @@ export const useSeo = (config: SeoConfig = {}) => {
     ogSiteName: DEFAULT_CONFIG.siteName,
     ogLocale: 'en_US',
     twitterCard,
-    twitterTitle,
+    twitterTitle: computedTwitterTitle,
     twitterDescription,
     twitterImage,
     twitterSite: DEFAULT_CONFIG.twitterSite,
@@ -54,7 +78,7 @@ export const useSeo = (config: SeoConfig = {}) => {
 
   // Set up head configuration using useHead
   useHead({
-    title,
+    title: computedTitle,
     htmlAttrs: {
       lang: 'en',
       dir: 'ltr'
@@ -115,13 +139,13 @@ export const useSeo = (config: SeoConfig = {}) => {
   })
 
   return {
-    title,
+    title: computedTitle,
     description,
-    ogTitle,
+    ogTitle: computedOgTitle,
     ogDescription,
     ogImage,
     ogUrl,
-    twitterTitle,
+    twitterTitle: computedTwitterTitle,
     twitterDescription,
     twitterImage,
     twitterCard,
