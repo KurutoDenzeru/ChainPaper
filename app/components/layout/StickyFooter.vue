@@ -23,11 +23,12 @@
               </TooltipContent>
             </Tooltip>
 
-            <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1 hidden sm:block"></div>
+            <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
             <Tooltip>
               <TooltipTrigger as-child>
-                <div class="flex items-center gap-2 cursor-pointer" @click="showWordCountDialog = true">
+                <div class="flex items-center gap-2 cursor-pointer" @click="showWordCountDialog = true" aria-label="Open document statistics">
+                  <FileText class="w-4 h-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
                   <span class="text-xs font-medium hidden sm:inline">Words</span>
                   <span class="font-medium">{{ wordCount || 0 }}</span>
                 </div>
@@ -37,12 +38,13 @@
               </TooltipContent>
             </Tooltip>
 
-            <div class="hidden sm:flex items-center gap-2 text-gray-500">•</div>
+            <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1 hidden sm:block"></div>
 
             <Tooltip>
               <TooltipTrigger as-child>
-                <div class="hidden sm:flex items-center gap-2 cursor-pointer" @click="showWordCountDialog = true">
-                  <span class="text-xs font-medium">Characters</span>
+                <div class="flex items-center gap-2 cursor-pointer" @click="showWordCountDialog = true">
+                  <Hash class="w-4 h-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
+                  <span class="text-xs font-medium hidden sm:inline">Characters</span>
                   <span class="font-medium">{{ characterCount || 0 }}</span>
                 </div>
               </TooltipTrigger>
@@ -54,6 +56,8 @@
             <WordCountDialog :open="showWordCountDialog"
               :stats="{ words: wordCount, characters: characterCount }" @update:open="v => showWordCountDialog = v" />
           </div>
+
+          <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2"></div>
 
           <!-- Zoom group -->
           <div class="flex items-center gap-2">
@@ -117,7 +121,7 @@
 <script setup lang="ts">
   const showWordCountDialog = ref(false)
   import { ref, computed, watch } from 'vue'
-  import { Minus, Plus, BookOpen, Edit } from 'lucide-vue-next'
+  import { Minus, Plus, BookOpen, Edit, FileText, Hash } from 'lucide-vue-next'
 
   // props for markdown editor specific data
   const props = defineProps<{
