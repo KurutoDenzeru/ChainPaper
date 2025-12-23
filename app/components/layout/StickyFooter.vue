@@ -1,70 +1,62 @@
 <template>
-  <div class="fixed inset-x-0 bottom-1 z-50 pointer-events-none">
-    <div class="w-full mx-auto pointer-events-auto px-4">
+  <div class="fixed bottom-4 z-50 inset-x-0 pointer-events-none">
+    <div class="mx-auto pointer-events-auto px-4 flex justify-center">
       <TooltipProvider>
         <div
-          class="flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm h-12 px-4 md:h-10 text-gray-700 dark:text-gray-200">
-          <!-- Left: Mode toggle + Word Count / Character Count -->
-          <div class="flex items-center gap-4 text-xs text-gray-600 dark:text-gray-300">
-            <!-- Mode label + toggle (far left) -->
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-medium text-gray-800 dark:text-gray-100">Mode:</span>
-              <Tooltip>
-                <TooltipTrigger as-child>
-                  <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="toggleMode"
-                    :aria-label="mode === 'source' ? 'Switch to reader view' : 'Switch to source view'"
-                    :aria-pressed="mode === 'source'"
-                    title="{{ mode === 'source' ? 'Switch to Reader View' : 'Switch to Source View' }}">
-                    <BookOpen v-if="mode === 'source'" class="w-4 h-4" aria-hidden="true" />
-                    <Edit v-else class="w-4 h-4" aria-hidden="true" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{{ mode === 'source' ? 'Switch to Reader View' : 'Switch to Source View' }}</p>
-                </TooltipContent>
-              </Tooltip>
-              <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
-            </div>
+          class="dock flex items-center gap-3 max-w-[90vw] md:max-w-lg bg-white/90 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-full shadow-lg h-12 px-3 sm:px-4 text-gray-700 dark:text-gray-200 backdrop-blur-sm"
+          role="toolbar" aria-label="Editor dock">
+          <!-- Left group: Mode toggle + counts -->
+          <div class="flex items-center gap-3">
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <Button variant="ghost" size="sm" class="h-8 w-8 p-0"
+                  @click="toggleMode"
+                  :aria-label="mode === 'source' ? 'Switch to reader view' : 'Switch to source view'"
+                  :aria-pressed="mode === 'source'"
+                  :title="mode === 'source' ? 'Switch to Reader View' : 'Switch to Source View'">
+                  <BookOpen v-if="mode === 'source'" class="w-4 h-4" aria-hidden="true" />
+                  <Edit v-else class="w-4 h-4" aria-hidden="true" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{{ mode === 'source' ? 'Switch to Reader View' : 'Switch to Source View' }}</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1 hidden sm:block"></div>
 
             <Tooltip>
               <TooltipTrigger as-child>
-                <div class="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer"
-                  @click="showWordCountDialog = true">
-                  <span class="font-medium">Words</span>
-                  <span class="text-gray-800 dark:text-gray-100">{{ wordCount || 0 }}</span>
+                <div class="flex items-center gap-2 cursor-pointer" @click="showWordCountDialog = true">
+                  <span class="text-xs font-medium hidden sm:inline">Words</span>
+                  <span class="font-medium">{{ wordCount || 0 }}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Click to view detailed word count statistics</p>
               </TooltipContent>
             </Tooltip>
-            <WordCountDialog :open="showWordCountDialog"
-              :stats="{ words: wordCount, characters: characterCount }" @update:open="v => showWordCountDialog = v" />
-            <div class="hidden sm:flex items-center gap-2 text-gray-500 dark:text-gray-400">•</div>
+
+            <div class="hidden sm:flex items-center gap-2 text-gray-500">•</div>
+
             <Tooltip>
               <TooltipTrigger as-child>
-                <div class="hidden sm:flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2 cursor-pointer"
-                  @click="showWordCountDialog = true">
-                  <span class="font-medium">Characters</span>
-                  <span class="text-gray-800 dark:text-gray-100">{{ characterCount || 0 }}</span>
+                <div class="hidden sm:flex items-center gap-2 cursor-pointer" @click="showWordCountDialog = true">
+                  <span class="text-xs font-medium">Characters</span>
+                  <span class="font-medium">{{ characterCount || 0 }}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Click to view detailed character count statistics</p>
               </TooltipContent>
             </Tooltip>
-            <div class="hidden md:flex items-center gap-2">•</div>
-            <!-- duplicate mode display removed; use far-left control -->
+
+            <WordCountDialog :open="showWordCountDialog"
+              :stats="{ words: wordCount, characters: characterCount }" @update:open="v => showWordCountDialog = v" />
           </div>
 
-          <!-- Middle: spacer -->
-          <div class="flex-1"></div>
-
-          <!-- Right: Mode toggle and Zoom controls -->
+          <!-- Zoom group -->
           <div class="flex items-center gap-2">
-            <!-- right-side duplicate mode toggles removed; use far-left control -->
-
-            <!-- Zoom controls -->
             <Tooltip>
               <TooltipTrigger as-child>
                 <Button type="button" @click="changeZoom(-25)"
@@ -83,8 +75,7 @@
                 <button type="button" aria-haspopup="dialog" :aria-expanded="false"
                   class="w-16 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   tabindex="0">
-                  <!-- Provide accessible name and spinbutton semantics for screen readers -->
-                  <Input type="number" class="w-16 text-center text-sm rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-gray-800 dark:text-gray-100"
+                  <Input type="number" class="w-14 text-center text-sm rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-gray-800 dark:text-gray-100"
                     v-model="zoomModel" min="50" max="200" placeholder="100" aria-label="Zoom percentage"
                     role="spinbutton" aria-valuemin="50" aria-valuemax="200"
                     :aria-valuenow="isFit ? 100 : zoomPercent" />
@@ -196,9 +187,16 @@
 </script>
 
 <style scoped>
+  /* Keep dock visually small and constrained */
+  .dock {
+    max-width: min(90vw, 28rem);
+  }
 
-  /* keep footer visually small on mobile */
-  .max-w-4xl {
-    max-width: 64rem;
+  @media (max-width: 640px) {
+    .dock {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      height: 44px;
+    }
   }
 </style>
