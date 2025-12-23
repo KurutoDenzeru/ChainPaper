@@ -34,7 +34,7 @@ export default defineNuxtConfig({
       '~/components',
       '~/components/ui',
       '~/components/dialogs',
-      '~/components/layouts',
+      '~/components/layout',
     ]
   },
 
