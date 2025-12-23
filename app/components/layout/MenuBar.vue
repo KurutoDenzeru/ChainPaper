@@ -216,19 +216,7 @@
   } from 'lucide-vue-next'
   // Theme icons
   import { Sun, Moon, Monitor } from 'lucide-vue-next'
-  import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from '@/components/ui/menubar'
   import { Input } from '@/components/ui/input'
-  import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
-  // Lazy-load dialog components to reduce initial bundle and improve LCP
-  const TableInsertDialog = defineAsyncComponent(() => import('~/components/dialogs/TableInsertDialog.vue'))
-  const EmojiInsertDialog = defineAsyncComponent(() => import('~/components/dialogs/EmojiInsertDialog.vue'))
-  const WordCountDialog = defineAsyncComponent(() => import('../dialogs/WordCountDialog.vue'))
-  const AuthProofDialog = defineAsyncComponent(() => import('../dialogs/AuthProofDialog.vue'))
-  const ExportDialog = defineAsyncComponent(() => import('../dialogs/ExportDialog.vue'))
-  const SaveDialog = defineAsyncComponent(() => import('../dialogs/SaveDialog.vue'))
-  const AboutDialog = defineAsyncComponent(() => import('../dialogs/AboutDialog.vue'))
-  const GuideDialog = defineAsyncComponent(() => import('../dialogs/GuideDialog.vue'))
-  const WelcomeDialog = defineAsyncComponent(() => import('../dialogs/WelcomeDialog.vue'))
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
   const store = useMarkdownDocStore()
