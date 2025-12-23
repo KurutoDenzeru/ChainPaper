@@ -41,8 +41,8 @@
                 <div class="hidden sm:flex items-center gap-2 cursor-pointer" @click="showWordCountDialog = true"
                   role="button" aria-label="Open document statistics">
                   <FileText class="w-4 h-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
-                  <span class="text-xs font-medium">Words</span>
-                  <span class="font-medium">{{ wordCount || 0 }}</span>
+                  <span class="text-sm font-medium">Words</span>
+                  <span class="text-sm font-medium">{{ wordCount || 0 }}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -56,8 +56,8 @@
               <TooltipTrigger as-child>
                 <div class="hidden sm:flex items-center gap-2 cursor-pointer" @click="showWordCountDialog = true">
                   <Hash class="w-4 h-4 text-gray-600 dark:text-gray-300" aria-hidden="true" />
-                  <span class="text-xs font-medium">Characters</span>
-                  <span class="font-medium">{{ characterCount || 0 }}</span>
+                  <span class="text-sm font-medium">Characters</span>
+                  <span class="text-sm font-medium">{{ characterCount || 0 }}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -78,7 +78,7 @@
                 <Button type="button" @click="changeZoom(-25)"
                   class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600"
                   aria-label="Zoom out">
-                  <Minus class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                  <ZoomOut class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -121,7 +121,7 @@
                 <Button type="button" @click="changeZoom(25)"
                   class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600"
                   aria-label="Zoom in">
-                  <Plus class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                  <ZoomIn class="w-4 h-4 text-gray-600 dark:text-gray-300" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -138,7 +138,7 @@
 <script setup lang="ts">
 const showWordCountDialog = ref(false)
 import { ref, computed, watch } from 'vue'
-import { Minus, Plus, BookOpen, Edit, FileText, Hash } from 'lucide-vue-next'
+import { ZoomOut, ZoomIn, BookOpen, Edit, FileText, Hash } from 'lucide-vue-next'
 
 // props for markdown editor specific data
 const props = defineProps<{
