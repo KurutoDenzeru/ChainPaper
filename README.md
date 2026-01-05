@@ -2,7 +2,7 @@
 
 # ChainPaper - Trustless Whitepaper
 
-✍️ Secure markdown platform for authorship assurance, built with Nuxt, Vue, TypeScript, Shadcn/ui, Tailwind, KaTeX, and Markdown-it, featuring cryptographic SHA-256 verification.
+✍️ Secure markdown platform for authorship assurance, built with Nuxt, Vue, TypeScript, shadcn/ui, Tailwind, KaTeX, and Markdown-it, featuring cryptographic SHA-256 verification.
 
 ## ☁️ Deploy your own
 
