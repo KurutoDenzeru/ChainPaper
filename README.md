@@ -2,9 +2,11 @@
 
 # ChainPaper - Trustless Whitepaper
 
-✍️ Secure markdown platform for authorship assurance, crafted with Nuxt, Pinia, Tailwind, and Shadcn, featuring cryptographic verification using SHA-256.
+✍️ Secure markdown platform for authorship assurance, built with Nuxt, Vue, TypeScript, Shadcn/ui, Tailwind, KaTeX, and Markdown-it, featuring cryptographic SHA-256 verification.
 
----
+## ☁️ Deploy your own
+
+[![Deploy with Vercel](_deploy_vercel.svg)](https://vercel.com/new/clone?repository-url=https://github.com/KurutoDenzeru/ChainPaper)  [![Deploy with Netlify](_deploy_netlify.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/KurutoDenzeru/ChainPaper)
 
 ## ✨ Features
 
@@ -16,9 +18,7 @@
 - **Export Options:** Generate documents with proper formatting and verification metadata.
 - **Open Source:** Free to use and contribute to, built with modern web technologies.
 
----
-
-## 🛠️ Tech Stack
+## 🧱 Tech Stack
 
 - [Nuxt.js](https://nuxt.com/): Vue framework for building performant full-stack applications.
 - [Vue 3](https://vuejs.org/): Progressive JavaScript framework with Composition API.
@@ -28,77 +28,62 @@
 - [KaTeX](https://katex.org/): Fast math typesetting for rendering mathematical expressions.
 - [Markdown-it](https://github.com/markdown-it/markdown-it): Flexible markdown parser with plugins.
 
----
+## ⚡ Getting Started
 
-## 🚀 Deploy your own
-
-[![Deploy with Vercel](_deploy_vercel.svg)](https://vercel.com/new/clone?repository-url=https://github.com/KurutoDenzeru/chainpaper)  [![Deploy with Netlify](_deploy_netlify.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/KurutoDenzeru/chainpaper)
-
----
-
-## 🚀 Getting Started
-
-### 1. Clone the repository
+Clone the repo, install deps, and boot the dev server:
 
 ```bash
 git clone https://github.com/KurutoDenzeru/ChainPaper.git
 cd ChainPaper
-```
-
-### 2. Install dependencies
-
-```bash
-# With npm
-yarn install
-# or
-npm install
-# or
 bun install
-```
-
-### 3. Run the development server
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
 bun run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the app.
 
----
-
 ## 📦 Build for Production
 
 ```bash
-npm run build
-npm start
+bun run build
+bun start
 ```
 
----
+## 🗂️ Configuration
 
-## ⚙️ Configuration
+The editor is componentized under `app/components`. Key areas to customize are:
 
-The main editor configuration lives in the /layouts folder under app/components. Key layout files:
+```text
+app/
+	components/
+		layout/
+			EditorToolbar.vue  # Main editing toolbar
+			MenuBar.vue        # Menu bar with formatting/insert options
+			StickyFooter.vue   # Dock/status bar and controls
+		dialogs/               # Dialog components (About, Export, etc)
+	composables/               # Reusable logic (useDocument, useSeo, ...)
+	lib/                       # Utility and formatting helpers
+	pages/
+		index.vue              # App entry page, composes layouts and editor
+	stores/                    # Pinia stores (editorMode, markdownDoc)
+public/
+	OpenGraph.webp             # Social preview image
+	robots.txt                 # Crawler rules
+server/
+	api/
+		upload.post.ts         # File upload API route
+types/                         # TypeScript type declarations
+```
 
-- `/layouts/EditorToolbar.vue` — Main editing toolbar with formatting options. ([app/components/layout/EditorToolbar.vue](app/components/layout/EditorToolbar.vue))
-- `/layouts/MenuBar.vue` — Menu bar with advanced formatting and insert options. ([app/components/layout/MenuBar.vue](app/components/layout/MenuBar.vue))
-- `/layouts/StickyFooter.vue` — Sticky footer / status bar and related controls. ([app/components/layout/StickyFooter.vue](app/components/layout/StickyFooter.vue))
+## 🤝🏻 Contributing
 
-The primary page that composes these layouts is:
+Contributions are always welcome, whether you’re fixing bugs, improving docs, or shipping new features that make the project better for everyone.
 
-- `/pages/index.vue` — App entry page that integrates the layouts and editor UI. ([app/pages/index.vue](app/pages/index.vue))
-
-## Contributing
-
-Contributions are always welcome!
-
-See `Contributing.md` for ways to get started.
+Check out [Contributing.md](Contributing) to learn how to get started and follow the recommended workflow.
 
 <!-- Please adhere to this project's `Code of Conduct`. -->
 
-## 📄 License
+## ⚖️ License
 
-[MIT](LICENSE)
+This project is released under the MIT License, giving you the freedom to use, modify, and distribute the code with minimal restrictions.
+
+For the full legal text, see the [MIT](LICENSE) file.
