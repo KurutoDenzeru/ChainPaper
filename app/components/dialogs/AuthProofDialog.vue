@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="max-w-5xl! max-h-[90vh] overflow-y-auto">
+    <DialogContent class="sm:max-w-5xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <FileSignature class="w-5 h-5 text-indigo-600" />
@@ -44,7 +44,7 @@
         </div>
 
         <!-- Key Management -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div>
             <div class="flex items-center justify-between mb-2">
               <Label>Public Key (SPKI, base64)</Label>
@@ -112,7 +112,7 @@
         </div>
 
         <!-- Results -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" v-if="exported || currentProof">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2" v-if="exported || currentProof">
           <div v-if="exported">
             <Label class="mb-2 block">Exported Markdown JSON</Label>
             <Textarea :model-value="exported" readonly

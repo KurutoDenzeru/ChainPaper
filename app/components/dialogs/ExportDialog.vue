@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="props.open" @update:open="onUpdateOpen">
-    <DialogContent class="max-w-2xl">
+    <DialogContent class="sm:max-w-2xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Download class="w-5 h-5 text-green-600" />
@@ -14,7 +14,7 @@
 
       <div class="space-y-6">
         <!-- Export Options -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
           <Button variant="outline" :class="[
             'h-24 flex flex-col items-center gap-2 p-4 transition-all',
             exportFormat === 'markdown'
@@ -24,7 +24,7 @@
             <FileText class="w-8 h-8 text-blue-600 dark:text-blue-300" />
             <div class="text-center">
               <div class="font-medium dark:text-gray-100">Markdown</div>
-              <div class="text-xs text-gray-600 dark:text-gray-300">.md file</div>
+              <div class="text-xs text-muted-foreground">.md file</div>
             </div>
           </Button>
 
@@ -37,7 +37,7 @@
             <Globe class="w-8 h-8 text-orange-600 dark:text-orange-300" />
             <div class="text-center">
               <div class="font-medium dark:text-gray-100">HTML</div>
-              <div class="text-xs text-gray-600 dark:text-gray-300">.html file</div>
+              <div class="text-xs text-muted-foreground">.html file</div>
             </div>
           </Button>
 
@@ -50,7 +50,7 @@
             <FileDown class="w-8 h-8 text-purple-600 dark:text-purple-300" />
             <div class="text-center">
               <div class="font-medium dark:text-gray-100">JSON</div>
-              <div class="text-xs text-gray-600 dark:text-gray-300">.json file</div>
+              <div class="text-xs text-muted-foreground">.json file</div>
             </div>
           </Button>
         </div>
@@ -62,7 +62,7 @@
         </div>
       </div>
 
-      <DialogFooter class="w-full">
+      <DialogFooter>
         <div class="flex w-full gap-3">
           <Button variant="outline" @click="close" class="flex-1">
             Cancel
@@ -152,22 +152,22 @@
 
   function wrapInHTMLDocument(content: string): string {
     return `<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${store.title}</title>
-        <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; }
-            h1, h2, h3 { color: #333; }
-            code { background: var(--muted, #f4f4f4); color: var(--muted-foreground, #111827); padding: 0.2em 0.4em; border-radius: 3px; }
-            a { color: #0066cc; }
-        </style>
-    </head>
-    <body>
-        ${content}
-    </body>
-    </html>`
+ <html lang="en">
+ <head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>${store.title}</title>
+ <style>
+ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; line-height: 1.6; }
+ h1, h2, h3 { color: #333; }
+ code { background: var(--muted, #f4f4f4); color: var(--muted-foreground, #111827); padding: 0.2em 0.4em; border-radius: 3px; }
+ a { color: #0066cc; }
+ </style>
+ </head>
+ <body>
+ ${content}
+ </body>
+ </html>`
   }
 
   async function performExport() {
@@ -184,9 +184,9 @@
         case 'markdown':
           // Always include metadata
           const metadata = `---
-          title: ${store.title}
-          date: ${new Date().toISOString()}
-          ---
+ title: ${store.title}
+ date: ${new Date().toISOString()}
+ ---
 
 `
           content = metadata + store.content
@@ -198,7 +198,7 @@
               const proofObj = JSON.parse(stored)
               content = content + `\n\n<!-- Cryptographic Proof: ${JSON.stringify(proofObj)} -->\n`
             } else {
-              content = content + `\n\n<!-- No cryptographic proof available. Generate one via Tools > Verify Authorship -->\n`
+              content = content + `\n\n<!-- No cryptographic proof available. Generate one via Tools> Verify Authorship -->\n`
             }
           } catch (_e) {
             // ignore
@@ -241,7 +241,7 @@
               const proofObj = JSON.parse(stored)
                 ; (obj as any).proof = proofObj
             } else {
-              ; (obj as any).proofNote = 'No cryptographic proof available. Generate one via Tools > Verify Authorship'
+              ; (obj as any).proofNote = 'No cryptographic proof available. Generate one via Tools> Verify Authorship'
             }
           } catch (_e) {
             // ignore

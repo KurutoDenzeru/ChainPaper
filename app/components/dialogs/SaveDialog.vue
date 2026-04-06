@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="max-w-2xl">
+    <DialogContent class="sm:max-w-2xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Save class="w-5 h-5 text-green-600" />
@@ -13,42 +13,42 @@
 
       <div class="space-y-6">
         <!-- Save Settings (only auto-save toggle) -->
-        <div class="space-y-4">
-          <h4 class="font-semibold text-gray-900 dark:text-gray-100">Save Options</h4>
+        <div class="space-y-2">
+          <h4 class="font-semibold text-foreground-100">Save Options</h4>
           <div class="space-y-3">
             <div class="flex items-center space-x-2">
               <Checkbox id="auto-save" v-model:checked="autoSave" />
-              <Label for="auto-save" class="text-gray-700 dark:text-gray-200">Enable auto-save every 30 seconds</Label>
+              <Label for="auto-save" class="text-foreground">Enable auto-save every 30 seconds</Label>
             </div>
           </div>
         </div>
 
         <!-- File Name Input (two-way bound to document title) -->
         <div class="space-y-2">
-          <Label for="filename" class="text-gray-700 dark:text-gray-200">File Name</Label>
+          <Label for="filename" class="text-foreground">File Name</Label>
           <Input id="filename" v-model="store.title"
-            class="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700"
+            class="w-full bg-card dark:bg-card text-foreground-100 border border-border/60 dark:border-border/60"
             placeholder="Enter file name..." />
         </div>
 
         <!-- Document Info -->
-        <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg space-y-2">
-          <h4 class="font-semibold text-gray-900 dark:text-gray-100">Document Information</h4>
-          <div class="grid grid-cols-2 gap-4 text-sm">
+        <div class="bg-background p-4 rounded-md space-y-2">
+          <h4 class="font-semibold text-foreground-100">Document Information</h4>
+          <div class="grid grid-cols-2 gap-2 text-sm">
             <div>
-              <span class="text-gray-600 dark:text-gray-300">Title:</span>
+              <span class="text-muted-foreground">Title:</span>
               <span class="ml-2 font-medium dark:text-gray-100">{{ store.title || 'Untitled' }}</span>
             </div>
             <div>
-              <span class="text-gray-600 dark:text-gray-300">Word Count:</span>
+              <span class="text-muted-foreground">Word Count:</span>
               <span class="ml-2 font-medium dark:text-gray-100">{{ wordCount }}</span>
             </div>
             <div>
-              <span class="text-gray-600 dark:text-gray-300">Characters:</span>
+              <span class="text-muted-foreground">Characters:</span>
               <span class="ml-2 font-medium dark:text-gray-100">{{ characterCount }}</span>
             </div>
             <div>
-              <span class="text-gray-600 dark:text-gray-300">Last Modified:</span>
+              <span class="text-muted-foreground">Last Modified:</span>
               <span class="ml-2 font-medium dark:text-gray-100">{{ lastModified }}</span>
             </div>
           </div>
@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <DialogFooter class="w-full">
+      <DialogFooter>
         <div class="flex w-full gap-3">
           <Button variant="outline" @click="$emit('update:open', false)" class="flex-1">
             Cancel

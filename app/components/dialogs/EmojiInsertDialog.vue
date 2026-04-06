@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-2xl sm:!max-w-2xl !max-w-full p-2 sm:p-6">
+    <DialogContent class="sm:max-w-2xl sm:max-w-full">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Smile class="h-5 w-5 text-green-600" /> Insert Emoji
@@ -13,7 +13,7 @@
           <Search
             class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
           <Input v-model="searchQuery" placeholder="Search emojis..."
-            class="pl-10 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 text-base sm:text-base" />
+            class="pl-10 bg-card dark:bg-card text-foreground-100 border border-border/60 dark:border-border/60 rounded focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 text-base sm:text-base" />
         </div>
 
         <TooltipProvider>
@@ -33,7 +33,7 @@
                 </TooltipTrigger>
                 <TooltipContent class="whitespace-nowrap" :portal="true">{{ e.name }} <span
                     class="text-muted-foreground ml-1">{{
-                      e.shortcode }}</span></TooltipContent>
+                    e.shortcode }}</span></TooltipContent>
               </Tooltip>
             </div>
             <div v-else class="text-center text-gray-500 py-8">No emojis found</div>
@@ -42,11 +42,11 @@
           <div v-else>
             <Tabs v-model="activeTab" class="w-full">
               <TabsList
-                class="flex w-full items-center gap-2 overflow-x-auto py-1 no-scrollbar bg-gray-50 dark:bg-gray-800 rounded-md p-1">
+                class="flex w-full items-center gap-2 overflow-x-auto py-1 no-scrollbar bg-muted/50 dark:bg-muted/50 rounded-md p-1">
                 <Tooltip>
                   <TooltipTrigger as-child>
                     <TabsTrigger value="recent"
-                      class="text-lg px-2 py-1 rounded hover:bg-green-50 dark:hover:bg-gray-700 data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:ring-2 data-[state=active]:ring-green-600 data-[state=active]:shadow-sm dark:data-[state=active]:bg-green-500 dark:data-[state=active]:ring-green-500">
+                      class="text-lg px-2 py-1 rounded hover:bg-green-50 dark:hover:bg-gray-700 data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:ring-2 data-[state=active]:ring-green-600 data-[state=active]:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] dark:data-[state=active]:bg-green-500 dark:data-[state=active]:ring-green-500">
                       🕒</TabsTrigger>
                   </TooltipTrigger>
                   <TooltipContent>Recent</TooltipContent>
@@ -55,7 +55,7 @@
                 <Tooltip v-for="cat in categoriesOrdered" :key="cat">
                   <TooltipTrigger as-child>
                     <TabsTrigger :value="cat"
-                      class="text-lg px-2 py-1 rounded hover:bg-green-50 dark:hover:bg-gray-700 data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:ring-2 data-[state=active]:ring-green-600 data-[state=active]:shadow-sm dark:data-[state=active]:bg-green-500 dark:data-[state=active]:ring-green-500">
+                      class="text-lg px-2 py-1 rounded hover:bg-green-50 dark:hover:bg-gray-700 data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:ring-2 data-[state=active]:ring-green-600 data-[state=active]:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] dark:data-[state=active]:bg-green-500 dark:data-[state=active]:ring-green-500">
                       {{ categoryIcon(cat) }}</TabsTrigger>
                   </TooltipTrigger>
                   <TooltipContent>{{ categoryLabel(cat) }}</TooltipContent>
@@ -78,7 +78,7 @@
                     </TooltipTrigger>
                     <TooltipContent class="whitespace-nowrap" :portal="true">{{ e.name }} <span
                         class="text-muted-foreground ml-1">{{
-                          e.shortcode }}</span></TooltipContent>
+                        e.shortcode }}</span></TooltipContent>
                   </Tooltip>
                 </div>
                 <div v-else class="text-center text-gray-500 py-8">No recently used emojis</div>
@@ -100,7 +100,7 @@
                     </TooltipTrigger>
                     <TooltipContent class="whitespace-nowrap" :portal="true">{{ e.name }} <span
                         class="text-muted-foreground ml-1">{{
-                          e.shortcode }}</span></TooltipContent>
+                        e.shortcode }}</span></TooltipContent>
                   </Tooltip>
                 </div>
                 <div v-else class="text-center text-gray-500 py-8">No emojis in {{ categoryLabel(cat) }}</div>
@@ -110,7 +110,7 @@
         </TooltipProvider>
       </div>
 
-      <DialogFooter class="w-full flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-2">
+      <DialogFooter class=" flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-2">
         <div class="flex-1 text-sm text-gray-700 dark:text-gray-300 mb-2 sm:mb-0">
           <span v-if="selectedEmoji">Selected: <span class="ml-2 text-2xl">{{ selectedEmoji.char }}</span> <span
               class="ml-2 font-medium">{{ selectedEmoji.name }}</span></span>

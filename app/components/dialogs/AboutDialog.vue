@@ -1,26 +1,25 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-2xl w-full p-2 sm:p-6">
+    <DialogContent class="sm:max-w-2xl">
       <DialogHeader>
-        <div class="flex flex-col items-center justify-center w-full mb-2">
-          <NuxtImg src="/markdown.webp" alt="ChainPaper Welcome"
-            class="w-20 h-20 sm:w-28 sm:h-28 object-contain mx-auto rounded-lg shadow-sm" />
+        <div class="flex flex-col items-center gap-3 mb-2">
+          <NuxtImg src="/markdown.webp" alt="ChainPaper Welcome" class="w-20 h-20 object-contain mx-auto" />
         </div>
-        <DialogTitle class="flex items-center gap-2 text-base sm:text-lg justify-center text-center w-full">
+        <DialogTitle class="flex items-center gap-2 justify-center">
           <Info class="w-5 h-5 text-green-600 dark:text-green-500" />
-          About ChainPaper - Trustless Whitepaper
+          About ChainPaper
         </DialogTitle>
-        <DialogDescription class="text-gray-600 dark:text-gray-300 text-sm sm:text-base text-center w-full">
+        <DialogDescription class="text-center">
           Information on how this project encapsulates authorship assurance using modern web technologies.
         </DialogDescription>
       </DialogHeader>
 
       <ScrollArea class="max-h-[60vh] sm:max-h-[50vh] w-full pr-2">
-        <div class="space-y-4 py-2 px-1 sm:px-0">
+        <div class="space-y-2 py-2 px-1 sm:px-0">
           <!-- Project Description -->
           <div class="space-y-3">
-            <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">Project Description</h3>
-            <p class="text-gray-600 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
+            <h3 class="text-base sm:text-lg font-semibold text-foreground">Project Description</h3>
+            <p class="text-foreground/80 leading-relaxed text-sm sm:text-base">
               ✍️ Secure markdown platform for authorship assurance, crafted with Nuxt, Pinia, Tailwind, and Shadcn,
               featuring cryptographic verification using SHA-256.
             </p>
@@ -28,8 +27,8 @@
 
           <!-- Features -->
           <div class="space-y-2">
-            <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">Features</h3>
-            <ul class="list-disc pl-5 text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+            <h3 class="text-base sm:text-lg font-semibold text-foreground">Features</h3>
+            <ul class="list-disc pl-5 text-foreground/80 text-sm sm:text-base">
               <li>Real-time markdown editing and instant preview</li>
               <li>Authorship verification with cryptographic proofs</li>
               <li>Advanced formatting: tables, math, lists, alignment</li>
@@ -41,8 +40,8 @@
 
           <!-- Tech Stack -->
           <div class="space-y-2">
-            <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">Tech Stack</h3>
-            <ul class="list-disc pl-5 text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+            <h3 class="text-base sm:text-lg font-semibold text-foreground">Tech Stack</h3>
+            <ul class="list-disc pl-5 text-foreground/80 text-sm sm:text-base">
               <li>Nuxt.js & Vue 3</li>
               <li>TypeScript</li>
               <li>Shadcn Vue & Tailwind CSS</li>
@@ -53,22 +52,22 @@
 
           <!-- Links -->
           <div class="space-y-2">
-            <h3 class="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100">Connect</h3>
+            <h3 class="text-xs sm:text-sm font-semibold text-foreground-100">Connect</h3>
             <div class="flex flex-wrap items-center gap-2">
               <a href="https://github.com/KurutoDenzeru/ChainPaper" target="_blank"
-                class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                class="p-2 rounded-md border border-border/60 dark:border-border/60 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 title="GitHub Repository">
-                <Github class="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                <Github class="w-5 h-5 text-foreground" />
               </a>
 
               <a href="https://www.linkedin.com/in/KurtCalacday" target="_blank"
-                class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                class="p-2 rounded-md border border-border/60 dark:border-border/60 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 title="LinkedIn Profile">
                 <Linkedin class="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </a>
 
               <a href="https://www.instagram.com/krtclcdy" target="_blank"
-                class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                class="p-2 rounded-md border border-border/60 dark:border-border/60 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 title="Instagram">
                 <Instagram class="w-5 h-5 text-pink-500 dark:text-pink-400" />
               </a>
@@ -77,7 +76,7 @@
         </div>
       </ScrollArea>
 
-      <DialogFooter class="mt-4">
+      <DialogFooter>
         <div class="w-full">
           <Button variant="outline" class="w-full" @click="$emit('update:open', false)">
             Close

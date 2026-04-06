@@ -12,7 +12,7 @@
         </DialogDescription>
       </DialogHeader>
 
-      <div class="space-y-4">
+      <div class="space-y-2">
         <!-- URL Input -->
         <div class="space-y-2">
           <Label for="url" class="flex items-center gap-2">

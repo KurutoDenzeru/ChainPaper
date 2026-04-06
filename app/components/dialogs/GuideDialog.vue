@@ -1,22 +1,22 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-3xl w-full p-2 sm:p-6">
+    <DialogContent class="sm:max-w-3xl w-full">
       <DialogHeader>
-        <DialogTitle class="flex items-center gap-2 text-base sm:text-lg">
+        <DialogTitle class="flex items-center gap-2">
           <BookOpen class="w-5 h-5 text-green-600 dark:text-green-500" />
           Markdown Guide
         </DialogTitle>
-        <DialogDescription class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
+        <DialogDescription class="text-gray-700 text-sm sm:text-base">
           Quick reference for markdown syntax and formatting
         </DialogDescription>
       </DialogHeader>
 
       <ScrollArea class="max-h-[60vh] sm:max-h-[50vh] w-full pr-2">
-        <div class="space-y-4 py-2 px-1 sm:px-0">
+        <div class="space-y-2 py-2 px-1 sm:px-0">
           <!-- Basic Syntax -->
           <div class="space-y-3">
-            <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">Basic Syntax</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <h3 class="text-base sm:text-lg font-semibold text-foreground-100">Basic Syntax</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div class="space-y-2">
                 <div class="flex items-center gap-2">
                   <code
@@ -63,8 +63,8 @@
 
           <!-- Advanced Features -->
           <div class="space-y-3">
-            <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">Advanced Features</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <h3 class="text-base sm:text-lg font-semibold text-foreground-100">Advanced Features</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div class="space-y-2">
                 <div class="flex items-center gap-2">
                   <code
@@ -103,7 +103,7 @@
 
           <!-- Tips -->
           <div class="space-y-2">
-            <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Quick Tips</h3>
+            <h3 class="text-sm font-semibold text-foreground-100">Quick Tips</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-400">
               <div>• Use Ctrl+B for bold, Ctrl+I for italic</div>
               <div>• Press Enter twice for new paragraph</div>
@@ -114,7 +114,7 @@
         </div>
       </ScrollArea>
 
-      <DialogFooter class="w-full mt-4">
+      <DialogFooter>
         <div class="w-full flex items-center gap-2">
           <Button variant="outline" class="w-1/2 dark:border-gray-700 dark:text-gray-100"
             @click="$emit('update:open', false)">

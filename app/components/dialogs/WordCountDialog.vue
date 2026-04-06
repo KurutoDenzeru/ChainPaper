@@ -1,6 +1,6 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="!max-w-3xl">
+    <DialogContent class="sm:max-w-3xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
           <Hash class="w-5 h-5 text-green-600" />
@@ -14,20 +14,20 @@
       <ScrollArea class="max-h-[60vh]">
         <div class="space-y-6 p-3">
           <!-- Quick Stats Grid -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="p-3 bg-blue-50 dark:bg-blue-900 rounded-lg text-center">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div class="p-3 bg-blue-50 dark:bg-blue-900 rounded-md text-center">
               <div class="text-2xl font-bold text-blue-600 dark:text-blue-300">{{ stats.words }}</div>
               <div class="text-sm text-blue-700 dark:text-blue-200">Words</div>
             </div>
-            <div class="p-3 bg-green-50 dark:bg-green-900 rounded-lg text-center">
+            <div class="p-3 bg-green-50 dark:bg-green-900 rounded-md text-center">
               <div class="text-2xl font-bold text-green-600 dark:text-green-300">{{ stats.characters }}</div>
               <div class="text-sm text-green-700 dark:text-green-200">Characters</div>
             </div>
-            <div class="p-3 bg-purple-50 dark:bg-purple-900 rounded-lg text-center">
+            <div class="p-3 bg-purple-50 dark:bg-purple-900 rounded-md text-center">
               <div class="text-2xl font-bold text-purple-600 dark:text-purple-300">{{ stats.charactersNoSpaces }}</div>
               <div class="text-sm text-purple-700 dark:text-purple-200">No Spaces</div>
             </div>
-            <div class="p-3 bg-orange-50 dark:bg-orange-900 rounded-lg text-center">
+            <div class="p-3 bg-orange-50 dark:bg-orange-900 rounded-md text-center">
               <div class="text-2xl font-bold text-orange-600 dark:text-orange-300">{{ stats.paragraphs }}</div>
               <div class="text-sm text-orange-700 dark:text-orange-200">Paragraphs</div>
             </div>
@@ -35,59 +35,59 @@
 
           <!-- Detailed Statistics -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-              <h4 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <div class="space-y-2">
+              <h4 class="font-semibold text-foreground-100 flex items-center gap-2">
                 <FileText class="w-4 h-4" />
                 Text Analysis
               </h4>
               <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Lines:</span>
+                  <span class="text-muted-foreground">Lines:</span>
                   <span class="font-medium dark:text-gray-100">{{ stats.lines }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Sentences:</span>
+                  <span class="text-muted-foreground">Sentences:</span>
                   <span class="font-medium dark:text-gray-100">{{ stats.sentences }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Average words per sentence:</span>
+                  <span class="text-muted-foreground">Average words per sentence:</span>
                   <span class="font-medium dark:text-gray-100">{{ stats.avgWordsPerSentence }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Reading time:</span>
+                  <span class="text-muted-foreground">Reading time:</span>
                   <span class="font-medium dark:text-gray-100">{{ stats.readingTime }}</span>
                 </div>
               </div>
             </div>
 
-            <div class="space-y-4">
-              <h4 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <div class="space-y-2">
+              <h4 class="font-semibold text-foreground-100 flex items-center gap-2">
                 <Hash class="w-4 h-4" />
                 Markdown Elements
               </h4>
               <div class="space-y-2 text-sm">
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Headings:</span>
+                  <span class="text-muted-foreground">Headings:</span>
                   <span class="font-medium dark:text-gray-100">{{ stats.headings }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Links:</span>
+                  <span class="text-muted-foreground">Links:</span>
                   <span class="font-medium dark:text-gray-100">{{ stats.links }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Images:</span>
+                  <span class="text-muted-foreground">Images:</span>
                   <span class="font-medium dark:text-gray-100">{{ stats.images }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Code blocks:</span>
+                  <span class="text-muted-foreground">Code blocks:</span>
                   <span class="font-medium dark:text-gray-100">{{ stats.codeBlocks }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Lists:</span>
+                  <span class="text-muted-foreground">Lists:</span>
                   <span class="font-medium dark:text-gray-100">{{ stats.lists }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Tables:</span>
+                  <span class="text-muted-foreground">Tables:</span>
                   <span class="font-medium dark:text-gray-100">{{ stats.tables }}</span>
                 </div>
               </div>
@@ -96,7 +96,7 @@
 
           <!-- Heading Breakdown -->
           <div v-if="headingBreakdown.length > 0" class="space-y-3">
-            <h4 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <h4 class="font-semibold text-foreground-100 flex items-center gap-2">
               <Heading class="w-4 h-4" />
               Heading Structure
             </h4>
@@ -106,7 +106,7 @@
                 <div class="flex-shrink-0" :style="{ marginLeft: `${(heading.level - 1) * 16}px` }">
                   <component :is="getHeadingIcon(heading.level)" class="w-4 h-4 text-gray-500" />
                 </div>
-                <span class="text-gray-600 dark:text-gray-300">H{{ heading.level }}:</span>
+                <span class="text-muted-foreground">H{{ heading.level }}:</span>
                 <span class="font-medium truncate dark:text-gray-100">{{ heading.text }}</span>
               </div>
             </div>
@@ -114,15 +114,15 @@
 
           <!-- Top Words -->
           <div v-if="topWords.length > 0" class="space-y-3">
-            <h4 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <h4 class="font-semibold text-foreground-100 flex items-center gap-2">
               <BarChart3 class="w-4 h-4" />
               Most Frequent Words
             </h4>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
               <div v-for="word in topWords" :key="word.word"
-                class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-800 rounded text-sm">
+                class="flex justify-between items-center p-2 bg-muted/50 dark:bg-muted/50 rounded text-sm">
                 <span class="font-medium dark:text-gray-100">{{ word.word }}</span>
-                <span class="text-gray-600 dark:text-gray-300">{{ word.count }}</span>
+                <span class="text-muted-foreground">{{ word.count }}</span>
               </div>
             </div>
           </div>

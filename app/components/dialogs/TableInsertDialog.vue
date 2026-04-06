@@ -1,12 +1,12 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent class="max-w-3xl! bg-white dark:bg-gray-900">
+    <DialogContent class="sm:max-w-3xl">
       <DialogHeader>
-        <DialogTitle class="flex items-center gap-2 dark:text-gray-100">
+        <DialogTitle class="flex items-center gap-2">
           <Table class="w-5 h-5 text-green-600 dark:text-green-300" />
           Insert Table
         </DialogTitle>
-        <DialogDescription class="dark:text-gray-300">
+        <DialogDescription>
           Create a table by selecting the size or entering custom dimensions.
         </DialogDescription>
       </DialogHeader>
@@ -17,21 +17,20 @@
           <div class="w-1/2">
             <div class="space-y-3">
               <div class="flex items-center gap-2">
-                <Grid3x3 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Quick Selection</span>
+                <Grid3x3 class="w-4 h-4 text-muted-foreground" />
+                <span class="text-sm font-medium text-foreground-100">Quick Selection</span>
               </div>
 
               <div class="flex flex-col items-center space-y-3">
                 <!-- Grid selector -->
-                <div class="grid gap-1 p-3 border rounded-lg bg-gray-50/50 dark:bg-gray-800 dark:border-gray-700"
+                <div class="grid gap-1 p-3 border rounded-md bg-gray-50/50 dark:bg-gray-800 dark:border-gray-700"
                   :style="{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }" @mouseleave="resetSelection">
                   <div v-for="(cell, index) in gridCells" :key="index" :class="[
-                    'w-5 h-5 border border-gray-300 dark:border-gray-600 cursor-pointer transition-all duration-150 rounded-sm',
+                    'w-5 h-5 border border-border/60 dark:border-border/60 cursor-pointer transition-all duration-150 rounded-sm',
                     cell.row <= selectedRows && cell.col <= selectedCols
-                      ? 'bg-green-500 border-green-600 shadow-sm dark:bg-green-600 dark:border-green-400'
+                      ? 'bg-green-500 border-green-600 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] dark:bg-green-600 dark:border-green-400'
                       : 'bg-white hover:bg-green-100 hover:border-green-300 dark:bg-gray-900 dark:hover:bg-green-900 dark:hover:border-green-400'
-                  ]" @mouseenter="updateSelection(cell.row, cell.col)"
-                    @click="insertTable(selectedRows, selectedCols)" />
+                  ]" @mouseenter="updateSelection(cell.row, cell.col)" @click="insertTable(selectedRows, selectedCols)" />
                 </div>
 
                 <!-- Status text -->
@@ -45,13 +44,13 @@
 
           <!-- Custom Dimensions (right) -->
           <div class="w-1/2">
-            <div class="space-y-4">
+            <div class="space-y-2">
               <div class="flex items-center gap-2">
-                <Settings class="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Custom Dimensions</span>
+                <Settings class="w-4 h-4 text-muted-foreground" />
+                <span class="text-sm font-medium text-foreground-100">Custom Dimensions</span>
               </div>
 
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-2 gap-2">
                 <div class="space-y-2">
                   <label class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     <Rows2 class="w-4 h-4" />
@@ -82,7 +81,7 @@
         </div>
       </div>
 
-      <DialogFooter class="w-full p-0">
+      <DialogFooter>
         <div class="flex w-full gap-2">
           <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">
             <X class="w-4 h-4 mr-2" />

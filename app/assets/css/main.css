@@ -33,83 +33,59 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 :root {
-  --radius: 0.65rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.648 0.2 131.684);
-  --primary-foreground: oklch(0.986 0.031 120.757);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.841 0.238 128.85);
-  --chart-1: oklch(0.871 0.15 154.449);
-  --chart-2: oklch(0.723 0.219 149.579);
-  --chart-3: oklch(0.627 0.194 149.214);
-  --chart-4: oklch(0.527 0.154 150.069);
-  --chart-5: oklch(0.448 0.119 151.328);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.648 0.2 131.684);
-  --sidebar-primary-foreground: oklch(0.986 0.031 120.757);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.841 0.238 128.85);
+  --radius: 0.5rem;
+  --background: #f7f6f0;
+  --foreground: #141413;
+  --card: #ffffff;
+  --card-foreground: #141413;
+  --popover: #ffffff;
+  --popover-foreground: #141413;
+  --primary: #d97757;
+  --primary-foreground: #faf9f5;
+  --secondary: #e8e6dc;
+  --secondary-foreground: #141413;
+  --muted: #e8e6dc;
+  --muted-foreground: #6b6b63;
+  --accent: #e8e6dc;
+  --accent-foreground: #141413;
+  --destructive: #d97757;
+  --border: #e8e6dc;
+  --input: #f7f6f0;
+  --ring: #d97757;
+  --chart-1: #d97757;
+  --chart-2: #6a9bcc;
+  --chart-3: #788c5d;
+  --chart-4: #b0aea5;
+  --chart-5: #e8e6dc;
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.648 0.2 131.684);
-  --primary-foreground: oklch(0.986 0.031 120.757);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.405 0.101 131.063);
-  --chart-1: oklch(0.871 0.15 154.449);
-  --chart-2: oklch(0.723 0.219 149.579);
-  --chart-3: oklch(0.627 0.194 149.214);
-  --chart-4: oklch(0.527 0.154 150.069);
-  --chart-5: oklch(0.448 0.119 151.328);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.768 0.233 130.85);
-  --sidebar-primary-foreground: oklch(0.986 0.031 120.757);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.405 0.101 131.063);
+  --background: #0d0d0c;
+  --foreground: #faf9f5;
+  --card: #1c1c1b;
+  --card-foreground: #faf9f5;
+  --popover: #1c1c1b;
+  --popover-foreground: #faf9f5;
+  --primary: #d97757;
+  --primary-foreground: #faf9f5;
+  --secondary: #333333;
+  --secondary-foreground: #faf9f5;
+  --muted: #2a2a29;
+  --muted-foreground: #9a9a92;
+  --accent: #333333;
+  --accent-foreground: #faf9f5;
+  --destructive: #d97757;
+  --border: #333333;
+  --input: #0d0d0c;
+  --ring: #d97757;
+  --chart-1: #d97757;
+  --chart-2: #6a9bcc;
+  --chart-3: #788c5d;
+  --chart-4: #b0aea5;
+  --chart-5: #333333;
 }
 
 @layer base {
@@ -125,29 +101,29 @@
 /* Table styling for markdown rendered content */
 .table-bordered table,
 table.table-bordered {
-  @apply border-collapse border border-gray-300 w-full;
+  @apply border-collapse border border-border w-full;
 }
 
 .table-bordered table th,
 .table-bordered table td,
 table.table-bordered th,
 table.table-bordered td {
-  @apply border border-gray-300 px-3 py-2;
+  @apply border border-border px-3 py-2;
 }
 
 .table-bordered table th,
 table.table-bordered th {
-  @apply bg-gray-50 font-semibold text-gray-900;
+  @apply bg-muted/30 font-semibold text-foreground;
 }
 
 .table-striped table tbody tr:nth-child(even),
 table.table-striped tbody tr:nth-child(even) {
-  @apply bg-gray-50;
+  @apply bg-muted/20;
 }
 
 .table-striped table tbody tr:nth-child(odd),
 table.table-striped tbody tr:nth-child(odd) {
-  @apply bg-white;
+  @apply bg-card;
 }
 
 /* Enhanced table styling in prose content */
@@ -161,15 +137,15 @@ table.table-striped tbody tr:nth-child(odd) {
 }
 
 .prose table th {
-  @apply bg-gray-50 font-semibold text-gray-900 border-b-2 border-gray-200;
+  @apply bg-muted/30 font-semibold text-foreground border-b-2 border-border/40;
 }
 
 .prose table td {
-  @apply border-b border-gray-200;
+  @apply border-b border-border/40;
 }
 
 .prose table tbody tr:hover {
-  @apply bg-gray-50;
+  @apply bg-muted/10;
 }
 
 /* Styling for HTML tables within content */
@@ -181,12 +157,12 @@ table.table-striped tbody tr:nth-child(odd) {
 /* Override prose table styles for custom tables */
 .prose .table-bordered table th,
 .prose .table-striped table th {
-  @apply border border-gray-300 bg-gray-50 font-semibold text-gray-900;
+  @apply border border-border bg-muted/30 font-semibold text-foreground;
 }
 
 .prose .table-bordered table td,
 .prose .table-striped table td {
-  @apply border border-gray-300;
+  @apply border border-border;
 }
 
 /* Ensure proper table rendering in styled wrappers */

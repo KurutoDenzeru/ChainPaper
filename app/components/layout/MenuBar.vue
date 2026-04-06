@@ -1,6 +1,6 @@
 <template>
   <Menubar
-    class="px-2 sm:px-4 py-9 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm text-gray-600 dark:text-gray-200">
+    class="px-2 sm:px-4 py-9 bg-card dark:bg-card border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] text-foreground">
     <div class="flex flex-row items-start w-full">
       <!-- Left Side: Brand Icon (spans two rows) -->
       <div class="flex flex-col items-center justify-start mr-3" role="presentation">
@@ -16,14 +16,14 @@
         <div class="flex items-center gap-2 mb-1" role="presentation">
           <div v-if="!isEditingTitle" class="flex items-center gap-2 px-3 rounded">
             <!-- Visible document title (non-interactive) -->
-            <span class="text-lg text-gray-900 dark:text-white font-medium -ml-2">{{ title || 'Untitled Markdown'
+            <span class="text-lg text-foreground font-medium -ml-2">{{ title || 'Untitled Markdown'
               }}</span>
 
             <!-- Edit button: icon-only, clearly labeled for assistive tech -->
             <button type="button" @click="startEditingTitle" aria-label="Edit document title"
-              class="inline-flex items-center justify-center p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-1">
+              class="inline-flex items-center justify-center p-1 rounded hover:bg-accent dark:hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-1">
               <span class="sr-only">Edit document title</span>
-              <Edit3 aria-hidden="true" class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+              <Edit3 aria-hidden="true" class="w-4 h-4 text-muted-foreground" />
             </button>
 
             <span v-if="isDirty" aria-hidden="true" class="text-orange-500">•</span>
@@ -32,7 +32,7 @@
             <div v-if="isEditingTitle" class="flex items-center gap-2">
               <Input id="doc-title-input" ref="titleInput" v-model="editingTitle" @blur="saveTitle"
                 @keyup.enter="saveTitle" @keyup.escape="cancelEdit"
-                class="text-lg bg-transparent border-2 border-gray-200 dark:border-gray-700 rounded-md outline-none px-1 min-w-48 text-gray-900 dark:text-white"
+                class="text-lg bg-transparent border-2 border-border dark:border-border rounded-md outline-none px-1 min-w-48 text-foreground"
                 :placeholder="'Untitled Markdown'" />
             </div>
           </client-only>
@@ -48,7 +48,7 @@
                   <!-- Checkbox items removed; now using buttons for toolbar/statusbar/preview -->
                   <MenubarSub v-else-if="item.type === 'sub'">
                     <MenubarSubTrigger class="flex items-center gap-2">
-                      <component :is="(item as any).icon" class="w-4 h-4 text-gray-600 dark:text-gray-300"
+                      <component :is="(item as any).icon" class="w-4 h-4 text-muted-foreground"
                         v-if="(item as any).icon" />
                       {{ item.label }}
                     </MenubarSubTrigger>
@@ -56,20 +56,24 @@
                       <!-- Special case: Text Color submenu -> render color grid + custom inputs (copied from EditorToolbar PopoverContent) -->
                       <template v-if="item.label === 'Text Color'">
                         <div class="px-3 py-2 w-[260px]">
-                          <div class="flex items-center gap-2">
-                            <Type class="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Text Color</span>
+                          <div class="flex items-center gap-2 mb-2">
+                            <Type class="w-4 h-4 text-foreground" />
+                            <span class="text-sm font-semibold text-foreground uppercase tracking-wide">Text
+                              Color</span>
                           </div>
-                          <div class="grid grid-cols-8 gap-1.5 mt-2">
-                            <Button v-for="c in textColors" :key="c" :title="c"
-                              class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer shadow-sm"
+                          <div class="grid grid-cols-8 gap-2">
+                            <button v-for="c in textColors" :key="c" :title="c"
+                              class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform cursor-pointer shadow-[0_4px_12px_rgb(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgb(0,0,0,0.2)] flex items-center justify-center"
+                              :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentTextColor }"
                               :style="{ backgroundColor: c }" @click="emitTextColor(c)">
-                            </Button>
+                            </button>
                           </div>
-                          <div class="flex items-center gap-2 mt-2">
-                            <Input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
+                          <div class="flex items-center gap-2 mt-4 pt-3 border-t border-border">
+                            <Input type="color"
+                              class="w-10 h-8 p-0 border border-border rounded cursor-pointer bg-background"
                               @input="onMenuCustomTextColor" />
-                            <Input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
+                            <Input type="text"
+                              class="flex-1 text-xs h-8 px-2 border border-border rounded bg-background text-foreground"
                               placeholder="#rrggbb" @change="onMenuCustomTextColorText" />
                           </div>
                         </div>
@@ -78,20 +82,23 @@
                       <!-- Special case: Highlight submenu -> render color grid + custom inputs -->
                       <template v-else-if="item.label === 'Highlight'">
                         <div class="px-3 py-2 w-[260px]">
-                          <div class="flex items-center gap-2">
-                            <Highlighter class="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Highlight</span>
+                          <div class="flex items-center gap-2 mb-2">
+                            <Highlighter class="w-4 h-4 text-foreground" />
+                            <span class="text-sm font-semibold text-foreground uppercase tracking-wide">Highlight</span>
                           </div>
-                          <div class="grid grid-cols-8 gap-1.5 mt-2">
+                          <div class="grid grid-cols-8 gap-2">
                             <button v-for="c in highlightColors" :key="c" :title="c"
-                              class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer shadow-sm"
+                              class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform cursor-pointer shadow-[0_4px_12px_rgb(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgb(0,0,0,0.2)] flex items-center justify-center"
+                              :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentHighlight }"
                               :style="{ backgroundColor: c }" @click="emitHighlight(c)">
                             </button>
                           </div>
-                          <div class="flex items-center gap-2 mt-2">
-                            <Input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
+                          <div class="flex items-center gap-2 mt-4 pt-3 border-t border-border">
+                            <Input type="color"
+                              class="w-10 h-8 p-0 border border-border rounded cursor-pointer bg-background"
                               @input="onMenuCustomHighlight" />
-                            <Input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
+                            <Input type="text"
+                              class="flex-1 text-xs h-8 px-2 border border-border rounded bg-background text-foreground"
                               placeholder="#rrggbb" @change="onMenuCustomHighlightText" />
                           </div>
                         </div>
@@ -104,14 +111,13 @@
                           <MenubarItem v-else @click="handleMenuEmit(sub)"
                             class="flex items-center justify-between min-w-[220px]">
                             <div class="flex items-center gap-2">
-                              <component :is="getIcon(sub)" class="w-4 h-4 text-gray-600 dark:text-gray-300"
-                                v-if="getIcon(sub)" />
+                              <component :is="getIcon(sub)" class="w-4 h-4 text-muted-foreground" v-if="getIcon(sub)" />
                               <span>{{ sub.label }}</span>
                             </div>
                             <MenubarShortcut v-if="getShortcut(sub)">
                               <!-- reuse shortcut rendering if present -->
                               <span
-                                class="inline-flex items-center justify-center aspect-square w-6 rounded bg-gray-100 dark:bg-gray-700 text-xs font-medium mr-1">{{
+                                class="inline-flex items-center justify-center aspect-square w-6 rounded bg-muted dark:bg-muted text-xs font-medium mr-1">{{
                                   getShortcut(sub)?.pc || getShortcut(sub)?.key || '' }}</span>
                             </MenubarShortcut>
                           </MenubarItem>
@@ -122,8 +128,7 @@
                   <MenubarItem v-else class="flex items-center justify-between min-w-[250px]"
                     :disabled="isDisabled(item)" @click="handleMenuEmit(item)">
                     <div class="flex items-center gap-2">
-                      <component :is="getIcon(item)" class="w-4 h-4 text-gray-600 dark:text-gray-300"
-                        v-if="getIcon(item)" />
+                      <component :is="getIcon(item)" class="w-4 h-4 text-muted-foreground" v-if="getIcon(item)" />
                       <span>{{ item.label }}</span>
                     </div>
                     <MenubarShortcut v-if="getShortcut(item)">
@@ -136,38 +141,43 @@
         </div>
       </div>
 
-      <!-- Theme selector (moved out of Menubar menus) - hide on narrow/mobile screens -->
-      <div v-if="!isNarrow" class="flex items-center self-center ml-3">
-        <Popover>
-          <PopoverTrigger as-child>
-            <Button variant="outline"
-              class="inline-flex items-center gap-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"
-              aria-label="Theme selector">
-              <component :is="theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor"
-                class="w-4 h-4 text-gray-600 dark:text-gray-200" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            class="p-2 w-44 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
-            <div class="flex flex-col items-start">
-              <Button variant="ghost"
-                class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left"
-                @click="setTheme('system')">
-                <Monitor class="w-4 h-4" /> System
-              </Button>
-              <Button variant="ghost"
-                class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left"
-                @click="setTheme('light')">
-                <Sun class="w-4 h-4" /> Light
-              </Button>
-              <Button variant="ghost"
-                class="flex items-center justify-start w-full gap-2 px-2 py-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-left"
-                @click="setTheme('dark')">
-                <Moon class="w-4 h-4" /> Dark
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+      <!-- Theme selector (now as a segmented control/tab) - hide on narrow/mobile screens -->
+      <div v-if="!isNarrow"
+        class="flex items-center self-center ml-3 bg-muted/40 p-0.5 rounded-md border border-border/40">
+        <TooltipProvider>
+          <div class="flex items-center gap-0.5">
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <button type="button" class="p-1.5 rounded-sm transition-all duration-200"
+                  :class="theme === 'light' ? 'bg-card shadow-sm text-foreground scale-105' : 'text-muted-foreground hover:text-foreground'"
+                  @click="setTheme('light')">
+                  <Sun class="w-4 h-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent :side-offset="8">Light Mode</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <button type="button" class="p-1.5 rounded-sm transition-all duration-200"
+                  :class="theme === 'system' ? 'bg-card shadow-sm text-foreground scale-105' : 'text-muted-foreground hover:text-foreground'"
+                  @click="setTheme('system')">
+                  <Monitor class="w-4 h-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent :side-offset="8">System Mode</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <button type="button" class="p-1.5 rounded-sm transition-all duration-200"
+                  :class="theme === 'dark' ? 'bg-card shadow-sm text-foreground scale-105' : 'text-muted-foreground hover:text-foreground'"
+                  @click="setTheme('dark')">
+                  <Moon class="w-4 h-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent :side-offset="8">Dark Mode</TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
       </div>
     </div>
   </Menubar>

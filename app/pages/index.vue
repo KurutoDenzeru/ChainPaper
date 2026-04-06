@@ -1,6 +1,6 @@
 <template>
 
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+  <div class="min-h-screen bg-background flex flex-col">
     <div ref="topFixed" class="fixed inset-x-1 top-1 z-50 pointer-events-none">
 
       <div class="mt-1 px-2 pointer-events-auto">
@@ -40,7 +40,7 @@
           :class="[mode === 'source' ? 'overflow-auto' : 'overflow-hidden', 'w-full flex justify-center items-center min-h-[60vh]']">
           <!-- inner page that is scaled via transform; size = Letter 8.5in x 11in -->
           <div ref="pageInner" :style="pageInnerStyle"
-            class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm m-2 sm:m-6">
+            class="bg-card border border-border/60 dark:border-border/60 rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] m-2 sm:m-6">
             <div class="w-full h-full">
               <textarea v-if="mode === 'source'" ref="textareaEl" :value="content"
                 class="w-full h-full outline-none resize-none font-mono text-sm p-4 sm:p-6"
@@ -581,7 +581,7 @@
 
     const updated = lines.map(l => {
       if (l.trim() === '') return l
-      return '  ' + l // Add 2 spaces for indentation
+      return ' ' + l // Add 2 spaces for indentation
     }).join('\n')
     replaceRange(ta, lineStart, actualEnd, updated)
   }
@@ -601,7 +601,7 @@
     const updated = lines.map(l => {
       if (l.trim() === '') return l
       // Remove up to 2 spaces from the beginning
-      return l.replace(/^  /, '') || l.replace(/^ /, '')
+      return l.replace(/^ /, '') || l.replace(/^ /, '')
     }).join('\n')
     replaceRange(ta, lineStart, actualEnd, updated)
   }
@@ -1306,8 +1306,8 @@
 
     code {
       /* Use theme-aware variables so inline code adapts to light/dark themes
-         --muted provides a subtle background and --muted-foreground the readable text
-         --border gives a gentle outline that also adapts in dark mode. */
+ --muted provides a subtle background and --muted-foreground the readable text
+ --border gives a gentle outline that also adapts in dark mode. */
       background-color: var(--muted);
       color: var(--muted-foreground);
       padding: 0.125rem 0.25rem;

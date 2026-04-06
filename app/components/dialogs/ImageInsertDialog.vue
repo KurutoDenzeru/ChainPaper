@@ -1,18 +1,17 @@
 <template>
   <Dialog :open="open" @update:open="$emit('update:open', $event)">
-    <DialogContent
-      class="max-w-md w-full p-6 flex flex-col items-center justify-center gap-4 bg-white dark:bg-gray-900">
+    <DialogContent class="sm:max-w-md w-full">
       <DialogHeader class="w-full flex flex-col items-start">
-        <DialogTitle class="flex items-center gap-2 text-lg font-semibold text-left dark:text-gray-100">
+        <DialogTitle class="flex items-center gap-2 font-semibold text-left">
           <ImageIcon class="w-5 h-5 text-green-600 dark:text-green-300" />
           Insert Image
         </DialogTitle>
-        <DialogDescription class="text-left mt-1 dark:text-gray-300">
+        <DialogDescription class="text-left mt-1">
           Drag and drop an image here, or click to select a file.
         </DialogDescription>
       </DialogHeader>
       <div
-        class="w-full h-48 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer transition relative"
+        class="w-full h-48 border-2 border-dashed rounded-md flex items-center justify-center cursor-pointer transition relative"
         :class="[
           isDragging ? 'border-blue-400 bg-blue-50 dark:border-blue-300 dark:bg-blue-950' :
             (isHover ? 'border-gray-400 bg-gray-100 dark:border-gray-500 dark:bg-gray-800' : 'border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800')
@@ -33,7 +32,7 @@
         </div>
         <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
       </div>
-      <DialogFooter class="w-full p-0 mt-4">
+      <DialogFooter>
         <div class="flex w-full gap-2">
           <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">Cancel</Button>
           <Button :disabled="!preview"

@@ -1,7 +1,7 @@
 <template>
   <TooltipProvider>
     <div
-      class="flex items-center justify-between px-4 sm:px-4 py-1 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 gap-1 sm:gap-2 overflow-x-auto shadow-sm text-gray-700 dark:text-gray-200">
+      class="flex items-center justify-between px-4 sm:px-4 py-1 rounded-md bg-card dark:bg-card border border-border dark:border-border gap-1 sm:gap-2 overflow-x-auto shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] text-foreground">
       <!-- Always Visible Controls -->
       <div class="flex gap-1 shrink-0 items-center">
         <!-- Mode label + toggle (farthest left) -->
@@ -23,7 +23,7 @@
         </div>
 
         <!-- View Controls -->
-        <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div class="h-6 w-px bg-muted dark:bg-muted mx-1"></div>
 
         <!-- Undo/Redo -->
         <Tooltip>
@@ -52,59 +52,59 @@
 
       <!-- Desktop Layout: Show all controls on large screens -->
       <div class="hidden lg:flex gap-1 flex-1 items-center">
-        <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div class="h-6 w-px bg-muted dark:bg-muted mx-1"></div>
 
         <!-- Headings (popover dropdown) -->
         <Popover>
           <PopoverTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16"
               title="Heading Styles" aria-label="Heading styles">
-              <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600 dark:text-gray-300" />
-              <ChevronDown class="w-3 h-3 text-gray-500" />
+              <component :is="currentHeadingIcon" class="w-4 h-4 text-muted-foreground" />
+              <ChevronDown class="w-3 h-3 text-foreground" />
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            class="w-40 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+            class="w-40 p-2 bg-card dark:bg-card text-foreground-200 border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
             <div class="flex flex-col">
               <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
                 @click="setHeading('p')">
                 <FileText class="w-4 h-4" />
                 Paragraph
               </button>
-              <div class="border-t my-1 border-gray-200 dark:border-gray-700" />
+              <div class="border-t my-1 border-border dark:border-border" />
               <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
                 @click="setHeading('h1')">
                 <Heading1 class="w-4 h-4" />
                 Heading 1
               </button>
               <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
                 @click="setHeading('h2')">
                 <Heading2 class="w-4 h-4" />
                 Heading 2
               </button>
               <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
                 @click="setHeading('h3')">
                 <Heading3 class="w-4 h-4" />
                 Heading 3
               </button>
               <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
                 @click="setHeading('h4')">
                 <Heading4 class="w-4 h-4" />
                 Heading 4
               </button>
               <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
                 @click="setHeading('h5')">
                 <Heading5 class="w-4 h-4" />
                 Heading 5
               </button>
               <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
                 @click="setHeading('h6')">
                 <Heading6 class="w-4 h-4" />
                 Heading 6
@@ -113,7 +113,7 @@
           </PopoverContent>
         </Popover>
 
-        <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div class="h-6 w-px bg-muted dark:bg-muted mx-1"></div>
 
         <!-- Zoom controls -->
         <div class="flex items-center gap-1 ml-1">
@@ -135,20 +135,20 @@
                 tabindex="0">
                 <span class="sr-only" id="editor-zoom-label">Zoom percentage</span>
                 <Input id="editor-zoom-input" type="number" v-model="zoomModel"
-                  class="w-20 text-center h-8 rounded bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100"
+                  class="w-20 text-center h-8 rounded bg-white dark:bg-muted border border-border dark:border-border text-foreground-100"
                   aria-labelledby="editor-zoom-label" aria-label="Zoom percentage" role="spinbutton" aria-valuemin="50"
                   aria-valuemax="200" :aria-valuenow="isFit ? 100 : zoomPercent" />
               </button>
             </PopoverTrigger>
             <PopoverContent
-              class="w-32 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+              class="w-32 p-2 bg-card dark:bg-card text-foreground-200 border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
               <div class="flex flex-col">
                 <button
-                  class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 font-medium"
+                  class="text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent text-foreground-100 font-medium"
                   @click="selectZoom('fit')">Fit</button>
-                <div class="border-t my-1 border-gray-100 dark:border-gray-700" />
+                <div class="border-t my-1 border-border dark:border-border" />
                 <button v-for="opt in zoomOptions" :key="opt"
-                  class="text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100"
+                  class="text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent text-foreground-100"
                   @click="selectZoom(opt)">{{ opt }}%</button>
               </div>
             </PopoverContent>
@@ -166,12 +166,12 @@
           </Tooltip>
         </div>
 
-        <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
+        <div class="h-6 w-px bg-muted dark:bg-muted mx-1"></div>
 
         <!-- Basic Formatting -->
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bold }]"
+            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bold }]"
               @click="$emit('format-bold')" :aria-pressed="active.bold" aria-label="Bold">
               <Bold class="w-4 h-4" />
             </Button>
@@ -182,7 +182,7 @@
         </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.italic }]"
+            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.italic }]"
               @click="$emit('format-italic')" :aria-pressed="active.italic" aria-label="Italic">
               <Italic class="w-4 h-4" />
             </Button>
@@ -193,7 +193,7 @@
         </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.underline }]"
+            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.underline }]"
               @click="$emit('format-underline')" :aria-pressed="active.underline" aria-label="Underline">
               <Underline class="w-4 h-4" />
             </Button>
@@ -204,7 +204,7 @@
         </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.strike }]"
+            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.strike }]"
               @click="$emit('format-strikethrough')" :aria-pressed="active.strike" aria-label="Strikethrough">
               <Strikethrough class="w-4 h-4" />
             </Button>
@@ -226,24 +226,24 @@
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            class="w-64 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+            class="w-64 p-3 bg-card dark:bg-card text-foreground border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
             <div class="grid grid-cols-8 gap-2">
               <button v-for="c in textColors" :key="c" :title="c"
-                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
-                :class="{ 'ring-2 ring-offset-1 ring-indigo-500': c === currentTextColor }"
-                :style="{ backgroundColor: c }" @click="$emit('set-text-color', c)">
+                class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
+                :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentTextColor }" :style="{ backgroundColor: c }"
+                @click="$emit('set-text-color', c)">
                 <Check v-if="c === currentTextColor"
                   :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
               </button>
             </div>
             <div class="mt-3 border-t pt-3">
-              <div class="text-xs text-gray-500 mb-2">Custom color</div>
+              <div class="text-xs text-foreground mb-2">Custom color</div>
               <div class="flex items-center gap-2">
                 <input type="color"
-                  class="w-10 h-8 p-0 border rounded cursor-pointer border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700"
+                  class="w-10 h-8 p-0 border rounded cursor-pointer border-border dark:border-border bg-white dark:bg-muted"
                   @input="onCustomTextColor" />
                 <input type="text"
-                  class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100"
+                  class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-muted border-border dark:border-border text-foreground"
                   placeholder="#rrggbb" @change="onCustomTextColorText" />
               </div>
             </div>
@@ -262,24 +262,24 @@
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            class="w-64 p-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+            class="w-64 p-3 bg-card dark:bg-card text-foreground border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
             <div class="grid grid-cols-8 gap-2">
               <button v-for="c in highlightColors" :key="c" :title="c"
-                class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
-                :class="{ 'ring-2 ring-offset-1 ring-indigo-500': c === currentHighlight }"
-                :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)">
+                class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
+                :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentHighlight }" :style="{ backgroundColor: c }"
+                @click="$emit('set-highlight', c)">
                 <Check v-if="c === currentHighlight"
                   :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
               </button>
             </div>
             <div class="mt-3 border-t pt-3">
-              <div class="text-xs text-gray-500 mb-2">Custom highlight</div>
+              <div class="text-xs text-foreground mb-2">Custom highlight</div>
               <div class="flex items-center gap-2">
                 <input type="color"
-                  class="w-10 h-8 p-0 border rounded cursor-pointer border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700"
+                  class="w-10 h-8 p-0 border rounded cursor-pointer border-border dark:border-border bg-white dark:bg-muted"
                   @input="onCustomHighlight" />
                 <input type="text"
-                  class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100"
+                  class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-muted border-border dark:border-border text-foreground"
                   placeholder="#rrggbb" @change="onCustomHighlightText" />
               </div>
             </div>
@@ -338,7 +338,7 @@
           </TooltipContent>
         </Tooltip>
 
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+        <div class="h-6 w-px bg-muted mx-1"></div>
 
         <!-- Alignment (popover with chevron inside trigger) -->
         <Popover>
@@ -346,29 +346,29 @@
             <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16"
               title="Text Alignment" aria-label="Text alignment">
               <component :is="alignmentIcon" class="w-4 h-4" />
-              <ChevronDown class="w-3 h-3 text-gray-500" />
+              <ChevronDown class="w-3 h-3 text-foreground" />
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            class="w-36 p-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
+            class="w-36 p-2 bg-card dark:bg-card text-foreground border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
             <div class="flex flex-col">
               <button
-                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
                 @click="setAlign('left')">
                 <AlignLeft class="w-4 h-4" />Left
               </button>
               <button
-                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
                 @click="setAlign('center')">
                 <AlignCenter class="w-4 h-4" />Center
               </button>
               <button
-                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
                 @click="setAlign('right')">
                 <AlignRight class="w-4 h-4" />Right
               </button>
               <button
-                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
                 @click="setAlign('justify')">
                 <AlignJustify class="w-4 h-4" />Justify
               </button>
@@ -376,7 +376,7 @@
           </PopoverContent>
         </Popover>
 
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+        <div class="h-6 w-px bg-muted mx-1"></div>
 
         <!-- Math -->
         <Tooltip>
@@ -444,7 +444,7 @@
         </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bullet }]"
+            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bullet }]"
               @click="$emit('toggle-bullet-list')" :aria-pressed="active.bullet" aria-label="Toggle bullet list">
               <List class="w-4 h-4" />
             </Button>
@@ -455,7 +455,7 @@
         </Tooltip>
         <Tooltip>
           <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.ordered }]"
+            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.ordered }]"
               @click="$emit('toggle-ordered-list')" :aria-pressed="active.ordered" aria-label="Toggle numbered list">
               <ListOrdered class="w-4 h-4" />
             </Button>
@@ -487,7 +487,7 @@
           </TooltipContent>
         </Tooltip>
 
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+        <div class="h-6 w-px bg-muted mx-1"></div>
 
         <!-- Insert Tools -->
         <Tooltip>
@@ -543,50 +543,50 @@
 
       <!-- Medium screens: Show essential formatting -->
       <div class="hidden md:flex lg:hidden gap-1 flex-1 items-center">
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+        <div class="h-6 w-px bg-muted mx-1"></div>
 
         <!-- Headings (smaller popover) -->
         <Popover>
           <PopoverTrigger as-child>
             <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
-              <component :is="currentHeadingIcon" class="w-4 h-4 text-gray-600 dark:text-gray-300" />
-              <ChevronDown class="w-3 h-3 text-gray-500" />
+              <component :is="currentHeadingIcon" class="w-4 h-4 text-muted-foreground" />
+              <ChevronDown class="w-3 h-3 text-foreground" />
             </Button>
           </PopoverTrigger>
           <PopoverContent class="w-36 p-2">
             <div class="flex flex-col">
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
                 @click="setHeading('p')">
                 <FileText class="w-4 h-4" />
                 P
               </button>
               <div class="border-t my-1" />
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
                 @click="setHeading('h1')">
                 <Heading1 class="w-4 h-4" />
                 H1
               </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
                 @click="setHeading('h2')">
                 <Heading2 class="w-4 h-4" />
                 H2
               </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
                 @click="setHeading('h3')">
                 <Heading3 class="w-4 h-4" />
                 H3
               </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
                 @click="setHeading('h4')">
                 <Heading4 class="w-4 h-4" />
                 H4
               </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
                 @click="setHeading('h5')">
                 <Heading5 class="w-4 h-4" />
                 H5
               </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-gray-100"
+              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
                 @click="setHeading('h6')">
                 <Heading6 class="w-4 h-4" />
                 H6
@@ -595,30 +595,30 @@
           </PopoverContent>
         </Popover>
 
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+        <div class="h-6 w-px bg-muted mx-1"></div>
 
         <!-- Basic Formatting -->
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bold }]"
+        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bold }]"
           @click="$emit('format-bold')" :aria-pressed="active.bold" aria-label="Bold">
           <Bold class="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.italic }]"
+        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.italic }]"
           @click="$emit('format-italic')" :aria-pressed="active.italic" aria-label="Italic">
           <Italic class="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.underline }]"
+        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.underline }]"
           @click="$emit('format-underline')" :aria-pressed="active.underline" aria-label="Underline">
           <Underline class="w-4 h-4" />
         </Button>
 
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+        <div class="h-6 w-px bg-muted mx-1"></div>
 
         <!-- Lists -->
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bullet }]"
+        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bullet }]"
           @click="$emit('toggle-bullet-list')" :aria-pressed="active.bullet" aria-label="Toggle bullet list">
           <List class="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.ordered }]"
+        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.ordered }]"
           @click="$emit('toggle-ordered-list')" :aria-pressed="active.ordered" aria-label="Toggle numbered list">
           <ListOrdered class="w-4 h-4" />
         </Button>
@@ -628,17 +628,17 @@
 
       <!-- Small screens: Show only Bold, Italic, Underline -->
       <div class="flex md:hidden gap-1 flex-1 items-center">
-        <div class="h-6 w-px bg-gray-300 mx-1"></div>
+        <div class="h-6 w-px bg-muted mx-1"></div>
 
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.bold }]"
+        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bold }]"
           @click="$emit('format-bold')" aria-label="Bold" :aria-pressed="active.bold">
           <Bold class="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.italic }]"
+        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.italic }]"
           @click="$emit('format-italic')" aria-label="Italic" :aria-pressed="active.italic">
           <Italic class="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-gray-100': active.underline }]"
+        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.underline }]"
           @click="$emit('format-underline')" aria-label="Underline" :aria-pressed="active.underline">
           <Underline class="w-4 h-4" />
         </Button>
@@ -655,13 +655,13 @@
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            class="w-80 p-0 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-md shadow-sm"
+            class="w-80 p-0 max-h-96 overflow-y-auto bg-card dark:bg-card text-foreground border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]"
             align="end">
             <div class="p-3 space-y-4">
               <!-- Text Styles Section -->
               <div class="space-y-2">
                 <div
-                  class="px-1 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
+                  class="px-1 py-1 text-xs font-semibold text-foreground uppercase tracking-wide border-b border-border dark:border-border pb-2">
                   Text Styles</div>
                 <Select @update:modelValue="handleHeadingChange">
                   <SelectTrigger class="w-full">
@@ -670,43 +670,43 @@
                   <SelectContent>
                     <SelectItem value="0">
                       <div class="flex items-center gap-2">
-                        <FileText class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                        <FileText class="w-4 h-4 text-muted-foreground" />
                         <span>Paragraph</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="1">
                       <div class="flex items-center gap-2">
-                        <Heading1 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                        <Heading1 class="w-4 h-4 text-muted-foreground" />
                         <span>Heading 1</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="2">
                       <div class="flex items-center gap-2">
-                        <Heading2 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                        <Heading2 class="w-4 h-4 text-muted-foreground" />
                         <span>Heading 2</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="3">
                       <div class="flex items-center gap-2">
-                        <Heading3 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                        <Heading3 class="w-4 h-4 text-muted-foreground" />
                         <span>Heading 3</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="4">
                       <div class="flex items-center gap-2">
-                        <Heading4 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                        <Heading4 class="w-4 h-4 text-muted-foreground" />
                         <span>Heading 4</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="5">
                       <div class="flex items-center gap-2">
-                        <Heading5 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                        <Heading5 class="w-4 h-4 text-muted-foreground" />
                         <span>Heading 5</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="6">
                       <div class="flex items-center gap-2">
-                        <Heading6 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                        <Heading6 class="w-4 h-4 text-muted-foreground" />
                         <span>Heading 6</span>
                       </div>
                     </SelectItem>
@@ -717,37 +717,38 @@
               <!-- Text Formatting Section -->
               <div class="space-y-2">
                 <div
-                  class="px-1 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
+                  class="px-1 py-1 text-xs font-semibold text-foreground uppercase tracking-wide border-b border-border dark:border-border pb-2">
                   Text Format</div>
                 <div class="grid grid-cols-2 gap-1">
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
-                    :class="{ 'bg-blue-50 text-blue-700': active.strike }" @click="$emit('format-strikethrough')">
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
+                    :class="{ 'bg-primary/20 text-primary font-medium': active.strike }"
+                    @click="$emit('format-strikethrough')">
                     <Strikethrough class="w-4 h-4" />
                     <span class="text-sm">Strikethrough</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="$emit('format-superscript')">
-                    <Superscript class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <Superscript class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Superscript</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="$emit('format-subscript')">
-                    <Subscript class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <Subscript class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Subscript</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="$emit('toggle-blockquote')">
-                    <Quote class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <Quote class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Quote</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors col-span-2"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors col-span-2"
                     @click="$emit('insert-code-block')">
-                    <Code2 class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <Code2 class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Code Block</span>
                   </button>
                 </div>
@@ -756,28 +757,28 @@
               <!-- Colors Section -->
               <div class="space-y-3">
                 <div
-                  class="px-1 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
+                  class="px-1 py-1 text-xs font-semibold text-foreground uppercase tracking-wide border-b border-border dark:border-border pb-2">
                   Colors</div>
 
                 <!-- Text Color -->
                 <div class="space-y-2">
                   <div class="flex items-center gap-2">
-                    <Type class="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Text Color</span>
+                    <Type class="w-4 h-4 text-muted-foreground" />
+                    <span class="text-sm font-medium text-foreground">Text Color</span>
                   </div>
                   <div class="grid grid-cols-8 gap-1.5">
                     <button v-for="c in textColors" :key="c" :title="c"
-                      class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer shadow-sm"
-                      :class="{ 'ring-2 ring-offset-1 ring-blue-500': c === currentTextColor }"
+                      class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform cursor-pointer shadow-[0_4px_12px_rgb(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgb(0,0,0,0.2)] flex items-center justify-center"
+                      :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentTextColor }"
                       :style="{ backgroundColor: c }" @click="$emit('set-text-color', c)">
                       <Check v-if="c === currentTextColor"
                         :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
                     </button>
                   </div>
                   <div class="flex items-center gap-2 mt-2">
-                    <input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
+                    <input type="color" class="w-8 h-6 border border-border rounded cursor-pointer"
                       @input="onCustomTextColor" />
-                    <input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
+                    <input type="text" class="flex-1 text-xs h-6 px-2 border border-border rounded"
                       placeholder="#rrggbb" @change="onCustomTextColorText" />
                   </div>
                 </div>
@@ -785,22 +786,22 @@
                 <!-- Highlight Color -->
                 <div class="space-y-2">
                   <div class="flex items-center gap-2">
-                    <Highlighter class="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-200">Highlight</span>
+                    <Highlighter class="w-4 h-4 text-muted-foreground" />
+                    <span class="text-sm font-medium text-foreground">Highlight</span>
                   </div>
                   <div class="grid grid-cols-8 gap-1.5">
                     <button v-for="c in highlightColors" :key="c" :title="c"
-                      class="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform cursor-pointer shadow-sm"
-                      :class="{ 'ring-2 ring-offset-1 ring-blue-500': c === currentHighlight }"
+                      class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform cursor-pointer shadow-[0_4px_12px_rgb(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgb(0,0,0,0.2)] flex items-center justify-center"
+                      :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentHighlight }"
                       :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)">
                       <Check v-if="c === currentHighlight"
                         :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
                     </button>
                   </div>
                   <div class="flex items-center gap-2 mt-2">
-                    <input type="color" class="w-8 h-6 border border-gray-300 rounded cursor-pointer"
+                    <input type="color" class="w-8 h-6 border border-border rounded cursor-pointer"
                       @input="onCustomHighlight" />
-                    <input type="text" class="flex-1 text-xs h-6 px-2 border border-gray-300 rounded"
+                    <input type="text" class="flex-1 text-xs h-6 px-2 border border-border rounded"
                       placeholder="#rrggbb" @change="onCustomHighlightText" />
                   </div>
                 </div>
@@ -809,54 +810,54 @@
               <!-- Lists & Layout Section -->
               <div class="space-y-2">
                 <div
-                  class="px-1 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
+                  class="px-1 py-1 text-xs font-semibold text-foreground uppercase tracking-wide border-b border-border dark:border-border pb-2">
                   Lists & Layout</div>
                 <div class="grid grid-cols-2 gap-1">
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     :class="{ 'bg-blue-50 text-blue-700': active.bullet }" @click="$emit('toggle-bullet-list')">
                     <List class="w-4 h-4" />
                     <span class="text-sm">Bullet List</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     :class="{ 'bg-blue-50 text-blue-700': active.ordered }" @click="$emit('toggle-ordered-list')">
                     <ListOrdered class="w-4 h-4" />
                     <span class="text-sm">Numbered</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="$emit('indent')">
-                    <Indent class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <Indent class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Indent</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="$emit('unindent')">
-                    <Outdent class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <Outdent class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Unindent</span>
                   </button>
                 </div>
 
                 <!-- Alignment -->
                 <div class="space-y-2 mt-3">
-                  <div class="text-xs font-medium text-gray-600 dark:text-gray-300">Alignment</div>
+                  <div class="text-xs font-medium text-muted-foreground">Alignment</div>
                   <div class="grid grid-cols-4 gap-1">
-                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
+                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-accent transition-colors"
                       @click="setAlign('left')">
-                      <AlignLeft class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                      <AlignLeft class="w-4 h-4 text-muted-foreground" />
                     </button>
-                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
+                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-accent transition-colors"
                       @click="setAlign('center')">
-                      <AlignCenter class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                      <AlignCenter class="w-4 h-4 text-muted-foreground" />
                     </button>
-                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
+                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-accent transition-colors"
                       @click="setAlign('right')">
-                      <AlignRight class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                      <AlignRight class="w-4 h-4 text-muted-foreground" />
                     </button>
-                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors"
+                    <button class="flex items-center justify-center p-2 rounded-md hover:bg-accent transition-colors"
                       @click="setAlign('justify')">
-                      <AlignJustify class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                      <AlignJustify class="w-4 h-4 text-muted-foreground" />
                     </button>
                   </div>
                 </div>
@@ -865,55 +866,55 @@
               <!-- Insert Elements Section -->
               <div class="space-y-2">
                 <div
-                  class="px-1 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide border-b border-gray-200 dark:border-gray-700 pb-2">
+                  class="px-1 py-1 text-xs font-semibold text-foreground uppercase tracking-wide border-b border-border dark:border-border pb-2">
                   Insert</div>
                 <div class="grid grid-cols-2 gap-1">
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="$emit('insert-link')">
-                    <Link class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <Link class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Link</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="$emit('insert-image')">
-                    <ImageIcon class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <ImageIcon class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Image</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="showTableDialog = true">
-                    <Table class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <Table class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Table</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="$emit('insert-horizontal-line')">
-                    <Minus class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <Minus class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Divider</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="$emit('insert-math')">
-                    <Sigma class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <Sigma class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Math</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="$emit('insert-mathblock')">
-                    <SquareSigma class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <SquareSigma class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Math Block</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="$emit('insert-footnote')">
-                    <FootnoteIcon class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <FootnoteIcon class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Footnote</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
                     @click="showEmojiDialog = true">
-                    <Smile class="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                    <Smile class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm">Emoji</span>
                   </button>
                 </div>
