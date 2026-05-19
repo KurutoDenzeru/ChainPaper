@@ -82,8 +82,8 @@
       </div>
 
       <DialogFooter>
-        <div class="flex w-full gap-2">
-          <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">
+        <div class="flex w-full items-center justify-end gap-2 pt-2 border-t border-border">
+          <Button variant="ghost" @click="$emit('update:open', false)">
             <X class="w-4 h-4 mr-2" />
             Cancel
           </Button>

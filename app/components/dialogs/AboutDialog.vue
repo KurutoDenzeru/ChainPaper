@@ -51,25 +51,24 @@
           </div>
 
           <!-- Links -->
-          <div class="space-y-2">
-            <h3 class="text-xs sm:text-sm font-semibold text-foreground-100">Connect</h3>
-            <div class="flex flex-wrap items-center gap-2">
+          <div class="space-y-4 pt-4 border-t border-border mt-4">
+            <div class="flex justify-center items-center gap-4">
               <a href="https://github.com/KurutoDenzeru/ChainPaper" target="_blank"
-                class="p-2 rounded-md border border-border/60 dark:border-border/60 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 title="GitHub Repository">
-                <Github class="w-5 h-5 text-foreground" />
+                <Github class="w-4 h-4" /> Github
               </a>
 
               <a href="https://www.linkedin.com/in/KurtCalacday" target="_blank"
-                class="p-2 rounded-md border border-border/60 dark:border-border/60 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 title="LinkedIn Profile">
-                <Linkedin class="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <Linkedin class="w-4 h-4" /> LinkedIn
               </a>
 
               <a href="https://www.instagram.com/krtclcdy" target="_blank"
-                class="p-2 rounded-md border border-border/60 dark:border-border/60 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                class="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 title="Instagram">
-                <Instagram class="w-5 h-5 text-pink-500 dark:text-pink-400" />
+                <Instagram class="w-4 h-4" /> Instagram
               </a>
             </div>
           </div>

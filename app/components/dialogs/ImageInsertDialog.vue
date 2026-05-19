@@ -33,11 +33,9 @@
         <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
       </div>
       <DialogFooter>
-        <div class="flex w-full gap-2">
-          <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">Cancel</Button>
-          <Button :disabled="!preview"
-            class="w-1/2 flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white border-none dark:bg-primary dark:hover:bg-primary dark:text-white"
-            @click="insertImage">
+        <div class="flex w-full items-center justify-end gap-2 pt-2 border-t border-border">
+          <Button variant="ghost" @click="$emit('update:open', false)">Cancel</Button>
+          <Button class="bg-primary hover:bg-primary/90 text-white" @click="insertImage" :disabled="!preview">
             <UploadCloud class="w-4 h-4" />
             Insert
           </Button>

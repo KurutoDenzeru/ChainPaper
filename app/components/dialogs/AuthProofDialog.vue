@@ -44,69 +44,65 @@
         </div>
 
         <!-- Key Management -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <Label>Public Key (SPKI, base64)</Label>
-              <div class="flex items-center gap-2">
-                <Button variant="ghost" size="sm" @click="pastePublicKey" title="Paste from clipboard">
+        <div class="space-y-4">
+          <div class="p-4 rounded-xl bg-card border border-border/50 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <Label class="text-sm font-semibold tracking-wide uppercase text-muted-foreground">Public Key (SPKI, base64)</Label>
+              <div class="flex items-center gap-1">
+                <Button variant="ghost" size="icon" class="w-8 h-8 rounded-full" @click="pastePublicKey" title="Paste from clipboard">
                   <Clipboard class="w-4 h-4" />
                 </Button>
-                <Button variant="outline" size="sm" @click="showPublicKey = !showPublicKey">
+                <Button variant="ghost" size="sm" class="h-8 rounded-full text-xs" @click="showPublicKey = !showPublicKey">
                   {{ showPublicKey ? 'Hide' : 'Show' }}
                 </Button>
               </div>
             </div>
             <div v-if="showPublicKey">
               <Textarea v-model="publicKeyB64" placeholder="Paste or generate a public key"
-                class="font-mono text-xs h-32 overflow-y-auto resize-none" />
+                class="font-mono text-xs h-24 overflow-y-auto resize-none bg-background border-border/40 focus-visible:ring-1 focus-visible:ring-primary" />
             </div>
-            <div v-else class="text-sm text-gray-500 p-3 bg-gray-50 rounded">
-              Public key hidden — click Show to view.
+            <div v-else class="text-xs text-muted-foreground p-3 bg-muted/30 rounded-lg flex items-center justify-center border border-border/30 border-dashed">
+              Public key hidden
             </div>
           </div>
 
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <Label>Private Key (PKCS8, base64)</Label>
-              <div class="flex items-center gap-2">
-                <Button variant="ghost" size="sm" @click="exportKeys" :disabled="!privateKey"
+          <div class="p-4 rounded-xl bg-card border border-border/50 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <Label class="text-sm font-semibold tracking-wide uppercase text-muted-foreground">Private Key (PKCS8, base64)</Label>
+              <div class="flex items-center gap-1">
+                <Button variant="ghost" size="icon" class="w-8 h-8 rounded-full" @click="exportKeys" :disabled="!privateKey"
                   title="Download key files">
                   <Download class="w-4 h-4" />
                 </Button>
-                <Button variant="outline" size="sm" @click="showPrivateKey = !showPrivateKey">
+                <Button variant="ghost" size="sm" class="h-8 rounded-full text-xs" @click="showPrivateKey = !showPrivateKey">
                   {{ showPrivateKey ? 'Hide' : 'Show' }}
                 </Button>
               </div>
             </div>
             <div v-if="showPrivateKey">
               <Textarea v-model="privateKeyB64" placeholder="(keeps local only)"
-                class="font-mono text-xs h-32 overflow-y-auto resize-none" />
+                class="font-mono text-xs h-24 overflow-y-auto resize-none bg-background border-border/40 focus-visible:ring-1 focus-visible:ring-primary" />
             </div>
-            <div v-else class="text-sm text-gray-500 p-3 bg-gray-50 rounded">
-              Private key hidden — keep this secret.
+            <div v-else class="text-xs text-muted-foreground p-3 bg-muted/30 rounded-lg flex items-center justify-center border border-border/30 border-dashed">
+              Private key hidden
             </div>
           </div>
         </div>
 
         <!-- Actions -->
-        <div class="flex flex-wrap items-center gap-3">
-          <Button variant="outline" @click="generateKeys">
-            <Key class="w-4 h-4 mr-2" />
-            Generate Keys
+        <div class="flex flex-wrap items-center gap-2 pt-2">
+          <Button variant="secondary" size="sm" class="rounded-full px-4" @click="generateKeys">
+            <Key class="w-4 h-4 mr-2" /> Generate
           </Button>
-          <Button variant="outline" @click="importProofFile">
-            <FileText class="w-4 h-4 mr-2" />
-            Import Proof
+          <Button variant="secondary" size="sm" class="rounded-full px-4" @click="importProofFile">
+            <FileText class="w-4 h-4 mr-2" /> Import
           </Button>
           <div class="ml-auto flex items-center gap-2">
-            <Button @click="signAndExport" :disabled="!privateKey">
-              <FileSignature class="w-4 h-4 mr-2" />
-              Sign & Export
+            <Button size="sm" class="rounded-full px-5 bg-primary hover:bg-primary/90 text-white" @click="signAndExport" :disabled="!privateKey">
+              <FileSignature class="w-4 h-4 mr-2 text-white" /> Sign & Export
             </Button>
-            <Button variant="outline" @click="verifyProof" :disabled="!publicKeyB64 || !currentProof">
-              <CheckCircle class="w-4 h-4 mr-2" />
-              Verify
+            <Button variant="outline" size="sm" class="rounded-full px-5 border-primary/20 text-primary hover:bg-primary/10 hover:text-primary" @click="verifyProof" :disabled="!publicKeyB64 || !currentProof">
+              <CheckCircle class="w-4 h-4 mr-2" /> Verify
             </Button>
           </div>
         </div>

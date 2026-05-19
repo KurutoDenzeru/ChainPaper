@@ -130,13 +130,11 @@
       </ScrollArea>
 
       <DialogFooter>
-        <div class="flex gap-2 w-full">
-          <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">
+        <div class="flex w-full items-center justify-end gap-2 pt-2 border-t border-border">
+          <Button variant="ghost" @click="$emit('update:open', false)">
             Close
           </Button>
-          <Button variant="outline"
-            class="w-1/2 bg-primary hover:bg-primary/90 text-white hover:text-white border-none dark:bg-primary dark:hover:bg-primary"
-            @click="exportStats">
+          <Button class="bg-primary hover:bg-primary/90 text-white" @click="exportStats">
             <Download class="w-4 h-4 mr-2 text-white" />
             Export Stats
           </Button>

@@ -67,12 +67,11 @@
       </div>
 
       <DialogFooter>
-        <div class="flex w-full gap-3">
-          <Button variant="outline" @click="$emit('update:open', false)" class="flex-1">
+        <div class="flex w-full items-center justify-end gap-2 pt-2 border-t border-border">
+          <Button variant="ghost" @click="$emit('update:open', false)">
             Cancel
           </Button>
-          <Button @click="handleSave"
-            class="flex-1 bg-primary hover:bg-primary/90 text-white hover:text-white border-none dark:bg-primary dark:hover:bg-primary">
+          <Button class="bg-primary hover:bg-primary/90 text-white" @click="handleSave">
             <Save class="w-4 h-4 mr-2 text-white" />
             Save Document
           </Button>

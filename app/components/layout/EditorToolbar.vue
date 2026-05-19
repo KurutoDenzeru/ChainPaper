@@ -50,482 +50,109 @@
         </Tooltip>
       </div>
 
-      <!-- Desktop Layout: Show all controls on large screens -->
-      <div class="hidden lg:flex gap-1 flex-1 items-center">
-        <div class="h-6 w-px bg-muted dark:bg-muted mx-1"></div>
+      <!-- Unified Responsive Main Toolbar -->
+      <div class="flex flex-1 items-center gap-1 overflow-hidden">
+        <div class="h-6 w-px bg-muted mx-1 hidden md:block"></div>
 
-        <!-- Headings (popover dropdown) -->
-        <Popover>
-          <PopoverTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16"
-              title="Heading Styles" aria-label="Heading styles">
-              <component :is="currentHeadingIcon" class="w-4 h-4 text-muted-foreground" />
-              <ChevronDown class="w-3 h-3 text-foreground" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            class="w-40 p-2 bg-card dark:bg-card text-foreground-200 border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
-            <div class="flex flex-col">
-              <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
-                @click="setHeading('p')">
-                <FileText class="w-4 h-4" />
-                Paragraph
-              </button>
-              <div class="border-t my-1 border-border dark:border-border" />
-              <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
-                @click="setHeading('h1')">
-                <Heading1 class="w-4 h-4" />
-                Heading 1
-              </button>
-              <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
-                @click="setHeading('h2')">
-                <Heading2 class="w-4 h-4" />
-                Heading 2
-              </button>
-              <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
-                @click="setHeading('h3')">
-                <Heading3 class="w-4 h-4" />
-                Heading 3
-              </button>
-              <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
-                @click="setHeading('h4')">
-                <Heading4 class="w-4 h-4" />
-                Heading 4
-              </button>
-              <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
-                @click="setHeading('h5')">
-                <Heading5 class="w-4 h-4" />
-                Heading 5
-              </button>
-              <button
-                class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
-                @click="setHeading('h6')">
-                <Heading6 class="w-4 h-4" />
-                Heading 6
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        <div class="h-6 w-px bg-muted dark:bg-muted mx-1"></div>
-
-        <!-- Zoom controls -->
-        <div class="flex items-center gap-1 ml-1">
-          <Tooltip>
-            <TooltipTrigger as-child>
-              <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="changeZoom(-25)" aria-label="Zoom out">
-                <Minus class="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Zoom Out</p>
-            </TooltipContent>
-          </Tooltip>
-
+        <!-- Headings (hidden on mobile, visible on tablet+) -->
+        <div class="hidden md:flex">
           <Popover>
             <PopoverTrigger as-child>
-              <button type="button" aria-haspopup="dialog" :aria-expanded="false"
-                class="w-20 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                tabindex="0">
-                <span class="sr-only" id="editor-zoom-label">Zoom percentage</span>
-                <Input id="editor-zoom-input" type="number" v-model="zoomModel"
-                  class="w-20 text-center h-8 rounded bg-white dark:bg-muted border border-border dark:border-border text-foreground-100"
-                  aria-labelledby="editor-zoom-label" aria-label="Zoom percentage" role="spinbutton" aria-valuemin="50"
-                  aria-valuemax="200" :aria-valuenow="isFit ? 100 : zoomPercent" />
-              </button>
+              <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16 shrink-0"
+                title="Heading Styles" aria-label="Heading styles">
+                <component :is="currentHeadingIcon" class="w-4 h-4 text-muted-foreground" />
+                <ChevronDown class="w-3 h-3 text-foreground" />
+              </Button>
             </PopoverTrigger>
             <PopoverContent
-              class="w-32 p-2 bg-card dark:bg-card text-foreground-200 border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
+              class="w-40 p-2 bg-card dark:bg-card text-foreground-200 border border-border dark:border-border rounded-md shadow-lg">
               <div class="flex flex-col">
                 <button
-                  class="text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent text-foreground-100 font-medium"
-                  @click="selectZoom('fit')">Fit</button>
+                  class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
+                  @click="setHeading('p')">
+                  <FileText class="w-4 h-4" />
+                  Paragraph
+                </button>
                 <div class="border-t my-1 border-border dark:border-border" />
-                <button v-for="opt in zoomOptions" :key="opt"
-                  class="text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent text-foreground-100"
-                  @click="selectZoom(opt)">{{ opt }}%</button>
+                <button v-for="h in [1,2,3,4,5,6]" :key="h"
+                  class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
+                  @click="setHeading('h'+h)">
+                  <component :is="h===1 ? Heading1 : h===2 ? Heading2 : h===3 ? Heading3 : h===4 ? Heading4 : h===5 ? Heading5 : Heading6" class="w-4 h-4" />
+                  Heading {{h}}
+                </button>
+              </div>
+            </PopoverContent>
+          </Popover>
+          <div class="h-6 w-px bg-muted dark:bg-muted mx-1 hidden lg:block"></div>
+        </div>
+
+        <!-- Zoom controls (Desktop only) -->
+        <div class="hidden lg:flex items-center gap-1">
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" class="h-8 w-8 p-0 shrink-0" @click="changeZoom(-25)"><Minus class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Zoom Out</p></TooltipContent></Tooltip>
+          <Popover>
+            <PopoverTrigger as-child>
+              <button type="button" class="w-16 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none shrink-0"><Input type="number" v-model="zoomModel" class="w-16 text-center h-8 rounded bg-background border border-border text-foreground text-xs" /></button>
+            </PopoverTrigger>
+            <PopoverContent class="w-32 p-2 bg-card text-foreground border border-border rounded-md shadow-lg">
+              <div class="flex flex-col">
+                <button class="text-left px-2 py-1 rounded hover:bg-accent text-sm" @click="selectZoom('fit')">Fit</button>
+                <div class="border-t my-1 border-border" />
+                <button v-for="opt in zoomOptions" :key="opt" class="text-left px-2 py-1 rounded hover:bg-accent text-sm" @click="selectZoom(opt)">{{ opt }}%</button>
+              </div>
+            </PopoverContent>
+          </Popover>
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" class="h-8 w-8 p-0 shrink-0" @click="changeZoom(25)"><Plus class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Zoom In</p></TooltipContent></Tooltip>
+          <div class="h-6 w-px bg-muted mx-1"></div>
+        </div>
+
+        <!-- Basic Formatting (Always visible) -->
+        <div class="flex items-center gap-1 shrink-0">
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bold }]" @click="$emit('format-bold')"><Bold class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Bold</p></TooltipContent></Tooltip>
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.italic }]" @click="$emit('format-italic')"><Italic class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Italic</p></TooltipContent></Tooltip>
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.underline }]" @click="$emit('format-underline')"><Underline class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Underline</p></TooltipContent></Tooltip>
+        </div>
+
+        <!-- Strikethrough (Desktop only) -->
+        <div class="hidden lg:flex items-center shrink-0">
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.strike }]" @click="$emit('format-strikethrough')"><Strikethrough class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Strikethrough</p></TooltipContent></Tooltip>
+        </div>
+
+        <!-- Lists (Tablet+ only) -->
+        <div class="hidden md:flex items-center gap-1 shrink-0">
+          <div class="h-6 w-px bg-muted mx-1 hidden lg:block"></div>
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bullet }]" @click="$emit('toggle-bullet-list')"><List class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Bullet List</p></TooltipContent></Tooltip>
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.ordered }]" @click="$emit('toggle-ordered-list')"><ListOrdered class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Numbered List</p></TooltipContent></Tooltip>
+        </div>
+
+        <!-- More formatting (Desktop only) -->
+        <div class="hidden lg:flex items-center gap-1 shrink-0">
+          <div class="h-6 w-px bg-muted mx-1"></div>
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('toggle-blockquote')"><Quote class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Blockquote</p></TooltipContent></Tooltip>
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-code-block')"><Code2 class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Code Block</p></TooltipContent></Tooltip>
+          
+          <Popover>
+            <PopoverTrigger as-child>
+              <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16" title="Alignment">
+                <component :is="alignmentIcon" class="w-4 h-4" />
+                <ChevronDown class="w-3 h-3 text-foreground" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent class="w-36 p-2 bg-card text-foreground border border-border rounded-md shadow-lg">
+              <div class="flex flex-col">
+                <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent text-sm" @click="setAlign('left')"><AlignLeft class="w-4 h-4" />Left</button>
+                <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent text-sm" @click="setAlign('center')"><AlignCenter class="w-4 h-4" />Center</button>
+                <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent text-sm" @click="setAlign('right')"><AlignRight class="w-4 h-4" />Right</button>
+                <button class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent text-sm" @click="setAlign('justify')"><AlignJustify class="w-4 h-4" />Justify</button>
               </div>
             </PopoverContent>
           </Popover>
 
-          <Tooltip>
-            <TooltipTrigger as-child>
-              <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="changeZoom(25)" aria-label="Zoom in">
-                <Plus class="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Zoom In</p>
-            </TooltipContent>
-          </Tooltip>
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-link')"><Link class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Link</p></TooltipContent></Tooltip>
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-image')"><ImageIcon class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Image</p></TooltipContent></Tooltip>
+          <Tooltip><TooltipTrigger as-child><Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showTableDialog = true"><Table class="w-4 h-4" /></Button></TooltipTrigger><TooltipContent><p>Table</p></TooltipContent></Tooltip>
         </div>
 
-        <div class="h-6 w-px bg-muted dark:bg-muted mx-1"></div>
-
-        <!-- Basic Formatting -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bold }]"
-              @click="$emit('format-bold')" :aria-pressed="active.bold" aria-label="Bold">
-              <Bold class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Bold</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.italic }]"
-              @click="$emit('format-italic')" :aria-pressed="active.italic" aria-label="Italic">
-              <Italic class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Italic</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.underline }]"
-              @click="$emit('format-underline')" :aria-pressed="active.underline" aria-label="Underline">
-              <Underline class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Underline</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.strike }]"
-              @click="$emit('format-strikethrough')" :aria-pressed="active.strike" aria-label="Strikethrough">
-              <Strikethrough class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Strikethrough</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Text Color -->
-        <Popover>
-          <PopoverTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" title="Text Color" aria-label="Text Color">
-              <div class="relative flex items-center justify-center">
-                <Type class="w-4 h-4" />
-                <div class="absolute bottom-0 left-0 w-full h-1 rounded" :style="{ backgroundColor: currentTextColor }">
-                </div>
-              </div>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            class="w-64 p-3 bg-card dark:bg-card text-foreground border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
-            <div class="grid grid-cols-8 gap-2">
-              <button v-for="c in textColors" :key="c" :title="c"
-                class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
-                :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentTextColor }" :style="{ backgroundColor: c }"
-                @click="$emit('set-text-color', c)">
-                <Check v-if="c === currentTextColor"
-                  :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
-              </button>
-            </div>
-            <div class="mt-3 border-t pt-3">
-              <div class="text-xs text-foreground mb-2">Custom color</div>
-              <div class="flex items-center gap-2">
-                <input type="color"
-                  class="w-10 h-8 p-0 border rounded cursor-pointer border-border dark:border-border bg-white dark:bg-muted"
-                  @input="onCustomTextColor" />
-                <input type="text"
-                  class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-muted border-border dark:border-border text-foreground"
-                  placeholder="#rrggbb" @change="onCustomTextColorText" />
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        <!-- Highlight -->
-        <Popover>
-          <PopoverTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" title="Highlight" aria-label="Highlight">
-              <div class="relative flex items-center justify-center">
-                <Highlighter class="w-4 h-4" />
-                <div class="absolute bottom-0 left-0 w-full h-1 rounded" :style="{ backgroundColor: currentHighlight }">
-                </div>
-              </div>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            class="w-64 p-3 bg-card dark:bg-card text-foreground border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
-            <div class="grid grid-cols-8 gap-2">
-              <button v-for="c in highlightColors" :key="c" :title="c"
-                class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform flex items-center justify-center cursor-pointer"
-                :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentHighlight }" :style="{ backgroundColor: c }"
-                @click="$emit('set-highlight', c)">
-                <Check v-if="c === currentHighlight"
-                  :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
-              </button>
-            </div>
-            <div class="mt-3 border-t pt-3">
-              <div class="text-xs text-foreground mb-2">Custom highlight</div>
-              <div class="flex items-center gap-2">
-                <input type="color"
-                  class="w-10 h-8 p-0 border rounded cursor-pointer border-border dark:border-border bg-white dark:bg-muted"
-                  @input="onCustomHighlight" />
-                <input type="text"
-                  class="w-full text-sm h-8 px-2 border rounded bg-white dark:bg-muted border-border dark:border-border text-foreground"
-                  placeholder="#rrggbb" @change="onCustomHighlightText" />
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        <!-- Code Block -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-code-block')"
-              aria-label="Insert code block">
-              <Code2 class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Code Block</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Blockquote -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('toggle-blockquote')"
-              aria-label="Toggle blockquote">
-              <Quote class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Blockquote</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Superscript -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-superscript')"
-              aria-label="Superscript">
-              <Superscript class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Superscript</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Subscript -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('format-subscript')"
-              aria-label="Subscript">
-              <Subscript class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Subscript</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <div class="h-6 w-px bg-muted mx-1"></div>
-
-        <!-- Alignment (popover with chevron inside trigger) -->
-        <Popover>
-          <PopoverTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16"
-              title="Text Alignment" aria-label="Text alignment">
-              <component :is="alignmentIcon" class="w-4 h-4" />
-              <ChevronDown class="w-3 h-3 text-foreground" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            class="w-36 p-2 bg-card dark:bg-card text-foreground border border-border dark:border-border rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]">
-            <div class="flex flex-col">
-              <button
-                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
-                @click="setAlign('left')">
-                <AlignLeft class="w-4 h-4" />Left
-              </button>
-              <button
-                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
-                @click="setAlign('center')">
-                <AlignCenter class="w-4 h-4" />Center
-              </button>
-              <button
-                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
-                @click="setAlign('right')">
-                <AlignRight class="w-4 h-4" />Right
-              </button>
-              <button
-                class="flex items-center gap-2 px-2 py-1 rounded hover:bg-accent dark:hover:bg-accent transition-colors"
-                @click="setAlign('justify')">
-                <AlignJustify class="w-4 h-4" />Justify
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        <div class="h-6 w-px bg-muted mx-1"></div>
-
-        <!-- Math -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-math')"
-              aria-label="Insert inline math">
-              <Sigma class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Insert Math</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Mathblock -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-mathblock')"
-              aria-label="Insert math block">
-              <SquareSigma class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Insert Math Block</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Horizontal Line -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-horizontal-line')"
-              aria-label="Insert horizontal line">
-              <Minus class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Insert Horizontal Line</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Footnote -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-footnote')"
-              aria-label="Insert footnote">
-              <FileText class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Insert Footnote</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Emoji -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showEmojiDialog = true"
-              aria-label="Insert emoji">
-              <Smile class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Insert Emoji</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bullet }]"
-              @click="$emit('toggle-bullet-list')" :aria-pressed="active.bullet" aria-label="Toggle bullet list">
-              <List class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Bullet List</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.ordered }]"
-              @click="$emit('toggle-ordered-list')" :aria-pressed="active.ordered" aria-label="Toggle numbered list">
-              <ListOrdered class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Numbered List</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Indent/Unindent -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('unindent')" aria-label="Unindent">
-              <Outdent class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Unindent</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('indent')" aria-label="Indent">
-              <Indent class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Indent</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <div class="h-6 w-px bg-muted mx-1"></div>
-
-        <!-- Insert Tools -->
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-link')"
-              aria-label="Insert link">
-              <Link class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Insert Link</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="$emit('insert-image')"
-              aria-label="Insert image">
-              <ImageIcon class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Insert Image</p>
-          </TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="showTableDialog = true"
-              aria-label="Insert table">
-              <Table class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Insert Table</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <!-- Collapse/Expand Menubar Button (at the end) -->
-        <div class="ml-auto flex items-center">
+        <div class="ml-auto flex items-center shrink-0">
           <Tooltip>
             <TooltipTrigger as-child>
               <Button variant="ghost" size="sm" class="h-8 w-8 p-0" @click="toggleMenubarCollapse"
@@ -541,111 +168,6 @@
         </div>
       </div>
 
-      <!-- Medium screens: Show essential formatting -->
-      <div class="hidden md:flex lg:hidden gap-1 flex-1 items-center">
-        <div class="h-6 w-px bg-muted mx-1"></div>
-
-        <!-- Headings (smaller popover) -->
-        <Popover>
-          <PopoverTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 px-2 flex items-center justify-between w-16">
-              <component :is="currentHeadingIcon" class="w-4 h-4 text-muted-foreground" />
-              <ChevronDown class="w-3 h-3 text-foreground" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent class="w-36 p-2">
-            <div class="flex flex-col">
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
-                @click="setHeading('p')">
-                <FileText class="w-4 h-4" />
-                P
-              </button>
-              <div class="border-t my-1" />
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
-                @click="setHeading('h1')">
-                <Heading1 class="w-4 h-4" />
-                H1
-              </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
-                @click="setHeading('h2')">
-                <Heading2 class="w-4 h-4" />
-                H2
-              </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
-                @click="setHeading('h3')">
-                <Heading3 class="w-4 h-4" />
-                H3
-              </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
-                @click="setHeading('h4')">
-                <Heading4 class="w-4 h-4" />
-                H4
-              </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
-                @click="setHeading('h5')">
-                <Heading5 class="w-4 h-4" />
-                H5
-              </button>
-              <button class="flex items-center gap-2 text-left px-2 py-1 rounded hover:bg-accent"
-                @click="setHeading('h6')">
-                <Heading6 class="w-4 h-4" />
-                H6
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        <div class="h-6 w-px bg-muted mx-1"></div>
-
-        <!-- Basic Formatting -->
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bold }]"
-          @click="$emit('format-bold')" :aria-pressed="active.bold" aria-label="Bold">
-          <Bold class="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.italic }]"
-          @click="$emit('format-italic')" :aria-pressed="active.italic" aria-label="Italic">
-          <Italic class="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.underline }]"
-          @click="$emit('format-underline')" :aria-pressed="active.underline" aria-label="Underline">
-          <Underline class="w-4 h-4" />
-        </Button>
-
-        <div class="h-6 w-px bg-muted mx-1"></div>
-
-        <!-- Lists -->
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bullet }]"
-          @click="$emit('toggle-bullet-list')" :aria-pressed="active.bullet" aria-label="Toggle bullet list">
-          <List class="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.ordered }]"
-          @click="$emit('toggle-ordered-list')" :aria-pressed="active.ordered" aria-label="Toggle numbered list">
-          <ListOrdered class="w-4 h-4" />
-        </Button>
-
-        <!-- (mode toggle removed for medium screens; use far-left labeled control) -->
-      </div>
-
-      <!-- Small screens: Show only Bold, Italic, Underline -->
-      <div class="flex md:hidden gap-1 flex-1 items-center">
-        <div class="h-6 w-px bg-muted mx-1"></div>
-
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.bold }]"
-          @click="$emit('format-bold')" aria-label="Bold" :aria-pressed="active.bold">
-          <Bold class="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.italic }]"
-          @click="$emit('format-italic')" aria-label="Italic" :aria-pressed="active.italic">
-          <Italic class="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" size="sm" :class="['h-8 w-8 p-0', { 'bg-muted': active.underline }]"
-          @click="$emit('format-underline')" aria-label="Underline" :aria-pressed="active.underline">
-          <Underline class="w-4 h-4" />
-        </Button>
-
-        <!-- Everything else goes to More Options dropdown -->
-      </div>
-
       <!-- More Options Dropdown (Only on medium and small screens) -->
       <div class="flex lg:hidden gap-1 shrink-0 items-center">
         <Popover>
@@ -659,7 +181,7 @@
             align="end">
             <div class="p-3 space-y-4">
               <!-- Text Styles Section -->
-              <div class="space-y-2">
+              <div class="space-y-2 md:hidden">
                 <div
                   class="px-1 py-1 text-xs font-semibold text-foreground uppercase tracking-wide border-b border-border dark:border-border pb-2">
                   Text Styles</div>
@@ -766,20 +288,25 @@
                     <Type class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm font-medium text-foreground">Text Color</span>
                   </div>
-                  <div class="grid grid-cols-8 gap-1.5">
+                  <div class="grid grid-cols-4 gap-2">
                     <button v-for="c in textColors" :key="c" :title="c"
-                      class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform cursor-pointer shadow-[0_4px_12px_rgb(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgb(0,0,0,0.2)] flex items-center justify-center"
-                      :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentTextColor }"
-                      :style="{ backgroundColor: c }" @click="$emit('set-text-color', c)">
+                      class="relative w-full aspect-square rounded-lg border border-border/40 hover:scale-105 transition-all flex items-center justify-center cursor-pointer group"
+                      :class="{ 'ring-2 ring-primary ring-offset-1 ring-offset-background': c === currentTextColor }" :style="{ backgroundColor: c }"
+                      @click="$emit('set-text-color', c)">
+                      <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-lg"></div>
                       <Check v-if="c === currentTextColor"
-                        :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
+                        :class="isLightColor(c) ? 'w-4 h-4 text-black' : 'w-4 h-4 text-white'" />
                     </button>
                   </div>
                   <div class="flex items-center gap-2 mt-2">
-                    <input type="color" class="w-8 h-6 border border-border rounded cursor-pointer"
-                      @input="onCustomTextColor" />
-                    <input type="text" class="flex-1 text-xs h-6 px-2 border border-border rounded"
-                      placeholder="#rrggbb" @change="onCustomTextColorText" />
+                    <div class="relative w-8 h-8 rounded-lg overflow-hidden border border-border/40 shrink-0">
+                      <input type="color"
+                        class="absolute -top-2 -left-2 w-12 h-12 cursor-pointer"
+                        @input="onCustomTextColor" :value="currentTextColor" />
+                    </div>
+                    <input type="text"
+                      class="flex-1 text-xs h-8 px-2 border rounded-lg bg-background border-border/40 text-foreground font-mono uppercase focus:ring-1 focus:ring-primary focus:outline-none"
+                      placeholder="#RRGG" :value="currentTextColor" @change="onCustomTextColorText" />
                   </div>
                 </div>
 
@@ -789,20 +316,29 @@
                     <Highlighter class="w-4 h-4 text-muted-foreground" />
                     <span class="text-sm font-medium text-foreground">Highlight</span>
                   </div>
-                  <div class="grid grid-cols-8 gap-1.5">
+                  <div class="grid grid-cols-4 gap-2">
                     <button v-for="c in highlightColors" :key="c" :title="c"
-                      class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform cursor-pointer shadow-[0_4px_12px_rgb(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgb(0,0,0,0.2)] flex items-center justify-center"
-                      :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentHighlight }"
-                      :style="{ backgroundColor: c }" @click="$emit('set-highlight', c)">
+                      class="relative w-full aspect-square rounded-lg border border-border/40 hover:scale-105 transition-all flex items-center justify-center cursor-pointer group"
+                      :class="{ 
+                        'ring-2 ring-primary ring-offset-1 ring-offset-background': c === currentHighlight,
+                        'bg-[url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PGxpbmUgeDE9IjAiIHkxPSIxMCIgeDI9IjEwIiB5Mj0iMCIgc3Ryb2tlPSIjZmYwMDAwIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=\')] bg-center bg-no-repeat bg-white dark:bg-black': c === 'transparent'
+                      }" 
+                      :style="{ backgroundColor: c !== 'transparent' ? c : undefined }"
+                      @click="$emit('set-highlight', c)">
+                      <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-lg"></div>
                       <Check v-if="c === currentHighlight"
-                        :class="isLightColor(c) ? 'w-3 h-3 text-black' : 'w-3 h-3 text-white'" />
+                        :class="(c === 'transparent' || isLightColor(c)) ? 'w-4 h-4 text-black drop-shadow-md' : 'w-4 h-4 text-white drop-shadow-md'" />
                     </button>
                   </div>
                   <div class="flex items-center gap-2 mt-2">
-                    <input type="color" class="w-8 h-6 border border-border rounded cursor-pointer"
-                      @input="onCustomHighlight" />
-                    <input type="text" class="flex-1 text-xs h-6 px-2 border border-border rounded"
-                      placeholder="#rrggbb" @change="onCustomHighlightText" />
+                    <div class="relative w-8 h-8 rounded-lg overflow-hidden border border-border/40 shrink-0">
+                      <input type="color"
+                        class="absolute -top-2 -left-2 w-12 h-12 cursor-pointer"
+                        @input="onCustomHighlight" :value="currentHighlight !== 'transparent' ? currentHighlight : '#ffffff'" />
+                    </div>
+                    <input type="text"
+                      class="flex-1 text-xs h-8 px-2 border rounded-lg bg-background border-border/40 text-foreground font-mono uppercase focus:ring-1 focus:ring-primary focus:outline-none"
+                      placeholder="#RRGG" :value="currentHighlight" @change="onCustomHighlightText" />
                   </div>
                 </div>
               </div>
@@ -814,14 +350,14 @@
                   Lists & Layout</div>
                 <div class="grid grid-cols-2 gap-1">
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
-                    :class="{ 'bg-blue-50 text-blue-700': active.bullet }" @click="$emit('toggle-bullet-list')">
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors md:hidden"
+                    :class="{ 'bg-primary/20 text-primary font-medium': active.bullet }" @click="$emit('toggle-bullet-list')">
                     <List class="w-4 h-4" />
                     <span class="text-sm">Bullet List</span>
                   </button>
                   <button
-                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors"
-                    :class="{ 'bg-blue-50 text-blue-700': active.ordered }" @click="$emit('toggle-ordered-list')">
+                    class="flex items-center gap-2 text-left px-2 py-2 rounded-md hover:bg-accent transition-colors md:hidden"
+                    :class="{ 'bg-primary/20 text-primary font-medium': active.ordered }" @click="$emit('toggle-ordered-list')">
                     <ListOrdered class="w-4 h-4" />
                     <span class="text-sm">Numbered</span>
                   </button>
@@ -1057,8 +593,8 @@
   watch(() => props.mode, v => { if (v) mode.value = v })
   function toggleMode() { mode.value = mode.value === 'source' ? 'reader' : 'source'; emit('update:mode', mode.value) }
 
-  const textColors = ['#111827', '#374151', '#6B7280', '#9CA3AF', '#DC2626', '#EA580C', '#D97706', '#CA8A04', '#16A34A', '#0D9488', '#2563EB', '#9333EA', '#DB2777', '#F59E0B', '#10B981', '#3B82F6', '#6366F1']
-  const highlightColors = ['#FEF3C7', '#FFEDD5', '#FFE4E6', '#F3E8FF', '#E0F2FE', '#DCFCE7', '#FEE2E2', '#E2E8F0', '#D1FAE5', '#FDE68A', '#FBCFE8', '#C7D2FE', '#E9D5FF', '#F5F3FF', '#FAE8FF', '#F1F5F9']
+  const textColors = ['#141413', '#333333', '#666666', '#b0aea5', '#d97757', '#c25a3a', '#6a9bcc', '#4a7fb5']
+  const highlightColors = ['transparent', '#e8e6dc', '#d6e4f2', '#fcdfc6', '#b0aea5', '#333333', '#141413']
   const currentTextColor = computed(() => props.textColor || '#111827')
   const currentHighlight = computed(() => props.highlight || '#FDE68A')
 
