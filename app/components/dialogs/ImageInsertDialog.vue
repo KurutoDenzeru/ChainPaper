@@ -3,7 +3,7 @@
     <DialogContent class="sm:max-w-md w-full">
       <DialogHeader class="w-full flex flex-col items-start">
         <DialogTitle class="flex items-center gap-2 font-semibold text-left">
-          <ImageIcon class="w-5 h-5 text-green-600 dark:text-green-300" />
+          <ImageIcon class="w-5 h-5 text-primary dark:text-primary" />
           Insert Image
         </DialogTitle>
         <DialogDescription class="text-left mt-1">
@@ -33,11 +33,9 @@
         <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
       </div>
       <DialogFooter>
-        <div class="flex w-full gap-2">
-          <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">Cancel</Button>
-          <Button :disabled="!preview"
-            class="w-1/2 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white border-none dark:bg-green-500 dark:hover:bg-green-600 dark:text-white"
-            @click="insertImage">
+        <div class="flex w-full gap-2 pt-2 border-t border-border">
+          <Button class="flex-1" variant="outline" @click="$emit('update:open', false)">Cancel</Button>
+          <Button class="flex-1 bg-primary hover:bg-primary/90 text-white" @click="insertImage" :disabled="!preview">
             <UploadCloud class="w-4 h-4" />
             Insert
           </Button>

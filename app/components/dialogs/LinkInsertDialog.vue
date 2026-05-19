@@ -3,7 +3,7 @@
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <LinkIcon class="w-5 h-5 text-green-600" />
+          <LinkIcon class="w-5 h-5 text-primary" />
           <span>Insert Link</span>
         </DialogTitle>
         <DialogDescription>
@@ -49,10 +49,9 @@
       </div>
 
       <DialogFooter>
-        <div class="flex w-full gap-2">
-          <Button variant="outline" @click="handleCancel" class="w-1/2">Cancel</Button>
-          <Button @click="handleInsert" :disabled="!url.trim()"
-            class="w-1/2 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white border-none disabled:opacity-50 disabled:cursor-not-allowed">
+        <div class="flex w-full gap-2 pt-2 border-t border-border">
+          <Button class="flex-1" variant="outline" @click="handleCancel">Cancel</Button>
+          <Button class="flex-1 bg-primary hover:bg-primary/90 text-white" @click="handleInsert" :disabled="!url.trim()">
             <Link2 class="w-4 h-4" />
             <span>Insert Link</span>
           </Button>

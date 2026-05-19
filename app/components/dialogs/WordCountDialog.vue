@@ -3,7 +3,7 @@
     <DialogContent class="sm:max-w-3xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <Hash class="w-5 h-5 text-green-600" />
+          <Hash class="w-5 h-5 text-primary" />
           Markdown Document Statistics
         </DialogTitle>
         <DialogDescription>
@@ -19,9 +19,9 @@
               <div class="text-2xl font-bold text-blue-600 dark:text-blue-300">{{ stats.words }}</div>
               <div class="text-sm text-blue-700 dark:text-blue-200">Words</div>
             </div>
-            <div class="p-3 bg-green-50 dark:bg-green-900 rounded-md text-center">
-              <div class="text-2xl font-bold text-green-600 dark:text-green-300">{{ stats.characters }}</div>
-              <div class="text-sm text-green-700 dark:text-green-200">Characters</div>
+            <div class="p-3 bg-primary/10 dark:bg-primary/20 rounded-md text-center">
+              <div class="text-2xl font-bold text-primary dark:text-primary">{{ stats.characters }}</div>
+              <div class="text-sm text-primary dark:text-primary">Characters</div>
             </div>
             <div class="p-3 bg-purple-50 dark:bg-purple-900 rounded-md text-center">
               <div class="text-2xl font-bold text-purple-600 dark:text-purple-300">{{ stats.charactersNoSpaces }}</div>
@@ -130,13 +130,11 @@
       </ScrollArea>
 
       <DialogFooter>
-        <div class="flex gap-2 w-full">
-          <Button variant="outline" class="w-1/2" @click="$emit('update:open', false)">
+        <div class="flex w-full gap-2 pt-2 border-t border-border">
+          <Button class="flex-1" variant="outline" @click="$emit('update:open', false)">
             Close
           </Button>
-          <Button variant="outline"
-            class="w-1/2 bg-green-600 hover:bg-green-700 text-white hover:text-white border-none dark:bg-green-500 dark:hover:bg-green-600"
-            @click="exportStats">
+          <Button class="flex-1 bg-primary hover:bg-primary/90 text-white" @click="exportStats">
             <Download class="w-4 h-4 mr-2 text-white" />
             Export Stats
           </Button>

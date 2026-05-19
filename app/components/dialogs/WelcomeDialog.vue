@@ -27,8 +27,8 @@
           </button>
 
           <button @click="selectTemplate('welcome')"
-            class="w-full text-left group border border-border/60 dark:border-border/60 rounded-md p-3 flex flex-col items-start hover:bg-green-50 dark:hover:bg-gray-800 transition cursor-pointer">
-            <BookOpen class="w-6 h-6 text-green-500 mb-2" />
+            class="w-full text-left group border border-border/60 dark:border-border/60 rounded-md p-3 flex flex-col items-start hover:bg-primary/10 dark:hover:bg-gray-800 transition cursor-pointer">
+            <BookOpen class="w-6 h-6 text-primary mb-2" />
             <span class="font-semibold text-sm text-foreground">Welcome Guide</span>
             <span class="text-xs text-muted-foreground">Learn how to use ChainPaper</span>
           </button>

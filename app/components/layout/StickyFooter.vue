@@ -92,7 +92,7 @@
                   class="w-16 h-8 rounded flex items-center justify-center bg-transparent border-none p-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   tabindex="0">
                   <Input type="number"
-                    class="w-14 text-center text-sm rounded-md border border-border dark:border-border bg-white dark:bg-gray-700 px-2 py-1 text-foreground-100"
+                    class="w-14 text-center text-sm rounded-md border border-border bg-background px-2 py-1 text-foreground text-xs"
                     v-model="zoomModel" min="50" max="200" placeholder="100" aria-label="Zoom percentage"
                     role="spinbutton" aria-valuemin="50" aria-valuemax="200"
                     :aria-valuenow="isFit ? 100 : zoomPercent" />

@@ -3,7 +3,7 @@
     <DialogContent class="sm:max-w-2xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <Download class="w-5 h-5 text-green-600" />
+          <Download class="w-5 h-5 text-primary" />
           Export Markdown Document
         </DialogTitle>
         <DialogDescription>
@@ -14,61 +14,61 @@
 
       <div class="space-y-6">
         <!-- Export Options -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Button variant="outline" :class="[
-            'h-24 flex flex-col items-center gap-2 p-4 transition-all',
+            'h-24 flex flex-col items-center justify-center gap-2 transition-all duration-200 ease-in-out border-border',
             exportFormat === 'markdown'
-              ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50 dark:bg-blue-900 dark:ring-blue-400 dark:border-blue-400'
-              : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600 dark:bg-gray-800'
+              ? 'bg-primary/5 border-primary text-primary ring-1 ring-primary'
+              : 'hover:bg-accent/50 hover:border-border/80 text-muted-foreground'
           ]" @click="exportAsMarkdown">
-            <FileText class="w-8 h-8 text-blue-600 dark:text-blue-300" />
+            <FileText class="w-6 h-6 mb-1 transition-transform" :class="exportFormat === 'markdown' ? 'scale-110' : ''" />
             <div class="text-center">
-              <div class="font-medium dark:text-gray-100">Markdown</div>
-              <div class="text-xs text-muted-foreground">.md file</div>
+              <div class="font-medium text-sm text-foreground">Markdown</div>
+              <div class="text-[10px] uppercase tracking-wider opacity-70">.md</div>
             </div>
           </Button>
 
           <Button variant="outline" :class="[
-            'h-24 flex flex-col items-center gap-2 p-4 transition-all',
+            'h-24 flex flex-col items-center justify-center gap-2 transition-all duration-200 ease-in-out border-border',
             exportFormat === 'html'
-              ? 'ring-2 ring-orange-500 border-orange-500 bg-orange-50 dark:bg-orange-900 dark:ring-orange-400 dark:border-orange-400'
-              : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600 dark:bg-gray-800'
+              ? 'bg-primary/5 border-primary text-primary ring-1 ring-primary'
+              : 'hover:bg-accent/50 hover:border-border/80 text-muted-foreground'
           ]" @click="exportAsHTML">
-            <Globe class="w-8 h-8 text-orange-600 dark:text-orange-300" />
+            <Globe class="w-6 h-6 mb-1 transition-transform" :class="exportFormat === 'html' ? 'scale-110' : ''" />
             <div class="text-center">
-              <div class="font-medium dark:text-gray-100">HTML</div>
-              <div class="text-xs text-muted-foreground">.html file</div>
+              <div class="font-medium text-sm text-foreground">HTML</div>
+              <div class="text-[10px] uppercase tracking-wider opacity-70">.html</div>
             </div>
           </Button>
 
           <Button variant="outline" :class="[
-            'h-24 flex flex-col items-center gap-2 p-4 transition-all',
+            'h-24 flex flex-col items-center justify-center gap-2 transition-all duration-200 ease-in-out border-border',
             exportFormat === 'json'
-              ? 'ring-2 ring-purple-500 border-purple-500 bg-purple-50 dark:bg-purple-900 dark:ring-purple-400 dark:border-purple-400'
-              : 'hover:ring-1 hover:ring-gray-300 dark:hover:ring-gray-600 dark:bg-gray-800'
+              ? 'bg-primary/5 border-primary text-primary ring-1 ring-primary'
+              : 'hover:bg-accent/50 hover:border-border/80 text-muted-foreground'
           ]" @click="exportAsJSON">
-            <FileDown class="w-8 h-8 text-purple-600 dark:text-purple-300" />
+            <FileDown class="w-6 h-6 mb-1 transition-transform" :class="exportFormat === 'json' ? 'scale-110' : ''" />
             <div class="text-center">
-              <div class="font-medium dark:text-gray-100">JSON</div>
-              <div class="text-xs text-muted-foreground">.json file</div>
+              <div class="font-medium text-sm text-foreground">JSON</div>
+              <div class="text-[10px] uppercase tracking-wider opacity-70">.json</div>
             </div>
           </Button>
         </div>
 
         <!-- Status Message -->
         <div v-if="statusMessage"
-          class="p-3 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded text-sm text-blue-600 dark:text-blue-200">
+          class="p-3 bg-primary/10 border border-primary/20 rounded-md text-sm text-primary text-center animate-in fade-in zoom-in-95 duration-200">
           {{ statusMessage }}
         </div>
       </div>
 
       <DialogFooter>
-        <div class="flex w-full gap-3">
-          <Button variant="outline" @click="close" class="flex-1">
+        <div class="flex w-full gap-2 pt-2 border-t border-border">
+          <Button class="flex-1" variant="outline" @click="close">
             Cancel
           </Button>
           <Button @click="performExport" :disabled="!exportFormat"
-            class="flex-1 bg-green-600 hover:bg-green-700 text-white hover:text-white border-none dark:bg-green-500 dark:hover:bg-green-600">
+            class="flex-1 bg-primary hover:bg-primary/90 text-white hover:text-white border-none dark:bg-primary dark:hover:bg-primary">
             <Download class="w-4 h-4 mr-2 text-white" />
             Export
           </Button>

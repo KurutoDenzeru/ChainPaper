@@ -3,7 +3,7 @@
     <DialogContent class="sm:max-w-2xl sm:max-w-full">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <Smile class="h-5 w-5 text-green-600" /> Insert Emoji
+          <Smile class="h-5 w-5 text-primary" /> Insert Emoji
         </DialogTitle>
         <DialogDescription>Choose an emoji to insert into your document</DialogDescription>
       </DialogHeader>
@@ -13,7 +13,7 @@
           <Search
             class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-gray-400" />
           <Input v-model="searchQuery" placeholder="Search emojis..."
-            class="pl-10 bg-card dark:bg-card text-foreground-100 border border-border/60 dark:border-border/60 rounded focus:outline-none focus:ring-2 focus:ring-green-600 dark:focus:ring-green-500 text-base sm:text-base" />
+            class="pl-10 bg-card dark:bg-card text-foreground-100 border border-border/60 dark:border-border/60 rounded focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primary text-base sm:text-base" />
         </div>
 
         <TooltipProvider>
@@ -25,7 +25,7 @@
                   <button :class="[
                     'p-2 rounded text-2xl transition-colors cursor-pointer',
                     selectedEmoji && selectedEmoji.char === e.char
-                      ? 'ring-2 ring-green-500 bg-green-50 dark:bg-green-900'
+                      ? 'ring-2 ring-primary bg-primary/10 dark:bg-primary/20'
                       : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                   ]" :title="e.name" @click="selectEmoji(e)" :aria-label="e.name">
                     <span>{{ e.char }}</span>
@@ -46,7 +46,7 @@
                 <Tooltip>
                   <TooltipTrigger as-child>
                     <TabsTrigger value="recent"
-                      class="text-lg px-2 py-1 rounded hover:bg-green-50 dark:hover:bg-gray-700 data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:ring-2 data-[state=active]:ring-green-600 data-[state=active]:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] dark:data-[state=active]:bg-green-500 dark:data-[state=active]:ring-green-500">
+                      class="text-lg px-2 py-1 rounded hover:bg-primary/10 dark:hover:bg-gray-700 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] dark:data-[state=active]:bg-primary dark:data-[state=active]:ring-primary">
                       🕒</TabsTrigger>
                   </TooltipTrigger>
                   <TooltipContent>Recent</TooltipContent>
@@ -55,7 +55,7 @@
                 <Tooltip v-for="cat in categoriesOrdered" :key="cat">
                   <TooltipTrigger as-child>
                     <TabsTrigger :value="cat"
-                      class="text-lg px-2 py-1 rounded hover:bg-green-50 dark:hover:bg-gray-700 data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:ring-2 data-[state=active]:ring-green-600 data-[state=active]:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] dark:data-[state=active]:bg-green-500 dark:data-[state=active]:ring-green-500">
+                      class="text-lg px-2 py-1 rounded hover:bg-primary/10 dark:hover:bg-gray-700 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:ring-2 data-[state=active]:ring-primary data-[state=active]:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] dark:data-[state=active]:bg-primary dark:data-[state=active]:ring-primary">
                       {{ categoryIcon(cat) }}</TabsTrigger>
                   </TooltipTrigger>
                   <TooltipContent>{{ categoryLabel(cat) }}</TooltipContent>
@@ -70,7 +70,7 @@
                       <button :class="[
                         'p-2 rounded text-2xl transition-colors cursor-pointer',
                         selectedEmoji && selectedEmoji.char === e.char
-                          ? 'ring-2 ring-green-500 bg-green-50 dark:bg-green-900'
+                          ? 'ring-2 ring-primary bg-primary/10 dark:bg-primary/20'
                           : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                       ]" :title="e.name" @click="selectEmoji(e)" :aria-label="e.name">
                         <span>{{ e.char }}</span>
@@ -92,7 +92,7 @@
                       <button :class="[
                         'p-2 rounded text-2xl transition-colors cursor-pointer',
                         selectedEmoji && selectedEmoji.char === e.char
-                          ? 'ring-2 ring-green-500 bg-green-50 dark:bg-green-900'
+                          ? 'ring-2 ring-primary bg-primary/10 dark:bg-primary/20'
                           : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                       ]" :title="e.name" @click="selectEmoji(e)" :aria-label="e.name">
                         <span>{{ e.char }}</span>
@@ -110,16 +110,10 @@
         </TooltipProvider>
       </div>
 
-      <DialogFooter class=" flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-2">
-        <div class="flex-1 text-sm text-gray-700 dark:text-gray-300 mb-2 sm:mb-0">
-          <span v-if="selectedEmoji">Selected: <span class="ml-2 text-2xl">{{ selectedEmoji.char }}</span> <span
-              class="ml-2 font-medium">{{ selectedEmoji.name }}</span></span>
-        </div>
-        <div class="flex gap-2 w-full sm:w-1/3">
-          <Button variant="outline" class="flex-1" @click="$emit('update:open', false)">Cancel</Button>
-          <Button
-            class="flex-1 bg-green-600 hover:bg-green-700 text-white border-none dark:bg-green-500 dark:hover:bg-green-600"
-            :disabled="!selectedEmoji" @click="confirmInsert">
+      <DialogFooter>
+        <div class="flex w-full gap-2 pt-2 border-t border-border">
+          <Button class="flex-1" variant="outline" @click="$emit('update:open', false)">Cancel</Button>
+          <Button class="flex-1 bg-primary hover:bg-primary/90 text-white" :disabled="!selectedEmoji" @click="confirmInsert">
             <Plus class="h-5 w-5 text-white" />
             <span class="ml-2">Insert</span>
           </Button>
@@ -260,7 +254,7 @@
 
 <style scoped>
 
-  /* green scrollbar for emoji grids */
+  /* primary scrollbar for emoji grids */
   .emoji-scroll::-webkit-scrollbar {
     width: 10px;
     height: 10px

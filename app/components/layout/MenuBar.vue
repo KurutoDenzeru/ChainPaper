@@ -56,25 +56,29 @@
                       <!-- Special case: Text Color submenu -> render color grid + custom inputs (copied from EditorToolbar PopoverContent) -->
                       <template v-if="item.label === 'Text Color'">
                         <div class="px-3 py-2 w-[260px]">
-                          <div class="flex items-center gap-2 mb-2">
-                            <Type class="w-4 h-4 text-foreground" />
-                            <span class="text-sm font-semibold text-foreground uppercase tracking-wide">Text
-                              Color</span>
+                          <div class="flex items-center gap-2 mb-3">
+                            <Type class="w-4 h-4 text-muted-foreground" />
+                            <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Theme Colors</span>
                           </div>
-                          <div class="grid grid-cols-8 gap-2">
+                          <div class="grid grid-cols-4 gap-2">
                             <button v-for="c in textColors" :key="c" :title="c"
-                              class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform cursor-pointer shadow-[0_4px_12px_rgb(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgb(0,0,0,0.2)] flex items-center justify-center"
-                              :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentTextColor }"
-                              :style="{ backgroundColor: c }" @click="emitTextColor(c)">
+                              class="relative w-full aspect-square rounded-lg border border-border/40 hover:scale-105 transition-all flex items-center justify-center cursor-pointer group"
+                              :class="{ 'ring-2 ring-primary ring-offset-1 ring-offset-background': c === currentTextColor }" :style="{ backgroundColor: c }"
+                              @click="emitTextColor(c)">
+                              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-lg"></div>
+                              <Check v-if="c === currentTextColor"
+                                :class="isLightColor(c) ? 'w-4 h-4 text-black' : 'w-4 h-4 text-white'" />
                             </button>
                           </div>
-                          <div class="flex items-center gap-2 mt-4 pt-3 border-t border-border">
-                            <Input type="color"
-                              class="w-10 h-8 p-0 border border-border rounded cursor-pointer bg-background"
-                              @input="onMenuCustomTextColor" />
+                          <div class="flex items-center gap-2 mt-4 pt-3 border-t border-border/40">
+                            <div class="relative w-8 h-8 rounded-lg overflow-hidden border border-border/40 shrink-0">
+                              <Input type="color"
+                                class="absolute -top-2 -left-2 w-12 h-12 cursor-pointer"
+                                @input="onMenuCustomTextColor" :value="currentTextColor" />
+                            </div>
                             <Input type="text"
-                              class="flex-1 text-xs h-8 px-2 border border-border rounded bg-background text-foreground"
-                              placeholder="#rrggbb" @change="onMenuCustomTextColorText" />
+                              class="flex-1 text-xs h-8 px-2 border rounded-lg bg-background border-border/40 text-foreground font-mono uppercase focus:ring-1 focus:ring-primary focus:outline-none"
+                              placeholder="#RRGG" :value="currentTextColor" @change="onMenuCustomTextColorText" />
                           </div>
                         </div>
                       </template>
@@ -82,24 +86,33 @@
                       <!-- Special case: Highlight submenu -> render color grid + custom inputs -->
                       <template v-else-if="item.label === 'Highlight'">
                         <div class="px-3 py-2 w-[260px]">
-                          <div class="flex items-center gap-2 mb-2">
-                            <Highlighter class="w-4 h-4 text-foreground" />
-                            <span class="text-sm font-semibold text-foreground uppercase tracking-wide">Highlight</span>
+                          <div class="flex items-center gap-2 mb-3">
+                            <Highlighter class="w-4 h-4 text-muted-foreground" />
+                            <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Highlights</span>
                           </div>
-                          <div class="grid grid-cols-8 gap-2">
+                          <div class="grid grid-cols-4 gap-2">
                             <button v-for="c in highlightColors" :key="c" :title="c"
-                              class="w-6 h-6 rounded border border-border hover:scale-110 transition-transform cursor-pointer shadow-[0_4px_12px_rgb(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgb(0,0,0,0.2)] flex items-center justify-center"
-                              :class="{ 'ring-2 ring-offset-1 ring-primary': c === currentHighlight }"
-                              :style="{ backgroundColor: c }" @click="emitHighlight(c)">
+                              class="relative w-full aspect-square rounded-lg border border-border/40 hover:scale-105 transition-all flex items-center justify-center cursor-pointer group"
+                              :class="{ 
+                                'ring-2 ring-primary ring-offset-1 ring-offset-background': c === currentHighlight,
+                                'bg-[url(\'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PGxpbmUgeDE9IjAiIHkxPSIxMCIgeDI9IjEwIiB5Mj0iMCIgc3Ryb2tlPSIjZmYwMDAwIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=\')] bg-center bg-no-repeat bg-white dark:bg-black': c === 'transparent'
+                              }" 
+                              :style="{ backgroundColor: c !== 'transparent' ? c : undefined }"
+                              @click="emitHighlight(c)">
+                              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-lg"></div>
+                              <Check v-if="c === currentHighlight"
+                                :class="(c === 'transparent' || isLightColor(c)) ? 'w-4 h-4 text-black drop-shadow-md' : 'w-4 h-4 text-white drop-shadow-md'" />
                             </button>
                           </div>
-                          <div class="flex items-center gap-2 mt-4 pt-3 border-t border-border">
-                            <Input type="color"
-                              class="w-10 h-8 p-0 border border-border rounded cursor-pointer bg-background"
-                              @input="onMenuCustomHighlight" />
+                          <div class="flex items-center gap-2 mt-4 pt-3 border-t border-border/40">
+                            <div class="relative w-8 h-8 rounded-lg overflow-hidden border border-border/40 shrink-0">
+                              <Input type="color"
+                                class="absolute -top-2 -left-2 w-12 h-12 cursor-pointer"
+                                @input="onMenuCustomHighlight" :value="currentHighlight !== 'transparent' ? currentHighlight : '#ffffff'" />
+                            </div>
                             <Input type="text"
-                              class="flex-1 text-xs h-8 px-2 border border-border rounded bg-background text-foreground"
-                              placeholder="#rrggbb" @change="onMenuCustomHighlightText" />
+                              class="flex-1 text-xs h-8 px-2 border rounded-lg bg-background border-border/40 text-foreground font-mono uppercase focus:ring-1 focus:ring-primary focus:outline-none"
+                              placeholder="#RRGG" :value="currentHighlight" @change="onMenuCustomHighlightText" />
                           </div>
                         </div>
                       </template>
@@ -115,10 +128,9 @@
                               <span>{{ sub.label }}</span>
                             </div>
                             <MenubarShortcut v-if="getShortcut(sub)">
-                              <!-- reuse shortcut rendering if present -->
-                              <span
-                                class="inline-flex items-center justify-center aspect-square w-6 rounded bg-muted dark:bg-muted text-xs font-medium mr-1">{{
-                                  getShortcut(sub)?.pc || getShortcut(sub)?.key || '' }}</span>
+                              <KbdGroup>
+                                <Kbd v-for="key in getShortcutKeys(sub)" :key="key">{{ key }}</Kbd>
+                              </KbdGroup>
                             </MenubarShortcut>
                           </MenubarItem>
                         </template>
@@ -132,6 +144,9 @@
                       <span>{{ item.label }}</span>
                     </div>
                     <MenubarShortcut v-if="getShortcut(item)">
+                      <KbdGroup>
+                        <Kbd v-for="key in getShortcutKeys(item)" :key="key">{{ key }}</Kbd>
+                      </KbdGroup>
                     </MenubarShortcut>
                   </MenubarItem>
                 </template>
@@ -222,11 +237,12 @@
     Type, Highlighter,
     List, ListOrdered, Quote, Link, Image, Table, AlignLeft, AlignCenter, AlignRight, AlignJustify,
     Code2, Wrench, BarChart3, ZoomIn, Hash, Shield, BookOpen, Info, Indent, Outdent,
-    Superscript, Subscript, Sigma, SquareSigma, Minus, Smile
+    Superscript, Subscript, Sigma, SquareSigma, Minus, Smile, Check
   } from 'lucide-vue-next'
   // Theme icons
   import { Sun, Moon, Monitor } from 'lucide-vue-next'
   import { Input } from '@/components/ui/input'
+  import { Kbd, KbdGroup } from '@/components/ui/kbd'
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
   const store = useMarkdownDocStore()
@@ -643,6 +659,38 @@
 
   function getShortcut(item: any) {
     return (item as any).shortcut
+  }
+
+  function getShortcutKeys(item: any): string[] {
+    const shortcut = getShortcut(item)
+    if (!shortcut) return []
+    
+    const keys: string[] = []
+    if (isMac.value) {
+      if (shortcut.mac) {
+        shortcut.mac.forEach((mod: string) => {
+          if (mod === 'Command') keys.push('⌘')
+          else if (mod === 'Shift') keys.push('⇧')
+          else if (mod === 'Option') keys.push('⌥')
+          else if (mod === 'Control') keys.push('⌃')
+          else keys.push(mod)
+        })
+      }
+      if (shortcut.key) {
+        keys.push(shortcut.key)
+      }
+    } else {
+      if (shortcut.pc) {
+        keys.push(shortcut.pc)
+      }
+      if (shortcut.mac && shortcut.mac.includes('Shift')) {
+        keys.push('Shift')
+      }
+      if (shortcut.key) {
+        keys.push(shortcut.key)
+      }
+    }
+    return keys
   }
 
   function getIcon(item: any) {

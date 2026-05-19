@@ -3,7 +3,7 @@
     <DialogContent class="sm:max-w-2xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <Save class="w-5 h-5 text-green-600" />
+          <Save class="w-5 h-5 text-primary" />
           Save Markdown Document
         </DialogTitle>
         <DialogDescription>
@@ -67,12 +67,11 @@
       </div>
 
       <DialogFooter>
-        <div class="flex w-full gap-3">
-          <Button variant="outline" @click="$emit('update:open', false)" class="flex-1">
+        <div class="flex w-full gap-2 pt-2 border-t border-border">
+          <Button class="flex-1" variant="outline" @click="$emit('update:open', false)">
             Cancel
           </Button>
-          <Button @click="handleSave"
-            class="flex-1 bg-green-600 hover:bg-green-700 text-white hover:text-white border-none dark:bg-green-500 dark:hover:bg-green-600">
+          <Button class="flex-1 bg-primary hover:bg-primary/90 text-white" @click="handleSave">
             <Save class="w-4 h-4 mr-2 text-white" />
             Save Document
           </Button>
