@@ -76,8 +76,8 @@
       </ScrollArea>
 
       <DialogFooter>
-        <div class="w-full">
-          <Button variant="outline" class="w-full" @click="$emit('update:open', false)">
+        <div class="flex w-full gap-2 pt-2 border-t border-border">
+          <Button class="flex-1" variant="outline" @click="$emit('update:open', false)">
             Close
           </Button>
         </div>

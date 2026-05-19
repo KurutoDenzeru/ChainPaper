@@ -129,7 +129,7 @@
       </div>
 
       <DialogFooter>
-        <Button variant="outline" @click="$emit('update:open', false)">
+        <Button class="flex-1" variant="outline" @click="$emit('update:open', false)">
           Close
         </Button>
       </DialogFooter>

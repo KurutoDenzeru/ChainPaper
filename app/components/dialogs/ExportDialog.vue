@@ -63,8 +63,8 @@
       </div>
 
       <DialogFooter>
-        <div class="flex w-full items-center justify-end gap-2 pt-2 border-t border-border">
-          <Button variant="outline" @click="close" class="flex-1">
+        <div class="flex w-full gap-2 pt-2 border-t border-border">
+          <Button class="flex-1" variant="outline" @click="close">
             Cancel
           </Button>
           <Button @click="performExport" :disabled="!exportFormat"

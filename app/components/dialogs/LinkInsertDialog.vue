@@ -49,9 +49,9 @@
       </div>
 
       <DialogFooter>
-        <div class="flex w-full items-center justify-end gap-2 pt-2 border-t border-border">
-          <Button variant="ghost" @click="handleCancel">Cancel</Button>
-          <Button class="bg-primary hover:bg-primary/90 text-white" @click="handleInsert" :disabled="!url.trim()">
+        <div class="flex w-full gap-2 pt-2 border-t border-border">
+          <Button class="flex-1" variant="outline" @click="handleCancel">Cancel</Button>
+          <Button class="flex-1 bg-primary hover:bg-primary/90 text-white" @click="handleInsert" :disabled="!url.trim()">
             <Link2 class="w-4 h-4" />
             <span>Insert Link</span>
           </Button>
