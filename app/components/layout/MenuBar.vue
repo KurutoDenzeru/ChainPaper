@@ -128,10 +128,9 @@
                               <span>{{ sub.label }}</span>
                             </div>
                             <MenubarShortcut v-if="getShortcut(sub)">
-                              <!-- reuse shortcut rendering if present -->
-                              <span
-                                class="inline-flex items-center justify-center aspect-square w-6 rounded bg-muted dark:bg-muted text-xs font-medium mr-1">{{
-                                  getShortcut(sub)?.pc || getShortcut(sub)?.key || '' }}</span>
+                              <KbdGroup>
+                                <Kbd v-for="key in getShortcutKeys(sub)" :key="key">{{ key }}</Kbd>
+                              </KbdGroup>
                             </MenubarShortcut>
                           </MenubarItem>
                         </template>
@@ -145,6 +144,9 @@
                       <span>{{ item.label }}</span>
                     </div>
                     <MenubarShortcut v-if="getShortcut(item)">
+                      <KbdGroup>
+                        <Kbd v-for="key in getShortcutKeys(item)" :key="key">{{ key }}</Kbd>
+                      </KbdGroup>
                     </MenubarShortcut>
                   </MenubarItem>
                 </template>
@@ -240,6 +242,7 @@
   // Theme icons
   import { Sun, Moon, Monitor } from 'lucide-vue-next'
   import { Input } from '@/components/ui/input'
+  import { Kbd, KbdGroup } from '@/components/ui/kbd'
   import { useMarkdownDocStore } from '@/stores/markdownDoc'
 
   const store = useMarkdownDocStore()
@@ -656,6 +659,38 @@
 
   function getShortcut(item: any) {
     return (item as any).shortcut
+  }
+
+  function getShortcutKeys(item: any): string[] {
+    const shortcut = getShortcut(item)
+    if (!shortcut) return []
+    
+    const keys: string[] = []
+    if (isMac.value) {
+      if (shortcut.mac) {
+        shortcut.mac.forEach((mod: string) => {
+          if (mod === 'Command') keys.push('⌘')
+          else if (mod === 'Shift') keys.push('⇧')
+          else if (mod === 'Option') keys.push('⌥')
+          else if (mod === 'Control') keys.push('⌃')
+          else keys.push(mod)
+        })
+      }
+      if (shortcut.key) {
+        keys.push(shortcut.key)
+      }
+    } else {
+      if (shortcut.pc) {
+        keys.push(shortcut.pc)
+      }
+      if (shortcut.mac && shortcut.mac.includes('Shift')) {
+        keys.push('Shift')
+      }
+      if (shortcut.key) {
+        keys.push(shortcut.key)
+      }
+    }
+    return keys
   }
 
   function getIcon(item: any) {
