@@ -110,16 +110,10 @@
         </TooltipProvider>
       </div>
 
-      <DialogFooter class=" flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 mt-2">
-        <div class="flex-1 text-sm text-gray-700 dark:text-gray-300 mb-2 sm:mb-0">
-          <span v-if="selectedEmoji">Selected: <span class="ml-2 text-2xl">{{ selectedEmoji.char }}</span> <span
-              class="ml-2 font-medium">{{ selectedEmoji.name }}</span></span>
-        </div>
-        <div class="flex gap-2 w-full sm:w-1/3">
-          <Button variant="outline" class="flex-1" @click="$emit('update:open', false)">Cancel</Button>
-          <Button
-            class="flex-1 bg-primary hover:bg-primary/90 text-white border-none dark:bg-primary dark:hover:bg-primary"
-            :disabled="!selectedEmoji" @click="confirmInsert">
+      <DialogFooter>
+        <div class="flex w-full gap-2 pt-2 border-t border-border">
+          <Button class="flex-1" variant="outline" @click="$emit('update:open', false)">Cancel</Button>
+          <Button class="flex-1 bg-primary hover:bg-primary/90 text-white" :disabled="!selectedEmoji" @click="confirmInsert">
             <Plus class="h-5 w-5 text-white" />
             <span class="ml-2">Insert</span>
           </Button>
