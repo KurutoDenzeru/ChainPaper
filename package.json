@@ -37,6 +37,12 @@
     "vue-router": "^5.0.7",
     "vue-sonner": "^2.0.9"
   },
+  "overrides": {
+    "entities": "4.5.0"
+  },
+  "resolutions": {
+    "entities": "4.5.0"
+  },
   "devDependencies": {
     "@types/markdown-it": "^14.1.2"
   }
