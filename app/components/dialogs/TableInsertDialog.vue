@@ -3,7 +3,7 @@
     <DialogContent class="sm:max-w-3xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <Table class="w-5 h-5 text-green-600 dark:text-green-300" />
+          <Table class="w-5 h-5 text-primary dark:text-primary" />
           Insert Table
         </DialogTitle>
         <DialogDescription>
@@ -28,8 +28,8 @@
                   <div v-for="(cell, index) in gridCells" :key="index" :class="[
                     'w-5 h-5 border border-border/60 dark:border-border/60 cursor-pointer transition-all duration-150 rounded-sm',
                     cell.row <= selectedRows && cell.col <= selectedCols
-                      ? 'bg-green-500 border-green-600 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] dark:bg-green-600 dark:border-green-400'
-                      : 'bg-white hover:bg-green-100 hover:border-green-300 dark:bg-gray-900 dark:hover:bg-green-900 dark:hover:border-green-400'
+                      ? 'bg-primary border-primary/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] dark:bg-primary dark:border-primary/30'
+                      : 'bg-white hover:bg-primary/10 hover:border-primary/30 dark:bg-gray-900 dark:hover:bg-primary/20 dark:hover:border-primary/30'
                   ]" @mouseenter="updateSelection(cell.row, cell.col)" @click="insertTable(selectedRows, selectedCols)" />
                 </div>
 
@@ -88,7 +88,7 @@
             Cancel
           </Button>
           <Button @click="insertCustomTable"
-            class="w-1/2 bg-green-600 hover:bg-green-700 text-white border-none dark:bg-green-500 dark:hover:bg-green-600 dark:text-white">
+            class="w-1/2 bg-primary hover:bg-primary/90 text-white border-none dark:bg-primary dark:hover:bg-primary dark:text-white">
             <Plus class="w-4 h-4 mr-2 text-white" />
             Insert Table
           </Button>

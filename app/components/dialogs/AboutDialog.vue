@@ -6,7 +6,7 @@
           <NuxtImg src="/markdown.webp" alt="ChainPaper Welcome" class="w-20 h-20 object-contain mx-auto" />
         </div>
         <DialogTitle class="flex items-center gap-2 justify-center">
-          <Info class="w-5 h-5 text-green-600 dark:text-green-500" />
+          <Info class="w-5 h-5 text-primary dark:text-primary" />
           About ChainPaper
         </DialogTitle>
         <DialogDescription class="text-center">

@@ -20,7 +20,7 @@
                 :variant="verified === true ? 'outline' : verified === false ? 'destructive' : 'outline'">
                 <span class="inline-flex items-center gap-1">
                   <template v-if="verified === true">
-                    <CheckCircle class="w-4 h-4 text-green-600" />
+                    <CheckCircle class="w-4 h-4 text-primary" />
                   </template>
                   <template v-else-if="verified === false">
                     <X class="w-4 h-4 text-red-600" />
@@ -196,7 +196,7 @@
   })
 
   const badgeClass = computed(() => {
-    if (verified.value === true) return 'text-green-700 border-green-300 bg-green-50'
+    if (verified.value === true) return 'text-primary border-primary/30 bg-primary/10'
     if (verified.value === false) return 'text-gray-600 border-red-600 bg-red-50'
     return 'text-gray-600'
   })

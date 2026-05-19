@@ -3,7 +3,7 @@
     <DialogContent class="sm:max-w-3xl w-full">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <BookOpen class="w-5 h-5 text-green-600 dark:text-green-500" />
+          <BookOpen class="w-5 h-5 text-primary dark:text-primary" />
           Markdown Guide
         </DialogTitle>
         <DialogDescription class="text-gray-700 text-sm sm:text-base">
@@ -121,7 +121,7 @@
             Close
           </Button>
           <Button
-            class="w-1/2 bg-green-600 hover:bg-green-700 text-white border-none dark:bg-green-500 dark:hover:bg-green-600"
+            class="w-1/2 bg-primary hover:bg-primary/90 text-white border-none dark:bg-primary dark:hover:bg-primary"
             @click="openExternalGuide">
             <ExternalLink class="w-4 h-4 mr-2" />
             Full Guide

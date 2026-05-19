@@ -3,7 +3,7 @@
     <DialogContent class="sm:max-w-2xl">
       <DialogHeader>
         <DialogTitle class="flex items-center gap-2">
-          <Download class="w-5 h-5 text-green-600" />
+          <Download class="w-5 h-5 text-primary" />
           Export Markdown Document
         </DialogTitle>
         <DialogDescription>
@@ -68,7 +68,7 @@
             Cancel
           </Button>
           <Button @click="performExport" :disabled="!exportFormat"
-            class="flex-1 bg-green-600 hover:bg-green-700 text-white hover:text-white border-none dark:bg-green-500 dark:hover:bg-green-600">
+            class="flex-1 bg-primary hover:bg-primary/90 text-white hover:text-white border-none dark:bg-primary dark:hover:bg-primary">
             <Download class="w-4 h-4 mr-2 text-white" />
             Export
           </Button>
